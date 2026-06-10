@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Pedidos — Admin | Lord's Burger House</title>
+  <link rel="icon" href="../../assets/images/logos/icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../../assets/css/panel.css"/>
+  <style>
+    .order-detail{padding:16px;background:var(--bg-900);border-radius:var(--r);margin-top:2px}
+    .order-items-list{list-style:none;padding:0;margin:0 0 12px}
+    .order-items-list li{
+      display:flex;justify-content:space-between;
+      padding:7px 0;border-bottom:1px solid var(--cream-faint);
+      font-size:.84rem;color:var(--cream-2);
+    }
+    .order-items-list li:last-child{border:none}
+    .order-items-list .item-qty{
+      font-family:var(--font-display);font-size:.7rem;letter-spacing:.06em;
+      color:var(--gold-light);margin-right:8px;
+    }
+    .order-total-row{
+      display:flex;justify-content:space-between;align-items:center;
+      padding-top:10px;border-top:1px solid var(--gold-border);
+    }
+    .order-total-label{font-size:.8rem;color:var(--cream-muted);font-family:var(--font-display);letter-spacing:.08em;text-transform:uppercase}
+    .order-total-val{font-family:var(--font-serif);font-size:1.15rem;font-weight:700;color:var(--gold-light)}
+
+    tr.expanded td{background:rgba(201,162,39,.03)}
+    .expand-btn{
+      background:none;border:none;cursor:pointer;color:var(--cream-muted);
+      transition:transform .2s;padding:4px;
+    }
+    .expand-btn.open{transform:rotate(90deg);color:var(--gold)}
+
+    .filter-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:20px}
+    .date-filter{display:flex;gap:8px;align-items:center}
+    .date-filter input{
+      background:var(--bg-700);border:1px solid var(--gold-border);
+      color:var(--cream);font-size:.82rem;padding:8px 12px;border-radius:var(--r);
+      font-family:var(--font-sans);cursor:pointer;
+    }
+    .date-filter input:focus{outline:none;border-color:var(--gold)}
+
+    .revenue-strip{
+      display:flex;gap:16px;flex-wrap:wrap;
+      background:rgba(201,162,39,.06);border:1px solid var(--gold-border);
+      border-radius:var(--r-lg);padding:14px 20px;margin-bottom:20px;
+    }
+    .revenue-item{display:flex;flex-direction:column;gap:2px}
+    .revenue-item__label{font-family:var(--font-display);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--cream-muted)}
+    .revenue-item__val{font-family:var(--font-serif);font-size:1.3rem;font-weight:700;color:var(--gold-light)}
+    .revenue-item__val.green{color:#2ecc71}
+    .revenue-divider{width:1px;background:var(--gold-border);margin:0 4px}
+  </style>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="panel-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__logo">
+      <img src="../../assets/images/logos/logo.png" alt=""/>
+      <div class="sidebar__logo-text">
+        <span class="sidebar__logo-name">Lord's Burger</span>
+        <span class="sidebar__logo-role">Administrador</span>
+      </div>
+    </div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Painel</div>
+      <a href="dashboard.html" class="sidebar__link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <div class="sidebar__section">Gestão</div>
+      <a href="products.html" class="sidebar__link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        Cardápio
+      </a>
+      <a href="orders.html" class="sidebar__link active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        Pedidos
+        <span class="sidebar__badge" id="pendingBadge">0</span>
+      </a>
+      <a href="users.html" class="sidebar__link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Usuários
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__avatar" id="avatarInitial">A</div>
+        <div class="sidebar__user-info">
+          <div class="sidebar__user-name" id="userName">Admin</div>
+          <div class="sidebar__user-email" id="userEmail"></div>
+        </div>
+      </div>
+      <button class="btn-logout" id="logoutBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="topbar__title">Pedidos</span>
+    </div>
+    <div class="topbar__actions">
+      <div class="search-bar" style="width:220px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Buscar por nome ou #pedido…"/>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-header">
+      <h1>Todos os Pedidos</h1>
+    </div>
+
+    <!-- Revenue strip -->
+    <div class="revenue-strip" id="revenueStrip">
+      <div class="revenue-item">
+        <span class="revenue-item__label">Pedidos hoje</span>
+        <span class="revenue-item__val" id="revToday">—</span>
+      </div>
+      <div class="revenue-divider"></div>
+      <div class="revenue-item">
+        <span class="revenue-item__label">Receita hoje</span>
+        <span class="revenue-item__val green" id="revAmount">—</span>
+      </div>
+      <div class="revenue-divider"></div>
+      <div class="revenue-item">
+        <span class="revenue-item__label">Ticket médio</span>
+        <span class="revenue-item__val" id="revAvg">—</span>
+      </div>
+      <div class="revenue-divider"></div>
+      <div class="revenue-item">
+        <span class="revenue-item__label">Em andamento</span>
+        <span class="revenue-item__val" id="revActive">—</span>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-row">
+      <div class="filter-bar" id="filterBar">
+        <button class="filter-tab active" data-filter="all">Todos</button>
+        <button class="filter-tab" data-filter="today">Hoje</button>
+        <button class="filter-tab" data-filter="pending">Aguardando</button>
+        <button class="filter-tab" data-filter="confirmed">Confirmados</button>
+        <button class="filter-tab" data-filter="preparing">Em preparo</button>
+        <button class="filter-tab" data-filter="ready">Prontos</button>
+        <button class="filter-tab" data-filter="delivering">A caminho</button>
+        <button class="filter-tab" data-filter="delivered">Entregues</button>
+        <button class="filter-tab" data-filter="cancelled">Cancelados</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="card__body" style="padding:0">
+        <div id="ordersTable">
+          <div class="state-loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module">
+  import { auth, db, ORDER_STATUS } from '../../assets/js/firebase-config.js';
+  import { onAuthStateChanged, signOut }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import {
+    collection, query, orderBy, onSnapshot, doc, getDoc, updateDoc, deleteDoc, serverTimestamp
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+  function fmt(n){ return Number(n||0).toFixed(2).replace('.',',') }
+  function fmtDatetime(ts){
+    if(!ts) return '—';
+    const d=ts.toDate?ts.toDate():new Date(ts);
+    return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})
+      +' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  }
+  function isToday(ts){
+    if(!ts) return false;
+    const d=ts.toDate?ts.toDate():new Date(ts);
+    const t=new Date();t.setHours(0,0,0,0);
+    return d>=t;
+  }
+  function toast(msg,type='info'){
+    const el=document.createElement('div');
+    el.className=`toast toast--${type}`;
+    el.innerHTML=`<span class="toast__icon">${{success:'✅',error:'❌',info:'ℹ️'}[type]||'ℹ️'}</span> ${msg}`;
+    document.getElementById('toastContainer').appendChild(el);
+    setTimeout(()=>{el.classList.add('removing');setTimeout(()=>el.remove(),300)},3500);
+  }
+
+  /* sidebar */
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('sidebarOverlay');
+  document.getElementById('sidebarToggle').addEventListener('click',()=>{sb.classList.toggle('open');ov.classList.toggle('show')});
+  ov.addEventListener('click',()=>{sb.classList.remove('open');ov.classList.remove('show')});
+
+  /* filter */
+  let activeFilter='all';
+  let searchQ='';
+  document.getElementById('filterBar').querySelectorAll('.filter-tab').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');activeFilter=btn.dataset.filter;
+      renderTable(allOrders);
+    });
+  });
+  document.getElementById('searchInput').addEventListener('input',e=>{
+    searchQ=e.target.value.toLowerCase();renderTable(allOrders);
+  });
+
+  /* revenue stats */
+  function updateRevenue(orders){
+    const todayOrders=orders.filter(o=>isToday(o.createdAt)&&o.status!=='cancelled');
+    const active=orders.filter(o=>['pending','confirmed','preparing','delivering','ready'].includes(o.status));
+    const rev=todayOrders.reduce((s,o)=>s+Number(o.total||0),0);
+    document.getElementById('revToday').textContent=todayOrders.length;
+    document.getElementById('revAmount').textContent=`R$ ${fmt(rev)}`;
+    document.getElementById('revAvg').textContent=todayOrders.length?`R$ ${fmt(rev/todayOrders.length)}`:'—';
+    document.getElementById('revActive').textContent=active.length;
+    document.getElementById('pendingBadge').textContent=active.length;
+  }
+
+  /* expanded rows */
+  const expanded=new Set();
+  function toggleRow(id){
+    if(expanded.has(id)) expanded.delete(id); else expanded.add(id);
+    renderTable(allOrders);
+  }
+
+  /* status update */
+  async function updateStatus(orderId, status){
+    try{
+      await updateDoc(doc(db,'orders',orderId),{status,updatedAt:serverTimestamp()});
+      toast(`Status atualizado: ${ORDER_STATUS[status]?.label}`,'success');
+    }catch(e){toast('Erro: '+e.message,'error')}
+  }
+
+  /* render */
+  let allOrders=[];
+  function renderTable(orders){
+    allOrders=orders;
+    updateRevenue(orders);
+    let filtered=orders.filter(o=>{
+      if(activeFilter==='all') return true;
+      if(activeFilter==='today') return isToday(o.createdAt);
+      return o.status===activeFilter;
+    });
+    if(searchQ) filtered=filtered.filter(o=>{
+      const num=(o.orderNumber||o.id||'').toLowerCase();
+      const name=(o.customerName||'').toLowerCase();
+      return num.includes(searchQ)||name.includes(searchQ);
+    });
+
+    const el=document.getElementById('ordersTable');
+    if(!filtered.length){
+      el.innerHTML='<div class="state-empty" style="padding:60px"><p>Nenhum pedido encontrado</p></div>';
+      return;
+    }
+
+    el.innerHTML=`<div class="table-wrap"><table>
+      <thead><tr>
+        <th></th>
+        <th>#</th>
+        <th>Cliente</th>
+        <th>Modo</th>
+        <th>Total</th>
+        <th>Pagamento</th>
+        <th>Status</th>
+        <th>Data/Hora</th>
+        <th>Alterar status</th>
+        <th style="width:44px"></th>
+      </tr></thead>
+      <tbody id="tbodyOrders">${filtered.map(o=>`
+        <tr class="${expanded.has(o.id)?'expanded':''}">
+          <td style="width:32px;padding:8px 4px 8px 14px">
+            <button class="expand-btn ${expanded.has(o.id)?'open':''}" onclick="toggleRow('${o.id}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </td>
+          <td class="td-mono">${o.orderNumber||o.id.slice(0,8).toUpperCase()}</td>
+          <td>
+            <div style="font-size:.85rem;color:var(--cream)">${o.customerName||'—'}</div>
+            <div style="font-size:.73rem;color:var(--cream-muted)">${o.customerPhone||''}</div>
+          </td>
+          <td style="font-size:.82rem;color:var(--cream-2)">${o.deliveryMode==='delivery'?'🛵 Delivery':'🏠 Retirada'}</td>
+          <td style="color:var(--gold-light);font-weight:700;font-family:var(--font-serif)">R$ ${fmt(o.total)}</td>
+          <td style="font-size:.82rem;color:var(--cream-2)">${o.payment||'—'}</td>
+          <td><span class="status-badge status-badge--${o.status}">${ORDER_STATUS[o.status]?.icon} ${ORDER_STATUS[o.status]?.label||o.status}</span></td>
+          <td style="font-size:.78rem;color:var(--cream-muted)">${fmtDatetime(o.createdAt)}</td>
+          <td>
+            <select class="form-control" style="font-size:.78rem;padding:5px 8px;min-width:140px" onchange="updateStatus('${o.id}',this.value)">
+              ${Object.entries(ORDER_STATUS).map(([k,v])=>`<option value="${k}" ${k===o.status?'selected':''}>${v.icon} ${v.label}</option>`).join('')}
+            </select>
+          </td>
+          <td style="padding:8px 10px 8px 4px">
+            <button onclick="deleteOrder('${o.id}','${o.orderNumber||o.id.slice(0,8).toUpperCase()}')"
+              title="Excluir pedido"
+              style="background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);color:#e74c3c;
+                     border-radius:6px;padding:5px 7px;cursor:pointer;transition:.2s;display:flex;align-items:center"
+              onmouseover="this.style.background='rgba(192,57,43,.25)'"
+              onmouseout="this.style.background='rgba(192,57,43,.1)'">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            </button>
+          </td>
+        </tr>
+        ${expanded.has(o.id)?`<tr class="expanded">
+          <td colspan="9" style="padding:0 14px 14px">
+            <div class="order-detail">
+              <ul class="order-items-list">
+                ${(o.items||[]).map(i=>`<li>
+                  <span><span class="item-qty">${i.qty}x</span> ${i.name}</span>
+                  <span style="color:var(--gold-light)">R$ ${fmt(i.price*i.qty)}</span>
+                </li>`).join('')}
+              </ul>
+              <div class="order-total-row">
+                <span class="order-total-label">Total</span>
+                <span class="order-total-val">R$ ${fmt(o.total)}</span>
+              </div>
+              ${o.address?`<div style="margin-top:10px;font-size:.8rem;color:var(--cream-muted)">📍 ${o.address}</div>`:''}
+              ${o.obs?`<div style="margin-top:6px;font-size:.8rem;color:var(--cream-muted)">📝 ${o.obs}</div>`:''}
+            </div>
+          </td>
+        </tr>`:''}
+      `).join('')}
+      </tbody>
+    </table></div>`;
+  }
+
+  async function deleteOrder(orderId, orderNum) {
+    if(!confirm(`Excluir pedido #${orderNum} permanentemente? Esta ação não pode ser desfeita.`)) return;
+    try{
+      await deleteDoc(doc(db,'orders',orderId));
+      toast('Pedido excluído','success');
+    }catch(e){toast('Erro ao excluir: '+e.message,'error')}
+  }
+
+  window.updateStatus=updateStatus;
+  window.toggleRow=toggleRow;
+  window.deleteOrder=deleteOrder;
+
+  /* auth guard */
+  onAuthStateChanged(auth,async user=>{
+    if(!user){window.location.href='../auth/login.html';return;}
+    const snap=await getDoc(doc(db,'users',user.uid));
+    if(!snap.exists()||snap.data().role!=='admin'){window.location.href='../customer/orders.html';return;}
+    document.getElementById('avatarInitial').textContent=(snap.data()?.name||'A')[0].toUpperCase();
+    document.getElementById('userName').textContent=snap.data()?.name||'Admin';
+    document.getElementById('userEmail').textContent=user.email||'';
+
+    onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')),snap=>{
+      allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderTable(allOrders);
+    });
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click',async()=>{await signOut(auth);window.location.href='../auth/login.html'});
+</script>
+</body>
+</html>

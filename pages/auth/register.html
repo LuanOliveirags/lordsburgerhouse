@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Criar Conta — Lord's Burger House</title>
+  <link rel="icon" href="../../assets/images/logos/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#060401;--bg-card:#161208;
+      --gold:#c9a227;--gold-light:#e6c84a;
+      --gold-glow:rgba(201,162,39,.1);--gold-border:rgba(201,162,39,.2);
+      --cream:#f5e6c8;--cream-2:#e8d4a8;--cream-muted:#8c7a52;--cream-faint:#4a3e28;
+      --red:#e74c3c;--green:#25d366;
+      --font-display:'Cinzel',serif;--font-serif:'Playfair Display',Georgia,serif;--font-body:'Inter',system-ui,sans-serif;
+      --r-md:12px;--r-full:9999px;--t:.22s cubic-bezier(.4,0,.2,1);
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    html{font-size:16px}
+    body{
+      background:var(--bg);color:var(--cream);font-family:var(--font-body);
+      min-height:100vh;display:flex;align-items:center;justify-content:center;
+      -webkit-font-smoothing:antialiased;padding:24px;position:relative;overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+    button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
+    input{font:inherit;color:inherit}
+
+    .bg-glow{
+      position:fixed;inset:0;pointer-events:none;
+      background:radial-gradient(ellipse 70% 50% at 50% 50%,rgba(201,162,39,.06) 0%,transparent 70%);
+    }
+
+    .auth-card{
+      position:relative;z-index:1;
+      width:100%;max-width:480px;
+      background:var(--bg-card);
+      border:1px solid var(--gold-border);
+      border-radius:24px;padding:36px;
+      box-shadow:0 24px 80px rgba(0,0,0,.6);
+      animation:fadeUp .5s ease both;
+    }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+    .auth-logo{
+      display:flex;flex-direction:column;align-items:center;gap:8px;
+      margin-bottom:24px;
+    }
+    .auth-logo img{width:60px;height:60px;object-fit:contain}
+    .auth-logo__name{
+      font-family:var(--font-display);font-size:.7rem;font-weight:700;
+      letter-spacing:.22em;text-transform:uppercase;color:var(--gold);
+    }
+    h1{
+      font-family:var(--font-serif);font-size:1.6rem;font-weight:700;
+      letter-spacing:-.01em;color:var(--cream);text-align:center;margin-bottom:4px;
+    }
+    .auth-sub{text-align:center;font-size:.88rem;color:var(--cream-muted);margin-bottom:24px}
+
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+    .form-group label{
+      font-family:var(--font-display);font-size:.6rem;font-weight:700;
+      letter-spacing:.15em;text-transform:uppercase;color:var(--cream-muted);
+    }
+    .form-control{
+      padding:11px 14px;
+      background:rgba(255,255,255,.03);
+      border:1.5px solid var(--gold-border);
+      border-radius:var(--r-md);
+      font-size:.9rem;color:var(--cream);
+      transition:border-color var(--t),box-shadow var(--t);
+      outline:none;width:100%;
+    }
+    .form-control:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,39,.12)}
+    .form-control::placeholder{color:var(--cream-faint)}
+    .form-control.error{border-color:var(--red)}
+
+    .strength-bar{height:3px;border-radius:var(--r-full);background:var(--cream-faint);margin-top:6px;overflow:hidden}
+    .strength-bar__fill{height:100%;border-radius:var(--r-full);width:0;transition:width .3s,background .3s}
+
+    .btn-submit{
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      width:100%;padding:14px;border-radius:var(--r-full);
+      background:linear-gradient(135deg,var(--gold-light),var(--gold));
+      color:#0d0a00;
+      font-family:var(--font-display);font-size:.78rem;font-weight:700;
+      letter-spacing:.12em;text-transform:uppercase;
+      box-shadow:0 4px 20px rgba(201,162,39,.3);
+      transition:all var(--t);cursor:pointer;border:none;margin-top:6px;
+    }
+    .btn-submit:hover{box-shadow:0 6px 28px rgba(201,162,39,.45);transform:translateY(-1px)}
+    .btn-submit:disabled{opacity:.55;pointer-events:none}
+
+    .error-msg{
+      display:none;background:rgba(192,57,43,.12);border:1px solid rgba(192,57,43,.3);
+      border-radius:var(--r-md);padding:10px 14px;font-size:.82rem;color:var(--red);
+      margin-bottom:14px;align-items:center;gap:8px;
+    }
+    .error-msg.show{display:flex}
+
+    .auth-footer{text-align:center;font-size:.85rem;color:var(--cream-muted);margin-top:20px}
+    .link-gold{color:var(--gold);transition:color var(--t);font-weight:600}
+    .link-gold:hover{color:var(--gold-light)}
+
+    .terms{font-size:.78rem;color:var(--cream-muted);text-align:center;margin-top:12px}
+
+    .loading-overlay{
+      display:none;position:fixed;inset:0;
+      background:rgba(6,4,1,.8);backdrop-filter:blur(4px);
+      z-index:500;align-items:center;justify-content:center;
+    }
+    .loading-overlay.show{display:flex}
+    .spinner{
+      width:36px;height:36px;border-radius:50%;
+      border:2.5px solid rgba(201,162,39,.25);border-top-color:var(--gold);
+      animation:spin .7s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .back-link{
+      position:fixed;top:20px;left:20px;z-index:10;
+      display:flex;align-items:center;gap:8px;
+      font-size:.78rem;color:var(--cream-muted);transition:color var(--t);
+    }
+    .back-link:hover{color:var(--gold)}
+
+    @media(max-width:480px){.form-row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+
+  <a href="../../index.html" class="back-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Voltar ao cardápio
+  </a>
+
+  <div class="auth-card">
+    <div class="auth-logo">
+      <img src="../../assets/images/logos/logo.png" alt="Lord's Burger House" />
+      <span class="auth-logo__name">Lord's Burger House</span>
+    </div>
+
+    <h1>Criar conta</h1>
+    <p class="auth-sub">Cadastre-se e acompanhe seus pedidos em tempo real</p>
+
+    <div class="error-msg" id="errorMsg">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="errorText"></span>
+    </div>
+
+    <form id="registerForm" novalidate>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nome">Nome *</label>
+          <input class="form-control" type="text" id="nome" placeholder="Seu nome" required />
+        </div>
+        <div class="form-group">
+          <label for="sobrenome">Sobrenome *</label>
+          <input class="form-control" type="text" id="sobrenome" placeholder="Sobrenome" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="telefone">WhatsApp *</label>
+        <input class="form-control" type="tel" id="telefone" placeholder="(11) 9 0000-0000" required />
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-mail *</label>
+        <input class="form-control" type="email" id="email" placeholder="seu@email.com" required autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Senha *</label>
+        <input class="form-control" type="password" id="password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" />
+        <div class="strength-bar"><div class="strength-bar__fill" id="strengthFill"></div></div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar senha *</label>
+        <input class="form-control" type="password" id="confirmPassword" placeholder="Repita a senha" required />
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Criar conta
+      </button>
+    </form>
+
+    <p class="terms">Ao criar sua conta você concorda com os<br/>termos de uso e política de privacidade.</p>
+
+    <div class="auth-footer">
+      Já tem conta? <a href="login.html" class="link-gold">Entrar</a>
+    </div>
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from '../../assets/js/firebase-config.js';
+    import { createUserWithEmailAndPassword, updateProfile }
+      from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import { doc, setDoc, getDocs, collection, query, where, writeBatch, serverTimestamp }
+      from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    /* ── password strength ── */
+    document.getElementById('password').addEventListener('input', e => {
+      const v = e.target.value;
+      const fill = document.getElementById('strengthFill');
+      let strength = 0;
+      if (v.length >= 6) strength++;
+      if (v.length >= 10) strength++;
+      if (/[A-Z]/.test(v)) strength++;
+      if (/[0-9]/.test(v)) strength++;
+      if (/[^A-Za-z0-9]/.test(v)) strength++;
+      const colors = ['#e74c3c','#e67e22','#f39c12','#2ecc71','#27ae60'];
+      fill.style.width = (strength * 20) + '%';
+      fill.style.background = colors[strength - 1] || 'transparent';
+    });
+
+    /* ── form submit ── */
+    document.getElementById('registerForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const errorEl = document.getElementById('errorMsg');
+      const errorTx = document.getElementById('errorText');
+      errorEl.classList.remove('show');
+
+      const nome     = document.getElementById('nome').value.trim();
+      const sobre    = document.getElementById('sobrenome').value.trim();
+      const tel      = document.getElementById('telefone').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const pass     = document.getElementById('password').value;
+      const confirm  = document.getElementById('confirmPassword').value;
+
+      if (!nome || !sobre || !tel || !email || !pass) {
+        errorTx.textContent = 'Preencha todos os campos obrigatórios.';
+        return errorEl.classList.add('show');
+      }
+      if (pass.length < 6) {
+        errorTx.textContent = 'A senha deve ter pelo menos 6 caracteres.';
+        return errorEl.classList.add('show');
+      }
+      if (pass !== confirm) {
+        errorTx.textContent = 'As senhas não coincidem.';
+        return errorEl.classList.add('show');
+      }
+
+      document.getElementById('submitBtn').disabled = true;
+      document.getElementById('loadingOverlay').classList.add('show');
+
+      const phoneDigits = tel.replace(/\D/g, '');
+
+      /* ── valida telefone único ── */
+      try {
+        const existing = await getDocs(
+          query(collection(db, 'users'), where('phone', '==', phoneDigits))
+        );
+        if (!existing.empty) {
+          document.getElementById('loadingOverlay').classList.remove('show');
+          document.getElementById('submitBtn').disabled = false;
+          errorTx.textContent = 'Este número de WhatsApp já está cadastrado. Faça login ou use outro número.';
+          return errorEl.classList.add('show');
+        }
+      } catch(e) { /* segue se falhar a verificação */ }
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        const fullName   = `${nome} ${sobre}`;
+
+        await updateProfile(cred.user, { displayName: fullName });
+
+        await setDoc(doc(db, 'users', cred.user.uid), {
+          name:      fullName,
+          firstName: nome,
+          lastName:  sobre,
+          email,
+          phone:     phoneDigits,
+          role:      'customer',
+          addresses: [],
+          createdAt: serverTimestamp()
+        });
+
+        /* ── vincula pedidos anteriores com mesmo telefone ── */
+        try {
+          const batch = writeBatch(db);
+          const orphans = await getDocs(
+            query(collection(db, 'orders'), where('customerPhone', '==', phoneDigits))
+          );
+          orphans.docs
+            .filter(d => !d.data().customerId)
+            .forEach(d => batch.update(d.ref, { customerId: cred.user.uid, updatedAt: serverTimestamp() }));
+          if (!orphans.empty) await batch.commit();
+        } catch(e) { /* silencioso — não bloqueia o cadastro */ }
+
+        window.location.href = '../customer/orders.html';
+      } catch (err) {
+        document.getElementById('loadingOverlay').classList.remove('show');
+        document.getElementById('submitBtn').disabled = false;
+        const msgs = {
+          'auth/email-already-in-use': 'Este e-mail já está cadastrado.',
+          'auth/invalid-email':        'E-mail inválido.',
+          'auth/weak-password':        'Senha muito fraca. Use pelo menos 6 caracteres.'
+        };
+        errorTx.textContent = msgs[err.code] || 'Erro ao criar conta. Tente novamente.';
+        errorEl.classList.add('show');
+      }
+    });
+  </script>
+</body>
+</html>

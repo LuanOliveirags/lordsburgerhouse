@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Painel Atendente — Lord's Burger House</title>
+  <link rel="icon" href="../../assets/images/logos/icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../../assets/css/panel.css"/>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="panel-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__logo">
+      <img src="../../assets/images/logos/logo.png" alt=""/>
+      <div class="sidebar__logo-text">
+        <span class="sidebar__logo-name">Lord's Burger</span>
+        <span class="sidebar__logo-role">Atendente</span>
+      </div>
+    </div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Pedidos</div>
+      <a href="#" class="sidebar__link active" data-view="queue">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        Fila de Pedidos
+        <span class="sidebar__badge" id="queueBadge">0</span>
+      </a>
+      <a href="#" class="sidebar__link" data-view="all">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Todos os Pedidos
+      </a>
+      <div class="sidebar__section" style="margin-top:8px">Ações</div>
+      <a href="#" class="sidebar__link" id="btnNewOrder">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Novo Pedido Manual
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__avatar" id="avatarInitial">?</div>
+        <div class="sidebar__user-info">
+          <div class="sidebar__user-name" id="userName">Carregando...</div>
+          <div class="sidebar__user-email" id="userEmail"></div>
+        </div>
+      </div>
+      <button class="btn-logout" id="logoutBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="topbar__title" id="topbarTitle">Fila de Pedidos</span>
+    </div>
+    <div class="topbar__actions">
+      <div class="online-dot"></div>
+      <span class="topbar__time" id="topbarTime"></span>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- VIEW: queue -->
+    <div id="view-queue">
+      <div class="filter-bar" id="filterBar">
+        <button class="filter-tab active" data-filter="active">Ativos</button>
+        <button class="filter-tab" data-filter="all">Todos</button>
+        <button class="filter-tab" data-filter="pending">Aguardando</button>
+        <button class="filter-tab" data-filter="preparing">Em preparo</button>
+        <button class="filter-tab" data-filter="delivered">Entregues</button>
+      </div>
+      <div class="orders-grid" id="ordersGrid">
+        <div class="state-loading"><div class="spinner"></div> Carregando pedidos...</div>
+      </div>
+    </div>
+
+    <!-- VIEW: all orders (table) -->
+    <div id="view-all" style="display:none">
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>
+            Histórico de Pedidos
+          </span>
+          <div class="search-bar" style="width:240px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="searchOrders" placeholder="Buscar pedido, cliente..."/>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Pedido</th>
+                <th>Cliente</th>
+                <th>Itens</th>
+                <th>Total</th>
+                <th>Modalidade</th>
+                <th>Pagamento</th>
+                <th>Status</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody id="allOrdersTable">
+              <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--cream-muted)">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- NEW ORDER MODAL -->
+<div class="modal-overlay" id="newOrderModal">
+  <div class="modal" style="max-width:640px">
+    <div class="modal__header">
+      <span class="modal__title">Novo Pedido Manual</span>
+      <button class="modal__close" id="closeNewOrder">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal__body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome do cliente *</label>
+          <input class="form-control" type="text" id="manNome" placeholder="Nome completo"/>
+        </div>
+        <div class="form-group">
+          <label>WhatsApp *</label>
+          <input class="form-control" type="tel" id="manTel" placeholder="(11) 9 0000-0000"/>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Modalidade</label>
+        <select class="form-control" id="manMode">
+          <option value="delivery">🛵 Delivery (+ R$ 5,00)</option>
+          <option value="pickup">🏠 Retirada no local (grátis)</option>
+        </select>
+      </div>
+      <div id="manAddressFields">
+        <div class="form-row">
+          <div class="form-group" style="grid-column:1/-1">
+            <label>Endereço</label>
+            <input class="form-control" type="text" id="manRua" placeholder="Rua, Número, Bairro"/>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:4px">
+        <label>Itens do pedido</label>
+        <div id="manItems" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+        <button class="btn btn--outline btn--sm" id="addItemBtn">+ Adicionar item</button>
+      </div>
+      <div class="form-row" style="margin-top:12px">
+        <div class="form-group">
+          <label>Pagamento</label>
+          <select class="form-control" id="manPayment">
+            <option value="pix">PIX</option>
+            <option value="credito">Cartão de Crédito</option>
+            <option value="debito">Cartão de Débito</option>
+            <option value="dinheiro">Dinheiro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Observações</label>
+          <input class="form-control" type="text" id="manObs" placeholder="Sem cebola, etc."/>
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" id="cancelNewOrder">Cancelar</button>
+      <button class="btn btn--primary" id="saveNewOrder">Registrar Pedido</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { auth, db, ORDER_STATUS, ROLES } from '../../assets/js/firebase-config.js';
+  import { onAuthStateChanged, signOut }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import {
+    collection, query, orderBy, onSnapshot, doc,
+    updateDoc, addDoc, serverTimestamp, getDoc, getDocs, where
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+  /* ── helpers ── */
+  const DELIVERY_FEE = 5.00;
+  function fmt(n){ return Number(n||0).toFixed(2).replace('.',',') }
+  function fmtDate(ts){
+    if (!ts) return '—';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  }
+  function genNumber(){ return 'LBH-' + Math.floor(10000+Math.random()*90000) }
+
+  /* ── toast ── */
+  function toast(msg, type='info'){
+    const el = document.createElement('div');
+    el.className = `toast toast--${type}`;
+    el.innerHTML = `<span class="toast__icon">${{success:'✅',error:'❌',info:'ℹ️'}[type]}</span> ${msg}`;
+    document.getElementById('toastContainer').appendChild(el);
+    setTimeout(()=>{ el.classList.add('removing'); setTimeout(()=>el.remove(),300) },3000);
+  }
+
+  /* ── sidebar toggle ── */
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  document.getElementById('sidebarToggle').addEventListener('click',()=>{
+    sidebar.classList.toggle('open'); overlay.classList.toggle('show');
+  });
+  overlay.addEventListener('click',()=>{ sidebar.classList.remove('open'); overlay.classList.remove('show') });
+
+  /* ── clock ── */
+  function tick(){ document.getElementById('topbarTime').textContent = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) }
+  tick(); setInterval(tick,1000);
+
+  /* ── nav views ── */
+  let currentFilter = 'active';
+  document.querySelectorAll('.sidebar__link[data-view]').forEach(a=>{
+    a.addEventListener('click',e=>{
+      e.preventDefault();
+      document.querySelectorAll('.sidebar__link').forEach(l=>l.classList.remove('active'));
+      a.classList.add('active');
+      const v = a.dataset.view;
+      document.getElementById('view-queue').style.display = v==='queue' ? '' : 'none';
+      document.getElementById('view-all').style.display   = v==='all'   ? '' : 'none';
+      document.getElementById('topbarTitle').textContent  = v==='queue' ? 'Fila de Pedidos' : 'Todos os Pedidos';
+    });
+  });
+
+  /* ── filter tabs ── */
+  document.querySelectorAll('#filterBar .filter-tab').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('#filterBar .filter-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      renderQueue(allOrders);
+    });
+  });
+
+  /* ── status update ── */
+  async function updateStatus(orderId, status){
+    try {
+      await updateDoc(doc(db,'orders',orderId),{ status, updatedAt:serverTimestamp() });
+      toast(`Status atualizado: ${ORDER_STATUS[status]?.label}`,'success');
+    } catch(e){ toast('Erro ao atualizar status','error') }
+  }
+
+  /* ── render queue ── */
+  let allOrders = [];
+  function renderQueue(orders){
+    const grid = document.getElementById('ordersGrid');
+    const active = ['pending','confirmed','preparing','delivering','ready'];
+    const filtered = currentFilter === 'active'
+      ? orders.filter(o=>active.includes(o.status))
+      : currentFilter === 'all'
+      ? orders
+      : orders.filter(o=>o.status===currentFilter);
+
+    document.getElementById('queueBadge').textContent = orders.filter(o=>active.includes(o.status)).length;
+
+    if (!filtered.length){
+      grid.innerHTML = `<div style="grid-column:1/-1"><div class="state-empty">
+        <div class="state-empty__icon">🍔</div>
+        <h3>Nenhum pedido aqui</h3>
+        <p>Os pedidos aparecerão aqui em tempo real</p>
+      </div></div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(o=>{
+      const statusOpts = Object.entries(ORDER_STATUS)
+        .map(([k,v])=>`<option value="${k}" ${o.status===k?'selected':''}>${v.icon} ${v.label}</option>`)
+        .join('');
+      return `<div class="order-card" id="oc-${o.id}">
+        <div class="order-card__header">
+          <span class="order-card__num">#${o.orderNumber||o.id.slice(0,8).toUpperCase()}</span>
+          <span class="order-card__time">${fmtDate(o.createdAt)}</span>
+        </div>
+        <div class="order-card__body">
+          <div class="order-card__customer">${o.customerName||'—'}</div>
+          <div class="order-card__mode">${o.deliveryMode==='delivery'?'🛵 Delivery':'🏠 Retirada'}${o.deliveryMode==='delivery'&&o.address?' · '+o.address:''}</div>
+          <div class="order-card__items">
+            ${o.items?.map(i=>`▸ ${i.qty}x ${i.name}`).join('<br>')||'—'}
+          </div>
+          ${o.obs?`<p style="font-size:.78rem;color:var(--cream-muted);margin-bottom:10px">📝 ${o.obs}</p>`:''}
+          <div class="order-card__total">
+            <span class="status-badge status-badge--${o.status}">${ORDER_STATUS[o.status]?.icon||''} ${ORDER_STATUS[o.status]?.label||o.status}</span>
+            <span>R$ ${fmt(o.total)}</span>
+          </div>
+        </div>
+        <div class="order-card__footer">
+          <select class="status-select" data-id="${o.id}">${statusOpts}</select>
+          <button class="btn btn--sm btn--primary" data-confirm="${o.id}">Confirmar</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    /* events */
+    grid.querySelectorAll('.status-select').forEach(sel=>{
+      sel.addEventListener('change', ()=>updateStatus(sel.dataset.id, sel.value));
+    });
+    grid.querySelectorAll('[data-confirm]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const sel = grid.querySelector(`select[data-id="${btn.dataset.confirm}"]`);
+        updateStatus(btn.dataset.confirm, sel.value);
+      });
+    });
+  }
+
+  /* ── render all orders table ── */
+  function renderTable(orders){
+    const body = document.getElementById('allOrdersTable');
+    const search = document.getElementById('searchOrders').value.toLowerCase();
+    const filtered = search
+      ? orders.filter(o=>
+          o.customerName?.toLowerCase().includes(search)||
+          o.orderNumber?.toLowerCase().includes(search)||
+          o.id.includes(search))
+      : orders;
+
+    if (!filtered.length){
+      body.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--cream-muted)">Nenhum pedido encontrado</td></tr>`;
+      return;
+    }
+    const payMap={pix:'PIX',credito:'Crédito',debito:'Débito',dinheiro:'Dinheiro'};
+    body.innerHTML = filtered.map(o=>`<tr>
+      <td class="td-mono">${o.orderNumber||o.id.slice(0,8).toUpperCase()}</td>
+      <td class="td-bold">${o.customerName||'—'}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.items?.map(i=>`${i.qty}x ${i.name}`).join(', ')||'—'}</td>
+      <td style="color:var(--gold-light);font-weight:700">R$ ${fmt(o.total)}</td>
+      <td>${o.deliveryMode==='delivery'?'🛵':'🏠'}</td>
+      <td>${payMap[o.payment]||o.payment||'—'}</td>
+      <td><span class="status-badge status-badge--${o.status}">${ORDER_STATUS[o.status]?.icon||''} ${ORDER_STATUS[o.status]?.label||o.status}</span></td>
+      <td>${fmtDate(o.createdAt)}</td>
+    </tr>`).join('');
+  }
+
+  document.getElementById('searchOrders').addEventListener('input',()=>renderTable(allOrders));
+
+  /* ── new order modal ── */
+  let manualItems = [];
+  let products = [];
+
+  async function loadProducts(){
+    const snap = await getDocs(query(collection(db,'products'),orderBy('sortOrder')));
+    products = snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.available!==false);
+  }
+
+  function addManualItem(){
+    const idx = manualItems.length;
+    manualItems.push({ productId:'', name:'', qty:1, price:0 });
+    const row = document.createElement('div');
+    row.style.cssText='display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center';
+    row.innerHTML=`
+      <select class="form-control man-prod" data-idx="${idx}">
+        <option value="">Selecionar produto...</option>
+        ${products.map(p=>`<option value="${p.id}" data-price="${p.price}" data-name="${p.name}">${p.name} — R$ ${fmt(p.price)}</option>`).join('')}
+      </select>
+      <input type="number" class="form-control man-qty" data-idx="${idx}" value="1" min="1" style="width:64px"/>
+      <span class="man-price" data-idx="${idx}" style="color:var(--gold-light);font-weight:700;white-space:nowrap">R$ 0,00</span>
+      <button class="btn btn--icon btn--danger man-del" data-idx="${idx}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+      </button>`;
+    document.getElementById('manItems').appendChild(row);
+
+    row.querySelector('.man-prod').addEventListener('change',e=>{
+      const opt=e.target.selectedOptions[0];
+      manualItems[idx].productId=opt.value;
+      manualItems[idx].name=opt.dataset.name||'';
+      manualItems[idx].price=parseFloat(opt.dataset.price||0);
+      updateManPrice(idx);
+    });
+    row.querySelector('.man-qty').addEventListener('input',e=>{
+      manualItems[idx].qty=parseInt(e.target.value)||1;
+      updateManPrice(idx);
+    });
+    row.querySelector('.man-del').addEventListener('click',()=>{
+      manualItems.splice(idx,1);
+      row.remove();
+    });
+  }
+
+  function updateManPrice(idx){
+    const item=manualItems[idx];
+    const el=document.querySelector(`.man-price[data-idx="${idx}"]`);
+    if(el) el.textContent=`R$ ${fmt(item.price*item.qty)}`;
+  }
+
+  document.getElementById('btnNewOrder').addEventListener('click',async e=>{
+    e.preventDefault();
+    if(!products.length) await loadProducts();
+    manualItems=[];
+    document.getElementById('manItems').innerHTML='';
+    addManualItem();
+    document.getElementById('newOrderModal').classList.add('open');
+  });
+  document.getElementById('addItemBtn').addEventListener('click',addManualItem);
+  document.getElementById('closeNewOrder').addEventListener('click',()=>document.getElementById('newOrderModal').classList.remove('open'));
+  document.getElementById('cancelNewOrder').addEventListener('click',()=>document.getElementById('newOrderModal').classList.remove('open'));
+  document.getElementById('manMode').addEventListener('change',e=>{
+    document.getElementById('manAddressFields').style.display=e.target.value==='delivery'?'':'none';
+  });
+
+  let currentUser = null;
+  document.getElementById('saveNewOrder').addEventListener('click',async()=>{
+    const nome=document.getElementById('manNome').value.trim();
+    const tel=document.getElementById('manTel').value.trim();
+    const mode=document.getElementById('manMode').value;
+    const payment=document.getElementById('manPayment').value;
+    const obs=document.getElementById('manObs').value.trim();
+    const rua=document.getElementById('manRua').value.trim();
+
+    const items=manualItems.filter(i=>i.productId&&i.qty>0);
+    if(!nome||!tel||!items.length){
+      toast('Preencha nome, telefone e pelo menos um item','error'); return;
+    }
+    const subtotal=items.reduce((s,i)=>s+i.price*i.qty,0);
+    const fee=mode==='delivery'?DELIVERY_FEE:0;
+    const total=subtotal+fee;
+    const orderNumber=genNumber();
+    try{
+      await addDoc(collection(db,'orders'),{
+        orderNumber, customerName:nome, customerPhone:tel,
+        customerId:null, status:'pending',
+        deliveryMode:mode,
+        address:mode==='delivery'?rua:'Retirada no local',
+        items:items.map(i=>({productId:i.productId,name:i.name,qty:i.qty,price:i.price})),
+        subtotal,deliveryFee:fee,total,payment,obs,
+        attendantId:currentUser?.uid||null,
+        createdAt:serverTimestamp(),updatedAt:serverTimestamp()
+      });
+      document.getElementById('newOrderModal').classList.remove('open');
+      toast(`Pedido ${orderNumber} registrado!`,'success');
+    }catch(e){ toast('Erro ao salvar pedido','error') }
+  });
+
+  /* ── auth guard ── */
+  onAuthStateChanged(auth, async user=>{
+    if(!user){ window.location.href='../auth/login.html'; return; }
+    currentUser=user;
+    const snap=await getDoc(doc(db,'users',user.uid));
+    const role=snap.exists()?snap.data().role:'customer';
+    if(role!=='attendant'&&role!=='admin'){ window.location.href='../customer/orders.html'; return; }
+    document.getElementById('avatarInitial').textContent=(snap.data()?.name||user.email||'?')[0].toUpperCase();
+    document.getElementById('userName').textContent=snap.data()?.name||user.displayName||'Atendente';
+    document.getElementById('userEmail').textContent=user.email||'';
+
+    /* live orders */
+    const q=query(collection(db,'orders'),orderBy('createdAt','desc'));
+    onSnapshot(q,snap=>{
+      allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderQueue(allOrders);
+      renderTable(allOrders);
+    });
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click',async()=>{
+    await signOut(auth); window.location.href='../auth/login.html';
+  });
+</script>
+</body>
+</html>

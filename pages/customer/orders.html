@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Meus Pedidos — Lord's Burger House</title>
+  <link rel="icon" href="../../assets/images/logos/icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../../assets/css/panel.css"/>
+  <style>
+    body{display:block}
+    .panel-layout{display:flex;flex-direction:column;min-height:100vh}
+
+    /* simple top nav */
+    .top-nav{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 24px;
+      background:rgba(13,10,3,.97);
+      border-bottom:1px solid var(--gold-border);
+      position:sticky;top:0;z-index:100;
+    }
+    .top-nav__logo{display:flex;align-items:center;gap:10px}
+    .top-nav__logo img{width:38px;height:38px;object-fit:contain}
+    .top-nav__name{
+      font-family:var(--font-display);font-size:.7rem;font-weight:700;
+      letter-spacing:.18em;text-transform:uppercase;color:var(--gold);
+    }
+    .top-nav__actions{display:flex;align-items:center;gap:12px}
+
+    /* content */
+    .content{max-width:820px;margin:0 auto;padding:32px 20px}
+
+    /* hero */
+    .orders-hero{
+      text-align:center;padding:32px 0 24px;
+    }
+    .orders-hero h1{
+      font-family:var(--font-serif);font-size:2rem;font-weight:700;
+      color:var(--cream);letter-spacing:-.01em;
+    }
+    .orders-hero p{font-size:.9rem;color:var(--cream-muted);margin-top:6px}
+
+    /* order card with status timeline */
+    .order-wrap{display:flex;flex-direction:column;gap:16px}
+
+    .order-item{
+      background:var(--bg-card);
+      border:1px solid var(--gold-border);
+      border-radius:var(--r-lg);
+      overflow:hidden;
+      transition:border-color var(--t);
+    }
+    .order-item.active{border-color:rgba(201,162,39,.4)}
+    .order-item__head{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:16px 20px;
+      border-bottom:1px solid var(--gold-border);
+      background:rgba(201,162,39,.04);
+      cursor:pointer;
+    }
+    .order-item__num{
+      font-family:var(--font-display);font-size:.78rem;font-weight:700;
+      letter-spacing:.1em;color:var(--gold-light);
+    }
+    .order-item__date{font-size:.75rem;color:var(--cream-muted)}
+    .order-item__body{padding:18px 20px}
+    .order-item__products{
+      font-size:.85rem;color:var(--cream-2);line-height:1.8;
+      margin-bottom:14px;
+    }
+    .order-item__products strong{color:var(--cream);font-weight:600}
+    .order-item__meta{
+      display:flex;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;gap:10px;
+      padding-top:14px;
+      border-top:1px solid var(--gold-border);
+    }
+    .order-item__total{
+      font-family:var(--font-serif);font-size:1.1rem;font-weight:700;
+      color:var(--gold-light);
+    }
+    .order-item__mode{font-size:.8rem;color:var(--cream-muted)}
+
+    /* status timeline */
+    .status-timeline{
+      display:flex;align-items:flex-start;gap:0;
+      margin:18px 0 6px;
+      position:relative;
+    }
+    .timeline-step{
+      display:flex;flex-direction:column;align-items:center;
+      flex:1;position:relative;
+    }
+    .timeline-step::before{
+      content:'';
+      position:absolute;top:14px;left:50%;
+      width:100%;height:2px;
+      background:var(--cream-faint);
+      z-index:0;
+    }
+    .timeline-step:last-child::before{display:none}
+    .timeline-step.done::before{background:var(--gold)}
+    .timeline-step__dot{
+      width:28px;height:28px;border-radius:50%;
+      background:var(--bg-700);
+      border:2px solid var(--cream-faint);
+      display:flex;align-items:center;justify-content:center;
+      font-size:.85rem;z-index:1;position:relative;
+      transition:all .3s;
+    }
+    .timeline-step.done .timeline-step__dot{
+      background:var(--gold);border-color:var(--gold);
+      box-shadow:0 0 12px rgba(201,162,39,.4);
+    }
+    .timeline-step.active .timeline-step__dot{
+      background:rgba(201,162,39,.15);border-color:var(--gold);
+      animation:pulse-ring 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-ring{
+      0%,100%{box-shadow:0 0 0 0 rgba(201,162,39,.4)}
+      50%{box-shadow:0 0 0 8px rgba(201,162,39,0)}
+    }
+    .timeline-step__label{
+      font-size:.62rem;font-family:var(--font-display);
+      letter-spacing:.04em;text-transform:uppercase;
+      color:var(--cream-faint);margin-top:6px;text-align:center;
+      line-height:1.3;
+    }
+    .timeline-step.done .timeline-step__label,
+    .timeline-step.active .timeline-step__label{color:var(--cream-muted)}
+
+    /* empty / loading */
+    .state-center{
+      text-align:center;padding:80px 24px;
+      display:flex;flex-direction:column;align-items:center;gap:16px;
+    }
+    .state-center__icon{font-size:3.5rem;opacity:.3}
+    .state-center h3{font-family:var(--font-serif);font-size:1.3rem;color:var(--cream-2)}
+    .state-center p{font-size:.88rem;color:var(--cream-muted)}
+  </style>
+</head>
+<body>
+
+<div class="panel-layout">
+  <!-- top nav -->
+  <nav class="top-nav">
+    <a href="../../index.html" class="top-nav__logo">
+      <img src="../../assets/images/logos/logo.png" alt="Lord's Burger House"/>
+      <span class="top-nav__name">Lord's Burger House</span>
+    </a>
+    <div class="top-nav__actions">
+      <a href="../../index.html" class="btn btn--outline btn--sm">Fazer pedido</a>
+      <button class="btn btn--ghost btn--sm" id="logoutBtn">Sair</button>
+    </div>
+  </nav>
+
+  <div class="content">
+    <div class="orders-hero">
+      <h1>Meus Pedidos</h1>
+      <p id="heroSub">Acompanhe seus pedidos em tempo real</p>
+    </div>
+
+    <div id="ordersWrap" class="order-wrap">
+      <div class="state-center">
+        <div class="spinner" style="width:32px;height:32px"></div>
+        <p style="color:var(--cream-muted)">Carregando pedidos...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { auth, db, ORDER_STATUS } from '../../assets/js/firebase-config.js';
+  import { onAuthStateChanged, signOut }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { collection, query, where, onSnapshot, doc, getDoc }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+  const wrap = document.getElementById('ordersWrap');
+
+  const STEPS = [
+    { key: 'pending',    emoji: '⏳', label: 'Recebido' },
+    { key: 'confirmed',  emoji: '✅', label: 'Confirmado' },
+    { key: 'preparing',  emoji: '👨‍🍳', label: 'Em preparo' },
+    { key: 'delivering', emoji: '🛵', label: 'Saiu p/ entrega' },
+    { key: 'delivered',  emoji: '🏁', label: 'Entregue' }
+  ];
+  const STEPS_PICKUP = [
+    { key: 'pending',   emoji: '⏳', label: 'Recebido' },
+    { key: 'confirmed', emoji: '✅', label: 'Confirmado' },
+    { key: 'preparing', emoji: '👨‍🍳', label: 'Em preparo' },
+    { key: 'ready',     emoji: '🟢', label: 'Pronto' },
+    { key: 'delivered', emoji: '🏁', label: 'Retirado' }
+  ];
+
+  function fmt(n){ return Number(n).toFixed(2).replace('.',',') }
+  function fmtDate(ts){
+    if (!ts) return '';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+  }
+
+  function statusIndex(order){
+    const steps = order.deliveryMode === 'pickup' ? STEPS_PICKUP : STEPS;
+    const i = steps.findIndex(s => s.key === order.status);
+    return { steps, idx: i >= 0 ? i : 0 };
+  }
+
+  function renderTimeline(order){
+    const { steps, idx } = statusIndex(order);
+    if (order.status === 'cancelled') return `<p style="color:#e74c3c;font-size:.85rem">⛔ Pedido cancelado</p>`;
+    return `<div class="status-timeline">
+      ${steps.map((s, i) => `
+        <div class="timeline-step ${i < idx ? 'done' : i === idx ? 'active' : ''}">
+          <div class="timeline-step__dot">${i <= idx ? s.emoji : ''}</div>
+          <span class="timeline-step__label">${s.label}</span>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  function renderOrders(orders) {
+    if (!orders.length) {
+      wrap.innerHTML = `<div class="state-center">
+        <div class="state-center__icon">🍔</div>
+        <h3>Nenhum pedido ainda</h3>
+        <p>Faça seu primeiro pedido e acompanhe aqui em tempo real!</p>
+        <a href="../../index.html" class="btn btn--primary" style="margin-top:8px">Ver cardápio</a>
+      </div>`;
+      return;
+    }
+
+    wrap.innerHTML = orders.map(o => `
+      <div class="order-item ${['pending','confirmed','preparing','delivering','ready'].includes(o.status) ? 'active' : ''}">
+        <div class="order-item__head">
+          <span class="order-item__num">#${o.orderNumber || o.id.slice(0,8).toUpperCase()}</span>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="status-badge status-badge--${o.status}">${ORDER_STATUS[o.status]?.icon || ''} ${ORDER_STATUS[o.status]?.label || o.status}</span>
+            <span class="order-item__date">${fmtDate(o.createdAt)}</span>
+          </div>
+        </div>
+        <div class="order-item__body">
+          ${renderTimeline(o)}
+          <div class="order-item__products">
+            ${o.items?.map(i => `<span><strong>${i.qty}x</strong> ${i.name}</span>`).join(' &nbsp;·&nbsp; ') || ''}
+          </div>
+          <div class="order-item__meta">
+            <span class="order-item__mode">${o.deliveryMode === 'delivery' ? '🛵 Delivery' : '🏠 Retirada'} · ${o.payment || ''}</span>
+            <span class="order-item__total">R$ ${fmt(o.total || 0)}</span>
+          </div>
+          ${o.obs ? `<p style="font-size:.8rem;color:var(--cream-muted);margin-top:10px">📝 ${o.obs}</p>` : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  /* ── merge two snapshots sem duplicatas ── */
+  let byUid = [], byPhone = [];
+  function mergeAndRender() {
+    const map = new Map();
+    [...byUid, ...byPhone].forEach(o => map.set(o.id, o));
+    const all = [...map.values()].sort((a, b) => {
+      const ta = a.createdAt?.seconds || a.createdAt?.toMillis?.() / 1000 || 0;
+      const tb = b.createdAt?.seconds || b.createdAt?.toMillis?.() / 1000 || 0;
+      return tb - ta;
+    });
+    renderOrders(all);
+  }
+
+  /* ── auth guard ── */
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = '../auth/login.html'; return; }
+
+    document.getElementById('heroSub').textContent =
+      `Olá, ${user.displayName?.split(' ')[0] || 'cliente'}! Acompanhe seus pedidos abaixo.`;
+
+    /* query 1: pedidos pelo UID (sem orderBy → sem exigência de índice composto) */
+    const qUid = query(collection(db, 'orders'), where('customerId', '==', user.uid));
+    onSnapshot(qUid, snap => {
+      byUid = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      mergeAndRender();
+    }, () => {});
+
+    /* query 2: pedidos pelo telefone (pré-cadastro) */
+    try {
+      const userSnap = await getDoc(doc(db, 'users', user.uid));
+      const phone = userSnap.data()?.phone?.replace(/\D/g, '') || '';
+      if (phone) {
+        const qPhone = query(collection(db, 'orders'), where('customerPhone', '==', phone));
+        onSnapshot(qPhone, snap => {
+          byPhone = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          mergeAndRender();
+        }, () => {});
+      }
+    } catch(e) {}
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = '../auth/login.html';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#c9a227" />
+  <title>Finalizar Pedido — Lord's Burger House</title>
+  <link rel="icon" type="image/png" href="../assets/images/logos/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── CHECKOUT STYLES ──────────────────────────────── */
+    :root {
+      --bg-900: #080808;
+      --bg-800: #0d0d0d;
+      --bg-700: #131313;
+      --bg-card: #161208;
+      --bg-card-alt: #0f0e0a;
+      --gold: #c9a227;
+      --gold-light: #e6c84a;
+      --gold-dim: #a8841e;
+      --gold-glow: rgba(201,162,39,.12);
+      --gold-border: rgba(201,162,39,.22);
+      --gold-border-hi: rgba(201,162,39,.55);
+      --cream: #f5e6c8;
+      --cream-2: #e8d4a8;
+      --cream-muted: #8c7a52;
+      --cream-faint: #4a3e28;
+      --green: #25d366;
+      --red: #c0392b;
+      --font-display: 'Cinzel', serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', system-ui, sans-serif;
+      --r-sm: 8px;
+      --r-md: 12px;
+      --r-lg: 18px;
+      --r-xl: 28px;
+      --r-full: 9999px;
+      --t: .25s cubic-bezier(.4,0,.2,1);
+      --max: 1100px;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    html{font-size:16px;-webkit-text-size-adjust:100%}
+    body{
+      background:var(--bg-800);color:var(--cream);
+      font-family:var(--font-body);line-height:1.65;
+      -webkit-font-smoothing:antialiased;
+    }
+    a{color:inherit;text-decoration:none}
+    button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
+    input,select,textarea{font:inherit;color:inherit}
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-track{background:var(--bg-700)}
+    ::-webkit-scrollbar-thumb{background:#6b5410;border-radius:3px}
+
+    /* HEADER */
+    .header{
+      position:sticky;top:0;
+      background:rgba(10,8,3,.96);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--gold-border);
+      padding:0 24px;height:68px;
+      display:flex;align-items:center;justify-content:space-between;
+      z-index:100;
+    }
+    .header__logo{display:flex;align-items:center;gap:12px}
+    .header__logo img{height:48px;object-fit:contain}
+    .header__logo span{
+      font-family:var(--font-display);font-size:.85rem;
+      font-weight:600;color:var(--gold);letter-spacing:.1em;
+    }
+    .header__back{
+      display:flex;align-items:center;gap:6px;
+      font-size:.85rem;color:var(--cream-muted);
+      transition:color var(--t);
+    }
+    .header__back:hover{color:var(--gold)}
+
+    /* LAYOUT */
+    .page{max-width:var(--max);margin:0 auto;padding:40px 24px 80px;
+      display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:start;}
+
+    /* FORM SECTION */
+    .form-section{display:flex;flex-direction:column;gap:28px}
+    .form-section h1{
+      font-family:var(--font-serif);font-size:clamp(1.6rem,3vw,2.2rem);
+      font-weight:700;color:var(--cream);
+    }
+    .form-section h1 em{color:var(--gold);font-style:italic}
+    .card{
+      background:var(--bg-card);
+      border:1px solid var(--gold-border);
+      border-radius:var(--r-lg);
+      padding:24px;
+    }
+    .card__title{
+      font-family:var(--font-display);font-size:.75rem;font-weight:700;
+      letter-spacing:.18em;text-transform:uppercase;
+      color:var(--gold);margin-bottom:18px;
+      display:flex;align-items:center;gap:10px;
+    }
+    .card__title svg{flex-shrink:0}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .form-row.single{grid-template-columns:1fr}
+    .form-group{display:flex;flex-direction:column;gap:6px}
+    .form-group label{font-size:.8rem;font-weight:600;color:var(--cream-muted);letter-spacing:.04em}
+    .form-group input,
+    .form-group select,
+    .form-group textarea{
+      padding:11px 14px;border-radius:var(--r-md);
+      border:1px solid var(--gold-border);
+      background:var(--bg-card-alt);
+      font-size:.9rem;color:var(--cream);
+      transition:border-color var(--t);
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder{color:var(--cream-faint)}
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus{outline:none;border-color:var(--gold)}
+    .form-group select option{background:var(--bg-800)}
+
+    /* Delivery Toggle */
+    .delivery-toggle{
+      display:grid;grid-template-columns:1fr 1fr;
+      border:1px solid var(--gold-border);border-radius:var(--r-full);overflow:hidden;
+    }
+    .delivery-opt{
+      padding:12px;display:flex;align-items:center;justify-content:center;gap:8px;
+      font-size:.88rem;font-weight:500;color:var(--cream-muted);
+      transition:all var(--t);cursor:pointer;
+    }
+    .delivery-opt.active{
+      background:linear-gradient(135deg,var(--gold-light),var(--gold));
+      color:#0d0a00;font-weight:700;
+    }
+    #addressFields{display:flex;flex-direction:column;gap:14px;margin-top:14px}
+    #addressFields.hidden{display:none}
+
+    /* Payment */
+    .payment-notice{
+      display:flex;align-items:flex-start;gap:10px;
+      padding:12px 14px;margin-bottom:14px;
+      background:rgba(201,162,39,.07);
+      border:1px solid rgba(201,162,39,.2);
+      border-radius:var(--r-md);
+      font-size:.82rem;color:var(--cream-muted);line-height:1.5;
+    }
+    .payment-notice svg{flex-shrink:0;margin-top:1px;color:var(--gold)}
+    .payment-notice strong{color:var(--cream)}
+    .payment-opts{display:flex;flex-direction:column;gap:10px}
+    .payment-opt{
+      display:flex;align-items:center;gap:12px;
+      padding:14px;border-radius:var(--r-md);
+      border:1.5px solid var(--gold-border);
+      cursor:pointer;transition:all var(--t);
+    }
+    .payment-opt:hover{border-color:var(--gold-border-hi);background:var(--gold-glow)}
+    .payment-opt.selected{border-color:var(--gold);background:var(--gold-glow)}
+    .payment-opt input[type=radio]{display:none}
+    .payment-opt__icon{
+      width:40px;height:40px;border-radius:50%;
+      background:var(--gold-glow);border:1px solid var(--gold-border);
+      display:flex;align-items:center;justify-content:center;
+      color:var(--gold);flex-shrink:0;font-size:1.3rem;
+    }
+    .payment-opt__label{flex:1}
+    .payment-opt__label strong{display:block;font-size:.9rem;color:var(--cream)}
+    .payment-opt__label span{font-size:.78rem;color:var(--cream-muted)}
+    .payment-opt__check{
+      width:20px;height:20px;border-radius:50%;
+      border:2px solid var(--gold-border);
+      display:flex;align-items:center;justify-content:center;
+      transition:all var(--t);flex-shrink:0;
+    }
+    .payment-opt.selected .payment-opt__check{
+      background:var(--gold);border-color:var(--gold);
+    }
+    .payment-opt.selected .payment-opt__check::after{
+      content:'';display:block;width:7px;height:7px;
+      border-radius:50%;background:#0d0a00;
+    }
+    #troco-wrap{margin-top:12px;display:none}
+    #troco-wrap.show{display:block}
+
+    /* ORDER SUMMARY */
+    .summary{
+      position:sticky;top:88px;
+      background:var(--bg-card);
+      border:1px solid var(--gold-border);
+      border-radius:var(--r-lg);
+      overflow:hidden;
+    }
+    .summary__header{
+      padding:20px 22px;
+      border-bottom:1px solid var(--gold-border);
+      font-family:var(--font-display);font-size:.75rem;font-weight:700;
+      letter-spacing:.18em;text-transform:uppercase;color:var(--gold);
+      display:flex;align-items:center;gap:10px;
+    }
+    .summary__items{padding:16px;max-height:300px;overflow-y:auto}
+    .summary__item{
+      display:flex;gap:12px;padding:10px 0;
+      border-bottom:1px solid rgba(201,162,39,.08);
+    }
+    .summary__item:last-child{border-bottom:none}
+    .summary__item-img{
+      width:54px;height:54px;border-radius:var(--r-sm);
+      object-fit:cover;flex-shrink:0;
+    }
+    .summary__item-info{flex:1;min-width:0}
+    .summary__item-name{
+      font-size:.88rem;font-weight:600;color:var(--cream);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .summary__item-qty{font-size:.78rem;color:var(--cream-muted)}
+    .summary__item-price{
+      font-family:var(--font-serif);font-size:.95rem;font-weight:700;
+      color:var(--gold-light);white-space:nowrap;align-self:center;
+    }
+    .summary__totals{
+      padding:16px 20px;
+      border-top:1px solid var(--gold-border);
+      display:flex;flex-direction:column;gap:10px;
+    }
+    .summary__row{
+      display:flex;justify-content:space-between;
+      font-size:.88rem;color:var(--cream-muted);
+    }
+    .summary__row--total{
+      padding-top:10px;border-top:1px solid var(--gold-border);
+      font-size:1.1rem;color:var(--cream);
+    }
+    .summary__row--total strong{color:var(--gold-light);font-size:1.25rem;font-family:var(--font-serif)}
+    .summary__empty{
+      padding:40px 24px;text-align:center;color:var(--cream-muted);
+      font-size:.9rem;
+    }
+
+    /* SUBMIT */
+    .submit-section{display:flex;flex-direction:column;gap:12px;padding:0 20px 20px}
+    .btn{
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      padding:14px 28px;border-radius:var(--r-full);
+      font-size:.95rem;font-weight:600;transition:all var(--t);
+      white-space:nowrap;width:100%;
+    }
+    .btn--gold{
+      background:linear-gradient(135deg,var(--gold-light),var(--gold));
+      color:#0d0a00;box-shadow:0 4px 20px rgba(201,162,39,.3);
+    }
+    .btn--gold:hover{box-shadow:0 6px 28px rgba(201,162,39,.45);transform:translateY(-1px)}
+    .btn--gold:disabled{opacity:.5;pointer-events:none}
+    .btn--whatsapp{
+      background:var(--green);color:#fff;
+      box-shadow:0 4px 16px rgba(37,211,102,.3);
+    }
+    .btn--whatsapp:hover{background:#20ba5a;transform:translateY(-1px)}
+    .btn--outline{
+      border:1.5px solid var(--gold-border-hi);color:var(--gold);background:transparent;
+    }
+    .btn--outline:hover{background:var(--gold-glow);border-color:var(--gold)}
+
+    /* SUCCESS STATE */
+    .success-screen{
+      display:none;position:fixed;inset:0;
+      background:var(--bg-900);
+      flex-direction:column;align-items:center;justify-content:center;
+      z-index:500;gap:24px;text-align:center;padding:24px;
+    }
+    .success-screen.show{display:flex}
+    .success-screen__icon{
+      width:90px;height:90px;border-radius:50%;
+      background:linear-gradient(135deg,var(--gold-light),var(--gold));
+      display:flex;align-items:center;justify-content:center;
+      font-size:2.5rem;
+      box-shadow:0 8px 40px rgba(201,162,39,.4);
+      animation:pop .5s cubic-bezier(.4,0,.2,1) both;
+    }
+    @keyframes pop{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+    .success-screen h2{
+      font-family:var(--font-serif);font-size:2rem;font-weight:700;color:var(--cream);
+    }
+    .success-screen p{font-size:1rem;color:var(--cream-muted);max-width:400px;line-height:1.6}
+    .success-screen__num{
+      font-family:var(--font-display);font-size:1rem;letter-spacing:.15em;
+      color:var(--gold);padding:10px 24px;border-radius:var(--r-full);
+      border:1px solid var(--gold-border);background:var(--gold-glow);
+    }
+
+    @media(max-width:768px){
+      .page{grid-template-columns:1fr;padding:24px 16px 60px}
+      .summary{position:static}
+      .form-row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <a href="../index.html" class="header__logo">
+      <img src="../assets/images/logos/logo.png" alt="Lord's Burger House" />
+      <span>LORD'S BURGER HOUSE</span>
+    </a>
+    <a href="../index.html" class="header__back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Voltar ao cardápio
+    </a>
+  </header>
+
+  <!-- PAGE -->
+  <div class="page" id="page">
+
+    <!-- FORM -->
+    <div class="form-section">
+      <div>
+        <h1>Finalizar <em>Pedido</em></h1>
+        <p style="color:var(--cream-muted);font-size:.9rem;margin-top:6px">Preencha os dados para concluir seu pedido real.</p>
+      </div>
+
+      <!-- DADOS PESSOAIS -->
+      <div class="card">
+        <div class="card__title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Dados Pessoais
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nome">Nome completo *</label>
+            <input type="text" id="nome" placeholder="Seu nome" required />
+          </div>
+          <div class="form-group">
+            <label for="telefone">WhatsApp *</label>
+            <input type="tel" id="telefone" placeholder="(00) 00000-0000" required />
+          </div>
+        </div>
+      </div>
+
+      <!-- MODALIDADE -->
+      <div class="card">
+        <div class="card__title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          Modalidade de Entrega
+        </div>
+        <div class="delivery-toggle">
+          <button class="delivery-opt active" id="optDelivery" onclick="setMode('delivery')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            Delivery — R$ 5,00
+          </button>
+          <button class="delivery-opt" id="optPickup" onclick="setMode('pickup')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 9v11a2 2 0 01-2 2H6a2 2 0 01-2-2V9"/><path d="M9 22V12h6v10"/><path d="M2 10.6L12 2l10 8.6"/></svg>
+            Retirar no Local — Grátis
+          </button>
+        </div>
+
+        <!-- ENDEREÇO -->
+        <div id="addressFields">
+          <div class="form-row">
+            <div class="form-group" style="grid-column:1/-1">
+              <label for="rua">Rua / Avenida *</label>
+              <input type="text" id="rua" placeholder="Nome da rua ou avenida" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="numero">Número *</label>
+              <input type="text" id="numero" placeholder="Ex: 123" />
+            </div>
+            <div class="form-group">
+              <label for="complemento">Complemento</label>
+              <input type="text" id="complemento" placeholder="Apto, bloco, etc." />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bairro">Bairro *</label>
+              <input type="text" id="bairro" placeholder="Nome do bairro" />
+            </div>
+            <div class="form-group">
+              <label for="referencia">Ponto de referência</label>
+              <input type="text" id="referencia" placeholder="Ex: próximo ao mercado" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGAMENTO -->
+      <div class="card">
+        <div class="card__title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Forma de Pagamento
+        </div>
+
+        <!-- aviso de fluxo de pagamento -->
+        <div class="payment-notice">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>O pagamento é realizado <strong>na entrega ou retirada</strong>. Caso prefira PIX ou cartão, enviaremos um link via WhatsApp após confirmar seu pedido.</span>
+        </div>
+
+        <div class="payment-opts" id="paymentOpts">
+          <label class="payment-opt" data-pay="pix">
+            <input type="radio" name="payment" value="pix" />
+            <div class="payment-opt__icon">PIX</div>
+            <div class="payment-opt__label">
+              <strong>PIX</strong>
+              <span>Link enviado pelo WhatsApp após confirmação</span>
+            </div>
+            <div class="payment-opt__check"></div>
+          </label>
+          <label class="payment-opt" data-pay="credito">
+            <input type="radio" name="payment" value="credito" />
+            <div class="payment-opt__icon">💳</div>
+            <div class="payment-opt__label">
+              <strong>Cartão de Crédito</strong>
+              <span>Link enviado pelo WhatsApp após confirmação</span>
+            </div>
+            <div class="payment-opt__check"></div>
+          </label>
+          <label class="payment-opt" data-pay="debito">
+            <input type="radio" name="payment" value="debito" />
+            <div class="payment-opt__icon">💳</div>
+            <div class="payment-opt__label">
+              <strong>Cartão de Débito</strong>
+              <span>Link enviado pelo WhatsApp após confirmação</span>
+            </div>
+            <div class="payment-opt__check"></div>
+          </label>
+          <label class="payment-opt" data-pay="dinheiro">
+            <input type="radio" name="payment" value="dinheiro" />
+            <div class="payment-opt__icon">💵</div>
+            <div class="payment-opt__label">
+              <strong>Dinheiro</strong>
+              <span>Pagamento na entrega ou retirada</span>
+            </div>
+            <div class="payment-opt__check"></div>
+          </label>
+        </div>
+        <div id="troco-wrap">
+          <div class="form-group">
+            <label for="troco">Troco para quanto?</label>
+            <input type="text" id="troco" placeholder="Ex: R$ 50,00" />
+          </div>
+        </div>
+      </div>
+
+      <!-- OBSERVAÇÕES -->
+      <div class="card">
+        <div class="card__title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Observações do Pedido
+        </div>
+        <div class="form-group">
+          <textarea id="checkoutObs" rows="3" placeholder="Ex: sem cebola, maionese à parte, molho extra..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESUMO DO PEDIDO -->
+    <div class="summary" id="summary">
+      <div class="summary__header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        Resumo do Pedido
+      </div>
+      <div class="summary__items" id="summaryItems">
+        <p class="summary__empty">Carrinho vazio. <a href="../index.html" style="color:var(--gold)">Adicionar itens</a></p>
+      </div>
+      <div class="summary__totals" id="summaryTotals" style="display:none">
+        <div class="summary__row"><span>Subtotal</span><span id="sumSubtotal">R$ 0,00</span></div>
+        <div class="summary__row" id="sumDeliveryRow"><span>Entrega</span><span id="sumFee">R$ 5,00</span></div>
+        <div class="summary__row summary__row--total"><span>Total</span><strong id="sumTotal">R$ 0,00</strong></div>
+      </div>
+      <div class="submit-section" id="submitSection" style="display:none">
+        <button class="btn btn--gold" id="submitBtn" onclick="submitOrder()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirmar Pedido
+        </button>
+        <button class="btn btn--whatsapp" id="waBtn" onclick="orderViaWhatsapp()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Enviar pelo WhatsApp
+        </button>
+        <a href="../index.html" class="btn btn--outline">Continuar comprando</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-screen__icon">👑</div>
+    <h2>Pedido Confirmado!</h2>
+    <p>Seu pedido foi enviado com sucesso. Em breve nossa equipe entrará em contato pelo WhatsApp para confirmar os detalhes.</p>
+    <div class="success-screen__num" id="orderNum">#LBH-00000</div>
+
+    <!-- tracking CTA — preenchido pelo JS após checar auth -->
+    <div id="trackingCta" style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:360px">
+      <div style="height:44px"></div><!-- placeholder enquanto carrega -->
+    </div>
+
+    <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:4px">
+      <a href="../index.html" style="padding:12px 28px;border-radius:9999px;background:linear-gradient(135deg,#e6c84a,#c9a227);color:#0d0a00;font-weight:700;font-size:.9rem">
+        Fazer Novo Pedido
+      </a>
+      <a href="../index.html#contact" style="padding:12px 28px;border-radius:9999px;border:1.5px solid rgba(201,162,39,.5);color:#c9a227;font-size:.9rem;font-weight:600">
+        Ver Contato
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const WHATSAPP = '5511940737953';
+    const DELIVERY_FEE = 5.00;
+    let cartData = null;
+    let deliveryMode = 'delivery';
+    let selectedPayment = null;
+
+    function fmt(n) { return n.toFixed(2).replace('.', ','); }
+
+    // Load cart from sessionStorage or localStorage
+    function loadData() {
+      try {
+        const session = JSON.parse(sessionStorage.getItem('lords_cart'));
+        const local   = JSON.parse(localStorage.getItem('lords_cart') || '[]');
+        if (session?.items?.length) {
+          cartData = session;
+          deliveryMode = session.mode || 'delivery';
+        } else if (local.length) {
+          cartData = {
+            items: local,
+            subtotal: local.reduce((s,i)=>s+i.price*i.qty,0),
+            fee: DELIVERY_FEE,
+            total: local.reduce((s,i)=>s+i.price*i.qty,0) + DELIVERY_FEE,
+            mode: 'delivery',
+            obs: ''
+          };
+        }
+      } catch(e) { cartData = null; }
+    }
+
+    function renderSummary() {
+      const items = cartData?.items || [];
+      const el    = document.getElementById('summaryItems');
+      const tots  = document.getElementById('summaryTotals');
+      const sub   = document.getElementById('submitSection');
+
+      if (!items.length) {
+        el.innerHTML = '<p class="summary__empty">Carrinho vazio. <a href="../index.html" style="color:var(--gold)">Adicionar itens</a></p>';
+        tots.style.display = 'none';
+        sub.style.display  = 'none';
+        return;
+      }
+
+      el.innerHTML = items.map(i => `
+        <div class="summary__item">
+          <img class="summary__item-img" src="${i.img}" alt="${i.name}" loading="lazy" />
+          <div class="summary__item-info">
+            <div class="summary__item-name">${i.name}</div>
+            <div class="summary__item-qty">${i.qty}x · R$ ${fmt(i.price)} cada</div>
+          </div>
+          <div class="summary__item-price">R$ ${fmt(i.price * i.qty)}</div>
+        </div>`).join('');
+
+      tots.style.display = 'flex';
+      sub.style.display  = 'flex';
+      updateTotals();
+    }
+
+    function updateTotals() {
+      if (!cartData?.items?.length) return;
+      const subtotal = cartData.items.reduce((s,i)=>s+i.price*i.qty,0);
+      const fee      = deliveryMode === 'delivery' ? DELIVERY_FEE : 0;
+      const total    = subtotal + fee;
+
+      document.getElementById('sumSubtotal').textContent = `R$ ${fmt(subtotal)}`;
+      document.getElementById('sumFee').textContent      = fee > 0 ? `R$ ${fmt(fee)}` : 'Grátis';
+      document.getElementById('sumTotal').textContent    = `R$ ${fmt(total)}`;
+      document.getElementById('sumDeliveryRow').style.display = '';
+    }
+
+    function setMode(mode) {
+      deliveryMode = mode;
+      document.getElementById('optDelivery').classList.toggle('active', mode === 'delivery');
+      document.getElementById('optPickup').classList.toggle('active', mode === 'pickup');
+      document.getElementById('addressFields').classList.toggle('hidden', mode === 'pickup');
+      updateTotals();
+    }
+
+    // Payment selection
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      renderSummary();
+
+      document.getElementById('paymentOpts').addEventListener('click', e => {
+        const opt = e.target.closest('.payment-opt');
+        if (!opt) return;
+        document.querySelectorAll('.payment-opt').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        opt.querySelector('input').checked = true;
+        selectedPayment = opt.dataset.pay;
+        document.getElementById('troco-wrap').classList.toggle('show', selectedPayment === 'dinheiro');
+      });
+    });
+
+    function validate() {
+      const nome = document.getElementById('nome').value.trim();
+      const tel  = document.getElementById('telefone').value.trim();
+      if (!nome) { alert('Por favor, informe seu nome.'); return false; }
+      if (!tel)  { alert('Por favor, informe seu WhatsApp.'); return false; }
+      if (!selectedPayment) { alert('Selecione uma forma de pagamento.'); return false; }
+      if (deliveryMode === 'delivery') {
+        const rua = document.getElementById('rua').value.trim();
+        const num = document.getElementById('numero').value.trim();
+        if (!rua || !num) { alert('Preencha o endereço de entrega.'); return false; }
+      }
+      return true;
+    }
+
+    function buildMsg() {
+      if (!cartData?.items?.length) return '';
+      const items    = cartData.items;
+      const subtotal = items.reduce((s,i)=>s+i.price*i.qty,0);
+      const fee      = deliveryMode === 'delivery' ? DELIVERY_FEE : 0;
+      const total    = subtotal + fee;
+      const nome     = document.getElementById('nome').value.trim();
+      const tel      = document.getElementById('telefone').value.trim();
+      const obs      = document.getElementById('checkoutObs').value.trim();
+      const troco    = document.getElementById('troco').value.trim();
+      const payMap   = { pix:'PIX', credito:'Cartão de Crédito', debito:'Cartão de Débito', dinheiro:'Dinheiro' };
+      const modeLabel= deliveryMode === 'delivery' ? '🛵 Delivery' : '🏠 Retirada';
+
+      let msg = `*LORD'S BURGER HOUSE* 👑\n`;
+      msg += `*NOVO PEDIDO*\n`;
+      msg += `──────────────────────\n`;
+      msg += `*Cliente:* ${nome}\n`;
+      msg += `*WhatsApp:* ${tel}\n`;
+      msg += `*Modalidade:* ${modeLabel}\n`;
+
+      if (deliveryMode === 'delivery') {
+        const rua = document.getElementById('rua').value.trim();
+        const num = document.getElementById('numero').value.trim();
+        const comp = document.getElementById('complemento').value.trim();
+        const bairro = document.getElementById('bairro').value.trim();
+        const ref = document.getElementById('referencia').value.trim();
+        msg += `*Endereço:* ${rua}, ${num}`;
+        if (comp) msg += `, ${comp}`;
+        if (bairro) msg += ` — ${bairro}`;
+        if (ref) msg += `\n*Referência:* ${ref}`;
+        msg += '\n';
+      }
+
+      msg += `\n*Itens:*\n`;
+      items.forEach(i => {
+        msg += `▸ ${i.qty}x ${i.name} — R$ ${fmt(i.price * i.qty)}\n`;
+      });
+
+      msg += `──────────────────────\n`;
+      msg += `*Subtotal:* R$ ${fmt(subtotal)}\n`;
+      if (fee > 0) msg += `*Entrega:* R$ ${fmt(fee)}\n`;
+      msg += `*TOTAL: R$ ${fmt(total)}*\n`;
+      msg += `*Pagamento:* ${payMap[selectedPayment] || selectedPayment}`;
+      if (selectedPayment === 'dinheiro' && troco) msg += ` (troco para ${troco})`;
+      if (selectedPayment === 'pix' || selectedPayment === 'credito' || selectedPayment === 'debito')
+        msg += ` _(aguardando link InfinityPay)_`;
+      msg += '\n';
+      if (obs) msg += `*Obs:* ${obs}\n`;
+      msg += `\n_Pedido realizado pelo site — Lord's Burger House_`;
+      return encodeURIComponent(msg);
+    }
+
+    async function submitOrder() {
+      if (!validate()) return;
+      const num = 'LBH-' + Math.floor(10000 + Math.random() * 90000);
+
+      const subtotal = cartData.items.reduce((s,i)=>s+i.price*i.qty,0);
+      const fee      = deliveryMode === 'delivery' ? DELIVERY_FEE : 0;
+      const total    = subtotal + fee;
+      const nome     = document.getElementById('nome').value.trim();
+      const tel      = document.getElementById('telefone').value.trim();
+      const obs      = document.getElementById('checkoutObs').value.trim();
+
+      let address = '';
+      if (deliveryMode === 'delivery') {
+        const rua    = document.getElementById('rua').value.trim();
+        const nrua   = document.getElementById('numero').value.trim();
+        const comp   = document.getElementById('complemento').value.trim();
+        const bairro = document.getElementById('bairro').value.trim();
+        address = `${rua}, ${nrua}${comp?', '+comp:''}${bairro?' — '+bairro:''}`;
+      }
+
+      const orderData = {
+        orderNumber:    num,
+        customerName:   nome,
+        customerPhone:  tel,
+        customerId:     window.__currentUser__?.uid || null,
+        items:          cartData.items.map(i=>({name:i.name, qty:i.qty, price:i.price, img:i.img||''})),
+        subtotal,
+        deliveryFee:    fee,
+        total,
+        deliveryMode,
+        address,
+        payment:        selectedPayment,
+        obs,
+        status:         'pending'
+      };
+
+      /* save to Firestore if Firebase is ready */
+      if (window.__saveOrder__) {
+        try { await window.__saveOrder__(orderData); } catch(e) { console.warn('Firestore save failed:', e); }
+      }
+
+      document.getElementById('orderNum').textContent = '#' + num;
+      document.getElementById('successScreen').classList.add('show');
+
+      /* update tracking CTA based on auth state */
+      window.__renderTrackingCta__ && window.__renderTrackingCta__();
+
+      localStorage.removeItem('lords_cart');
+      sessionStorage.removeItem('lords_cart');
+
+      const msg = buildMsg();
+      if (msg) setTimeout(() => window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, '_blank'), 800);
+    }
+
+    function orderViaWhatsapp() {
+      if (!validate()) return;
+      const msg = buildMsg();
+      window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, '_blank');
+    }
+  </script>
+
+  <!-- Firebase: pré-preenche form, salva pedido + pré-cadastro por telefone -->
+  <script type="module">
+    import { auth, db } from '../assets/js/firebase-config.js';
+    import { onAuthStateChanged }
+      from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import { collection, doc, getDoc, addDoc, setDoc, serverTimestamp }
+      from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    /* ── pré-preenche campos se logado ── */
+    onAuthStateChanged(auth, async user => {
+      window.__currentUser__ = user || null;
+      if (!user) return;
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        const data = snap.data() || {};
+        const nomeEl = document.getElementById('nome');
+        const telEl  = document.getElementById('telefone');
+        if (nomeEl && !nomeEl.value) {
+          nomeEl.value = data.name || user.displayName || '';
+          nomeEl.style.background = 'rgba(201,162,39,.05)';
+        }
+        if (telEl && !telEl.value) {
+          telEl.value = data.phone || '';
+          telEl.style.background = 'rgba(201,162,39,.05)';
+        }
+      } catch(e) {}
+    });
+
+    /* ── salva pedido + pré-cadastro por telefone ── */
+    window.__saveOrder__ = async (orderData) => {
+      const phoneDigits = (orderData.customerPhone || '').replace(/\D/g, '');
+
+      /* salva pedido com telefone normalizado */
+      await addDoc(collection(db, 'orders'), {
+        ...orderData,
+        customerPhone: phoneDigits,
+        createdAt:     serverTimestamp(),
+        updatedAt:     serverTimestamp()
+      });
+
+      /* pré-cadastro: guarda nome+tel para vinculação futura */
+      if (!orderData.customerId && phoneDigits) {
+        await setDoc(doc(db, 'guestProfiles', phoneDigits), {
+          name:      orderData.customerName,
+          phone:     phoneDigits,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+      }
+    };
+
+    /* ── CTA de rastreamento na tela de sucesso ── */
+    window.__renderTrackingCta__ = () => {
+      const cta = document.getElementById('trackingCta');
+      if (!cta) return;
+      const user = window.__currentUser__;
+      if (user) {
+        cta.innerHTML = `
+          <a href="customer/orders.html"
+             style="display:flex;align-items:center;justify-content:center;gap:8px;
+                    width:100%;padding:13px 28px;border-radius:9999px;
+                    background:rgba(201,162,39,.12);border:1px solid rgba(201,162,39,.5);
+                    color:#e6c84a;font-weight:600;font-size:.9rem">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Acompanhar meu pedido
+          </a>`;
+      } else {
+        cta.innerHTML = `
+          <p style="font-size:.82rem;color:#8c7a52;text-align:center;line-height:1.6">
+            Crie uma conta com o mesmo número de WhatsApp<br/>
+            para acompanhar este pedido em tempo real.
+          </p>
+          <a href="auth/register.html"
+             style="display:flex;align-items:center;justify-content:center;gap:8px;
+                    width:100%;padding:13px 28px;border-radius:9999px;
+                    background:rgba(201,162,39,.12);border:1px solid rgba(201,162,39,.5);
+                    color:#e6c84a;font-weight:600;font-size:.9rem">
+            Criar conta para acompanhar
+          </a>
+          <a href="auth/login.html"
+             style="font-size:.8rem;color:#8c7a52;text-decoration:underline;text-underline-offset:3px">
+            Já tenho conta — fazer login
+          </a>`;
+      }
+    };
+  </script>
+</body>
+</html>

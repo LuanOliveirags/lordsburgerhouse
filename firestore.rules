@@ -1,0 +1,97 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── helpers ──────────────────────────────────────────────────────────────
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function myRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isAuth() && myRole() == 'admin';
+    }
+
+    function isAttendant() {
+      return isAuth() && (myRole() == 'attendant' || myRole() == 'admin');
+    }
+
+    // telefone do usuário logado (vem do doc users/{uid})
+    function userPhone() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('phone', '');
+    }
+
+    // ── users ────────────────────────────────────────────────────────────────
+    match /users/{uid} {
+      allow read:   if isAuth() && (request.auth.uid == uid || isAdmin());
+      allow create: if isAuth()
+                    && request.auth.uid == uid
+                    && request.resource.data.role == 'customer';
+      allow update: if isAuth() && (
+                      (request.auth.uid == uid
+                        && !('role' in request.resource.data.diff(resource.data).affectedKeys()))
+                      || isAdmin()
+                    );
+      allow delete: if isAdmin();
+    }
+
+    // ── products ─────────────────────────────────────────────────────────────
+    match /products/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    // ── combos ───────────────────────────────────────────────────────────────
+    match /combos/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    // ── guestProfiles (pré-cadastro por telefone) ─────────────────────────────
+    match /guestProfiles/{phone} {
+      allow read, write: if true;
+    }
+
+    // ── orders ───────────────────────────────────────────────────────────────
+    match /orders/{orderId} {
+
+      // LEITURA: próprio uid, ou mesmo telefone, ou atendente/admin
+      allow read: if (
+        isAttendant()
+        || (isAuth() && resource.data.customerId == request.auth.uid)
+        || (isAuth() && resource.data.customerPhone != ''
+              && resource.data.customerPhone == userPhone())
+      );
+
+      // CRIAÇÃO:
+      //   - guest sem conta (customerId == null, sem auth)
+      //   - cliente logado criando próprio pedido (customerId == uid) ou pedido guest
+      //   - atendente/admin
+      allow create: if (
+        (request.auth == null && request.resource.data.customerId == null)
+        || (isAuth() && (
+              request.resource.data.customerId == request.auth.uid
+              || request.resource.data.customerId == null
+           ))
+        || isAttendant()
+      );
+
+      // ATUALIZAÇÃO:
+      //   - atendente/admin (status, etc)
+      //   - cliente vinculando pedido guest ao próprio uid via telefone
+      allow update: if (
+        isAttendant()
+        || (isAuth()
+              && resource.data.customerPhone != ''
+              && resource.data.customerPhone == userPhone()
+              && request.resource.data.customerId == request.auth.uid)
+      );
+
+      allow delete: if isAdmin();
+    }
+  }
+}

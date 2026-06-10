@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Usuários — Admin | Lord's Burger House</title>
+  <link rel="icon" href="../../assets/images/logos/icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../../assets/css/panel.css"/>
+  <style>
+    .avatar-lg{
+      width:44px;height:44px;border-radius:50%;
+      background:rgba(201,162,39,.15);border:1px solid var(--gold-border);
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--font-display);font-size:.95rem;font-weight:700;
+      color:var(--gold-light);text-transform:uppercase;flex-shrink:0;
+    }
+    .user-row{display:flex;align-items:center;gap:12px}
+    .user-info__name{font-size:.88rem;color:var(--cream);font-weight:500}
+    .user-info__email{font-size:.75rem;color:var(--cream-muted)}
+    .user-info__phone{font-size:.75rem;color:var(--cream-muted)}
+
+    /* role selector */
+    .role-select{
+      background:var(--bg-700);border:1px solid var(--gold-border);
+      color:var(--cream);font-size:.78rem;padding:5px 8px;border-radius:var(--r);
+      font-family:var(--font-sans);cursor:pointer;
+    }
+    .role-select:focus{outline:none;border-color:var(--gold)}
+
+    /* create attendant modal */
+    .form-group{display:flex;flex-direction:column;gap:6px}
+    .form-group label{font-family:var(--font-display);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--cream-muted)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  </style>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="panel-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__logo">
+      <img src="../../assets/images/logos/logo.png" alt=""/>
+      <div class="sidebar__logo-text">
+        <span class="sidebar__logo-name">Lord's Burger</span>
+        <span class="sidebar__logo-role">Administrador</span>
+      </div>
+    </div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Painel</div>
+      <a href="dashboard.html" class="sidebar__link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <div class="sidebar__section">Gestão</div>
+      <a href="products.html" class="sidebar__link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        Cardápio
+      </a>
+      <a href="orders.html" class="sidebar__link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        Pedidos
+      </a>
+      <a href="users.html" class="sidebar__link active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Usuários
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="sidebar__user">
+        <div class="sidebar__avatar" id="avatarInitial">A</div>
+        <div class="sidebar__user-info">
+          <div class="sidebar__user-name" id="userName">Admin</div>
+          <div class="sidebar__user-email" id="userEmail"></div>
+        </div>
+      </div>
+      <button class="btn-logout" id="logoutBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="topbar__title">Usuários</span>
+    </div>
+    <div class="topbar__actions">
+      <button class="btn btn--primary" id="createStaffBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Criar atendente
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-header">
+      <h1>Gerenciar Usuários</h1>
+      <p>Visualize clientes, promova atendentes e gerencie permissões.</p>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--gold">👥</div>
+        <span class="stat-card__label">Clientes</span>
+        <span class="stat-card__value" id="countCustomers">—</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--blue">🎧</div>
+        <span class="stat-card__label">Atendentes</span>
+        <span class="stat-card__value" id="countAttendants">—</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon stat-card__icon--purple">👑</div>
+        <span class="stat-card__label">Administradores</span>
+        <span class="stat-card__value" id="countAdmins">—</span>
+      </div>
+    </div>
+
+    <!-- filter + search -->
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px">
+      <div class="filter-bar" id="roleFilter">
+        <button class="filter-tab active" data-role="all">Todos</button>
+        <button class="filter-tab" data-role="customer">Clientes</button>
+        <button class="filter-tab" data-role="attendant">Atendentes</button>
+        <button class="filter-tab" data-role="admin">Admins</button>
+      </div>
+      <div class="search-bar" style="width:220px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Buscar por nome ou email…"/>
+      </div>
+    </div>
+
+    <!-- table -->
+    <div class="card">
+      <div class="card__body" style="padding:0">
+        <div id="usersTable">
+          <div class="state-loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- CREATE STAFF MODAL -->
+<div class="modal-overlay" id="createModal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal__header">
+      <h2 class="modal__title">Criar Atendente / Admin</h2>
+      <button class="btn btn--icon" id="createModalClose">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome</label>
+          <input class="form-control" id="cName" placeholder="Nome completo"/>
+        </div>
+        <div class="form-group">
+          <label>Telefone</label>
+          <input class="form-control" id="cPhone" placeholder="(11) 99999-0000"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input class="form-control" id="cEmail" type="email" placeholder="atendente@loja.com"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Senha</label>
+          <input class="form-control" id="cPass" type="password" placeholder="mín. 6 caracteres"/>
+        </div>
+        <div class="form-group">
+          <label>Nível de acesso</label>
+          <select class="form-control" id="cRole">
+            <option value="attendant">Atendente</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+      </div>
+      <p style="font-size:.78rem;color:var(--cream-muted);line-height:1.6">
+        ⚠️ Você será redirecionado para re-autenticar após a criação, pois Firebase exige isso para criar usuários adicionais no cliente.
+      </p>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" id="createModalCancel">Cancelar</button>
+      <button class="btn btn--primary" id="createSaveBtn">Criar conta</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module">
+  import { auth, db, ROLE_LABELS } from '../../assets/js/firebase-config.js';
+  import { onAuthStateChanged, signOut, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import {
+    collection, query, orderBy, onSnapshot, doc, getDoc, updateDoc, deleteDoc, setDoc, serverTimestamp
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+  function toast(msg,type='info'){
+    const el=document.createElement('div');
+    el.className=`toast toast--${type}`;
+    el.innerHTML=`<span class="toast__icon">${{success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'}[type]||'ℹ️'}</span> ${msg}`;
+    document.getElementById('toastContainer').appendChild(el);
+    setTimeout(()=>{el.classList.add('removing');setTimeout(()=>el.remove(),300)},3500);
+  }
+
+  /* sidebar */
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('sidebarOverlay');
+  document.getElementById('sidebarToggle').addEventListener('click',()=>{sb.classList.toggle('open');ov.classList.toggle('show')});
+  ov.addEventListener('click',()=>{sb.classList.remove('open');ov.classList.remove('show')});
+
+  /* filter */
+  let activeRole='all',searchQ='';
+  document.getElementById('roleFilter').querySelectorAll('.filter-tab').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');activeRole=btn.dataset.role;renderTable(allUsers);
+    });
+  });
+  document.getElementById('searchInput').addEventListener('input',e=>{
+    searchQ=e.target.value.toLowerCase();renderTable(allUsers);
+  });
+
+  /* counters */
+  function updateCounts(users){
+    document.getElementById('countCustomers').textContent=users.filter(u=>u.role==='customer').length;
+    document.getElementById('countAttendants').textContent=users.filter(u=>u.role==='attendant').length;
+    document.getElementById('countAdmins').textContent=users.filter(u=>u.role==='admin').length;
+  }
+
+  /* role change */
+  window.deleteUser = async (uid, name, currentAdminUid) => {
+    if(uid === currentAdminUid){ toast('Não é possível excluir sua própria conta','warning'); return; }
+    if(!confirm(`Excluir o cadastro de "${name}" permanentemente?\n\nO acesso ao sistema será removido imediatamente.`)) return;
+    try{
+      await deleteDoc(doc(db,'users',uid));
+      toast(`Cadastro de ${name} excluído`,'success');
+    }catch(e){ toast('Erro ao excluir: '+e.message,'error') }
+  };
+
+  window.changeRole = async (uid, newRole, currentAdminUid) => {
+    if(uid===currentAdminUid&&newRole!=='admin'){
+      toast('Não é possível rebaixar sua própria conta','warning');
+      document.querySelector(`select[data-uid="${uid}"]`).value='admin';
+      return;
+    }
+    if(!confirm(`Alterar função para "${ROLE_LABELS[newRole]||newRole}"?`)){
+      renderTable(allUsers);return;
+    }
+    try{
+      await updateDoc(doc(db,'users',uid),{role:newRole,updatedAt:serverTimestamp()});
+      toast('Função atualizada','success');
+    }catch(e){toast('Erro: '+e.message,'error')}
+  };
+
+  let allUsers=[];
+  let currentAdminUid='';
+  function renderTable(users){
+    allUsers=users;
+    updateCounts(users);
+    let filtered=users.filter(u=>activeRole==='all'||u.role===activeRole);
+    if(searchQ) filtered=filtered.filter(u=>{
+      return (u.name||'').toLowerCase().includes(searchQ)||(u.email||'').toLowerCase().includes(searchQ);
+    });
+
+    const el=document.getElementById('usersTable');
+    if(!filtered.length){
+      el.innerHTML='<div class="state-empty" style="padding:60px"><p>Nenhum usuário encontrado</p></div>';
+      return;
+    }
+
+    const fmtDate=ts=>{
+      if(!ts) return '—';
+      const d=ts.toDate?ts.toDate():new Date(ts);
+      return d.toLocaleDateString('pt-BR');
+    };
+
+    el.innerHTML=`<div class="table-wrap"><table>
+      <thead><tr>
+        <th>Usuário</th>
+        <th>Telefone</th>
+        <th>Função</th>
+        <th>Cadastro</th>
+        <th>Alterar função</th>
+        <th style="width:44px"></th>
+      </tr></thead>
+      <tbody>${filtered.map(u=>`<tr>
+        <td>
+          <div class="user-row">
+            <div class="avatar-lg">${(u.name||u.email||'?')[0].toUpperCase()}</div>
+            <div>
+              <div class="user-info__name">${u.name||'Sem nome'}</div>
+              <div class="user-info__email">${u.email||'—'}</div>
+            </div>
+          </div>
+        </td>
+        <td style="font-size:.82rem;color:var(--cream-2)">${u.phone||'—'}</td>
+        <td><span class="role-badge role-badge--${u.role}">${ROLE_LABELS[u.role]||u.role}</span></td>
+        <td style="font-size:.78rem;color:var(--cream-muted)">${fmtDate(u.createdAt)}</td>
+        <td>
+          <select class="role-select" data-uid="${u.id}" onchange="changeRole('${u.id}',this.value,'${currentAdminUid}')">
+            <option value="customer" ${u.role==='customer'?'selected':''}>Cliente</option>
+            <option value="attendant" ${u.role==='attendant'?'selected':''}>Atendente</option>
+            <option value="admin" ${u.role==='admin'?'selected':''}>Administrador</option>
+          </select>
+        </td>
+        <td style="padding:8px 10px 8px 4px">
+          ${u.id !== currentAdminUid ? `
+          <button onclick="deleteUser('${u.id}','${(u.name||'usuário').replace(/'/g,"\\'")}','${currentAdminUid}')"
+            title="Excluir cadastro"
+            style="background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);color:#e74c3c;
+                   border-radius:6px;padding:5px 7px;cursor:pointer;transition:.2s;display:flex;align-items:center"
+            onmouseover="this.style.background='rgba(192,57,43,.25)'"
+            onmouseout="this.style.background='rgba(192,57,43,.1)'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+          </button>` : `<span style="font-size:.7rem;color:var(--cream-faint)">você</span>`}
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  }
+
+  /* create staff modal */
+  const createModal=document.getElementById('createModal');
+  document.getElementById('createStaffBtn').addEventListener('click',()=>createModal.classList.add('open'));
+  document.getElementById('createModalClose').addEventListener('click',()=>createModal.classList.remove('open'));
+  document.getElementById('createModalCancel').addEventListener('click',()=>createModal.classList.remove('open'));
+  createModal.addEventListener('click',e=>{if(e.target===createModal)createModal.classList.remove('open')});
+
+  let adminEmail='',adminPass='';
+
+  document.getElementById('createSaveBtn').addEventListener('click',async()=>{
+    const name=document.getElementById('cName').value.trim();
+    const email=document.getElementById('cEmail').value.trim();
+    const pass=document.getElementById('cPass').value;
+    const phone=document.getElementById('cPhone').value.trim();
+    const role=document.getElementById('cRole').value;
+    if(!name||!email||pass.length<6){toast('Preencha todos os campos (senha mín. 6 chars)','warning');return;}
+
+    const btn=document.getElementById('createSaveBtn');
+    btn.disabled=true;btn.textContent='Criando…';
+
+    try{
+      /* create new user (signs out current admin temporarily) */
+      const cred=await createUserWithEmailAndPassword(auth,email,pass);
+      await updateProfile(cred.user,{displayName:name});
+      await setDoc(doc(db,'users',cred.user.uid),{
+        name,email,phone,role,
+        createdAt:serverTimestamp(),updatedAt:serverTimestamp()
+      });
+      /* sign admin back in */
+      if(adminEmail&&adminPass){
+        await signInWithEmailAndPassword(auth,adminEmail,adminPass);
+      }
+      toast(`Conta de ${ROLE_LABELS[role]||role} criada para ${name}`,'success');
+      createModal.classList.remove('open');
+    }catch(e){
+      toast('Erro: '+e.message,'error');
+      /* try to restore admin session */
+      if(adminEmail&&adminPass) await signInWithEmailAndPassword(auth,adminEmail,adminPass).catch(()=>{});
+    }finally{
+      btn.disabled=false;btn.textContent='Criar conta';
+    }
+  });
+
+  /* auth guard */
+  onAuthStateChanged(auth,async user=>{
+    if(!user){window.location.href='../auth/login.html';return;}
+    const snap=await getDoc(doc(db,'users',user.uid));
+    if(!snap.exists()||snap.data().role!=='admin'){window.location.href='../customer/orders.html';return;}
+    currentAdminUid=user.uid;
+    adminEmail=user.email;
+    document.getElementById('avatarInitial').textContent=(snap.data()?.name||'A')[0].toUpperCase();
+    document.getElementById('userName').textContent=snap.data()?.name||'Admin';
+    document.getElementById('userEmail').textContent=user.email||'';
+
+    onSnapshot(query(collection(db,'users'),orderBy('createdAt','desc')),snap=>{
+      allUsers=snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderTable(allUsers);
+    });
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click',async()=>{await signOut(auth);window.location.href='../auth/login.html'});
+</script>
+</body>
+</html>
