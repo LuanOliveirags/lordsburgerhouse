@@ -1310,13 +1310,13 @@ input,textarea,select{font:inherit;color:inherit}
 }
 .hero__stat:hover strong { color:var(--gold-light) }
 
-/* Store closed banner — override inline style (P7) */
+/* Store closed banner — cor gold, não vermelha */
 #storeClosedBanner {
-  background:linear-gradient(135deg,#6b1a1a,#8b2020) !important;
-  border-bottom:1px solid rgba(255,100,100,.2);
-  box-shadow:0 2px 16px rgba(139,26,26,.35);
-  font-size:.85rem !important;
-  padding:12px 24px !important;
+  background: linear-gradient(90deg,#1e1806,#282008 40%,#1e1806) !important;
+  border-bottom: 1px solid rgba(201,162,39,.3) !important;
+  box-shadow: none !important;
+  font-size: .72rem !important;
+  padding: 10px 24px !important;
 }
 
 /* ── P7.4: MICROINTERACTIONS ────────────────────────────── */
@@ -2271,6 +2271,25 @@ body.has-store-banner {
 .cart-items,
 .product-modal { overscroll-behavior: contain }
 .mobile-nav    { overscroll-behavior-y: contain }
+
+/* ── 6b. Cart drawer: bottom-sheet em mobile ─────────────────
+   Troca translateX (horizontal) por translateY (vertical).
+   inset:0 = full-screen sem nenhuma ambiguidade de largura.
+   Padrão nativo iOS/Android: slide do baixo para cima.        */
+@media (max-width: 768px) {
+  .cart-drawer {
+    inset:         0    !important;   /* top/right/bottom/left = 0 */
+    border-left:   none !important;
+    border-top:    1px solid var(--gold-border) !important;
+    border-radius: 20px 20px 0 0     !important;
+    box-shadow:    0 -8px 48px rgba(0,0,0,.65) !important;
+    transform:     translateY(100%)  !important;   /* escondido abaixo */
+  }
+  .cart-drawer.open {
+    transform:  translateY(0) !important;
+    transition: transform .42s cubic-bezier(.17,.84,.44,1) !important;
+  }
+}
 
 /* ── 7. Bottom-sheet: modal de produto em mobile ─────────────
    Slide-up do bottom → padrão nativo iOS / Android           */
