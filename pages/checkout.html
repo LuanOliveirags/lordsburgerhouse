@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <!-- Design system tokens (skeletons, focus rings, ripple) -->
+  <link rel="stylesheet" href="../assets/css/theme.css" />
   <style>
     /* ── CHECKOUT STYLES ──────────────────────────────── */
     :root {
@@ -294,9 +296,127 @@
       .summary{position:static}
       .form-row{grid-template-columns:1fr}
     }
+
+    /* ── P7.6: CHECKOUT ENHANCEMENTS ───── */
+
+    /* Step progress bar */
+    .checkout-steps {
+      display: flex; align-items: center; gap: 0;
+      margin-bottom: 28px;
+      padding: 0 4px;
+    }
+    .checkout-step {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; flex: 1; position: relative;
+    }
+    .checkout-step::after {
+      content: '';
+      position: absolute; top: 14px; left: 50%;
+      width: 100%; height: 2px;
+      background: rgba(201,162,39,.15);
+    }
+    .checkout-step:last-child::after { display: none }
+    .checkout-step__dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 2px solid rgba(201,162,39,.25);
+      background: var(--bg-card-alt);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 700;
+      color: var(--cream-muted);
+      z-index: 1; position: relative;
+      transition: all .25s;
+    }
+    .checkout-step.active .checkout-step__dot {
+      background: linear-gradient(135deg,var(--gold-light),var(--gold));
+      border-color: var(--gold);
+      color: #0d0a00;
+      box-shadow: 0 0 12px rgba(201,162,39,.35);
+    }
+    .checkout-step.done .checkout-step__dot {
+      background: rgba(201,162,39,.15);
+      border-color: rgba(201,162,39,.4);
+      color: var(--gold);
+    }
+    .checkout-step.done::after { background: rgba(201,162,39,.35) }
+    .checkout-step__label {
+      font-size: .6rem; font-family: var(--font-display);
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--cream-faint); white-space: nowrap;
+    }
+    .checkout-step.active .checkout-step__label { color: var(--gold) }
+    .checkout-step.done .checkout-step__label   { color: var(--cream-muted) }
+
+    /* Enhanced focus rings */
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--gold) !important;
+      box-shadow: 0 0 0 3px rgba(201,162,39,.14) !important;
+    }
+
+    /* Validation feedback */
+    .form-group input.is-invalid,
+    .form-group select.is-invalid {
+      border-color: #e74c3c !important;
+      box-shadow: 0 0 0 3px rgba(231,76,60,.12) !important;
+    }
+    .field-error {
+      font-size: .72rem; color: #e74c3c;
+      margin-top: 4px; display: none;
+    }
+    .field-error.show { display: block }
+
+    /* Submit button loading state */
+    #submitBtn.loading {
+      pointer-events: none; opacity: .75; position: relative;
+      color: transparent;
+    }
+    #submitBtn.loading::after {
+      content: '';
+      position: absolute; inset: 50% auto auto 50%;
+      margin: -9px 0 0 -9px;
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid rgba(0,0,0,.2);
+      border-top-color: #0d0a00;
+      animation: co-spin .65s linear infinite;
+    }
+    @keyframes co-spin { to { transform: rotate(360deg) } }
+
+    /* Card hover state */
+    .card {
+      transition: border-color .22s, box-shadow .22s;
+    }
+    .card:focus-within {
+      border-color: rgba(201,162,39,.4);
+      box-shadow: 0 0 0 1px rgba(201,162,39,.1);
+    }
+
+    /* Payment opt better accessibility */
+    .payment-opt:focus-within {
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
+    }
+
+    /* Summary items hover */
+    .summary__item {
+      transition: background .18s;
+      border-radius: 6px;
+      margin: 0 -4px;
+      padding: 10px 4px;
+    }
+    .summary__item:hover { background: rgba(201,162,39,.04) }
+
+    /* Mobile: tighter layout */
+    @media(max-width:480px){
+      .card { padding: 18px 16px }
+      .checkout-steps { gap: 0 }
+      .checkout-step__label { display: none }
+    }
   </style>
 </head>
-<body>
+<body class="page-enter">
+  <a href="#page" class="skip-link">Ir para o formulário</a>
 
   <!-- HEADER -->
   <header class="header">
@@ -318,6 +438,26 @@
       <div>
         <h1>Finalizar <em>Pedido</em></h1>
         <p style="color:var(--cream-muted);font-size:.9rem;margin-top:6px">Preencha os dados para concluir seu pedido real.</p>
+      </div>
+
+      <!-- Progress steps (P7.6) -->
+      <div class="checkout-steps" aria-label="Etapas do pedido">
+        <div class="checkout-step active">
+          <div class="checkout-step__dot">1</div>
+          <span class="checkout-step__label">Dados</span>
+        </div>
+        <div class="checkout-step">
+          <div class="checkout-step__dot">2</div>
+          <span class="checkout-step__label">Entrega</span>
+        </div>
+        <div class="checkout-step">
+          <div class="checkout-step__dot">3</div>
+          <span class="checkout-step__label">Pagamento</span>
+        </div>
+        <div class="checkout-step">
+          <div class="checkout-step__dot">4</div>
+          <span class="checkout-step__label">Confirmar</span>
+        </div>
       </div>
 
       <!-- DADOS PESSOAIS -->
@@ -674,6 +814,11 @@
 
     async function submitOrder() {
       if (!validate()) return;
+
+      /* Loading state on button (P7.6) */
+      const submitBtn = document.getElementById('submitBtn');
+      if (submitBtn) submitBtn.classList.add('loading');
+
       const num = 'LBH-' + Math.floor(10000 + Math.random() * 90000);
 
       const subtotal = cartData.items.reduce((s,i)=>s+i.price*i.qty,0);
@@ -712,6 +857,9 @@
       if (window.__saveOrder__) {
         try { await window.__saveOrder__(orderData); } catch(e) { console.warn('Firestore save failed:', e); }
       }
+
+      /* Remove loading state */
+      if (submitBtn) submitBtn.classList.remove('loading');
 
       document.getElementById('orderNum').textContent = '#' + num;
       document.getElementById('successScreen').classList.add('show');

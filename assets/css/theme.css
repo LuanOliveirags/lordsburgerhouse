@@ -1,0 +1,628 @@
+/* ============================================================
+   LORD'S BURGER HOUSE — theme.css
+   Design System v1.0 · P7 · Centralizes all design tokens,
+   utilities, skeleton loaders, microinteractions & a11y.
+   ============================================================
+
+   USAGE:
+     <link rel="stylesheet" href="assets/css/theme.css"/>
+   Load BEFORE style.css / panel.css so variables can cascade.
+   ============================================================ */
+
+/* ─────────────────────────────────────────────────────────────
+   §1  DESIGN TOKENS
+───────────────────────────────────────────────────────────── */
+:root {
+  /* ── Core palette ─────────────────────── */
+  --c-bg-deepest:    #060401;
+  --c-bg-page:       #0d0a03;
+  --c-bg-card:       #161208;
+  --c-bg-card-alt:   #0f0e0a;
+  --c-bg-sunken:     #131006;
+  --c-bg-raised:     #1c1609;
+
+  /* ── Gold scale ─────────────────────── */
+  --c-gold-50:  #fffae8;
+  --c-gold-100: #f8e878;
+  --c-gold-200: #e6c84a;    /* --gold-light */
+  --c-gold-300: #c9a227;    /* --gold */
+  --c-gold-400: #a8841e;    /* --gold-dim */
+  --c-gold-500: #7a5f10;    /* --gold-deep */
+  --c-gold-600: #4a3a09;
+
+  /* ── Cream scale ─────────────────────── */
+  --c-cream-100: #f5e6c8;   /* --cream */
+  --c-cream-200: #e8d4a8;   /* --cream-2 */
+  --c-cream-300: #c8b078;   /* --cream-3 */
+  --c-cream-400: #8c7a52;   /* --cream-muted */
+  --c-cream-500: #4a3e28;   /* --cream-faint */
+
+  /* ── Semantic state colors ─────────────── */
+  --c-success:        #2ecc71;
+  --c-success-bg:     rgba(46,204,113,.10);
+  --c-success-border: rgba(46,204,113,.30);
+
+  --c-error:          #e74c3c;
+  --c-error-bg:       rgba(231,76,60,.10);
+  --c-error-border:   rgba(231,76,60,.30);
+
+  --c-warning:        #f39c12;
+  --c-warning-bg:     rgba(243,156,18,.10);
+  --c-warning-border: rgba(243,156,18,.30);
+
+  --c-info:           #3498db;
+  --c-info-bg:        rgba(52,152,219,.10);
+  --c-info-border:    rgba(52,152,219,.30);
+
+  /* ── Typography ─────────────────────── */
+  --font-display: 'Cinzel', 'Times New Roman', serif;
+  --font-serif:   'Playfair Display', Georgia, serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+
+  --text-xs:   .65rem;
+  --text-sm:   .78rem;
+  --text-base: .9rem;
+  --text-md:   1rem;
+  --text-lg:   1.15rem;
+  --text-xl:   1.35rem;
+  --text-2xl:  1.7rem;
+  --text-3xl:  2.2rem;
+  --text-4xl:  3rem;
+
+  --leading-tight:   1.15;
+  --leading-snug:    1.35;
+  --leading-normal:  1.65;
+  --leading-relaxed: 1.85;
+
+  /* ── Spacing scale ─────────────────── */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-7:  28px;
+  --sp-8:  32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+  --sp-20: 80px;
+  --sp-24: 96px;
+
+  /* ── Border radius ─────────────────── */
+  --r-xs:   3px;
+  --r-sm:   6px;
+  --r-md:   10px;
+  --r-lg:   16px;
+  --r-xl:   24px;
+  --r-2xl:  32px;
+  --r-full: 9999px;
+
+  /* ── Shadows ──────────────────────── */
+  --sh-xs:    0 1px  4px rgba(0,0,0,.3);
+  --sh-sm:    0 2px  8px rgba(0,0,0,.4);
+  --sh-md:    0 4px 16px rgba(0,0,0,.5);
+  --sh-lg:    0 8px 32px rgba(0,0,0,.55);
+  --sh-xl:    0 16px 48px rgba(0,0,0,.6);
+  --sh-gold:  0 0 24px rgba(201,162,39,.18);
+  --sh-gold-strong: 0 0 40px rgba(201,162,39,.35);
+  --sh-glow:  0 0 0 3px rgba(201,162,39,.18);
+
+  /* ── Borders ──────────────────────── */
+  --border-faint:  1px solid rgba(201,162,39,.12);
+  --border-subtle: 1px solid rgba(201,162,39,.20);
+  --border-base:   1px solid rgba(201,162,39,.28);
+  --border-strong: 1px solid rgba(201,162,39,.50);
+
+  /* ── Motion ───────────────────────── */
+  --ease-in:     cubic-bezier(.4,0,1,1);
+  --ease-out:    cubic-bezier(0,0,.2,1);
+  --ease-inout:  cubic-bezier(.4,0,.2,1);
+  --ease-spring: cubic-bezier(.34,1.56,.64,1);
+  --ease-back:   cubic-bezier(.36,.07,.19,.97);
+
+  --dur-fast:   120ms;
+  --dur-base:   220ms;
+  --dur-slow:   400ms;
+  --dur-slower: 650ms;
+
+  /* ── Z-index scale ─────────────────── */
+  --z-below:   -1;
+  --z-base:    0;
+  --z-raised:  10;
+  --z-sticky:  90;
+  --z-overlay: 100;
+  --z-modal:   200;
+  --z-toast:   300;
+  --z-top:     9999;
+
+  /* ── Focus ring ─────────────────────── */
+  --focus-ring: 0 0 0 3px rgba(201,162,39,.45);
+  --focus-ring-error: 0 0 0 3px rgba(231,76,60,.35);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   §2  GLOBAL ACCESSIBILITY
+───────────────────────────────────────────────────────────── */
+
+/* Visible keyboard-focus ring on all interactive elements */
+:focus-visible {
+  outline: 2px solid var(--c-gold-300);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+/* Remove default outline only for mouse users */
+:focus:not(:focus-visible) { outline: none }
+
+/* Skip to main content link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--sp-6);
+  padding: var(--sp-3) var(--sp-6);
+  background: var(--c-gold-300);
+  color: #0d0a00;
+  font-weight: 700;
+  font-size: var(--text-sm);
+  border-radius: 0 0 var(--r-md) var(--r-md);
+  z-index: var(--z-top);
+  transition: top var(--dur-base);
+}
+.skip-link:focus { top: 0 }
+
+/* Respect motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High-contrast text helpers */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   §3  SKELETON LOADERS
+───────────────────────────────────────────────────────────── */
+@keyframes sk-shimmer {
+  0%   { background-position: -600px 0 }
+  100% { background-position:  600px 0 }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(201,162,39,.04) 25%,
+    rgba(201,162,39,.10) 37%,
+    rgba(201,162,39,.04) 63%
+  );
+  background-size: 600px 100%;
+  animation: sk-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--r-sm);
+}
+
+/* Product card skeleton */
+.skeleton-card {
+  background: var(--c-bg-card);
+  border: var(--border-subtle);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  animation: cardIn .45s var(--ease-inout) both;
+}
+.skeleton-card__img {
+  width: 100%; padding-top: 66%;
+  background: linear-gradient(
+    90deg,
+    rgba(201,162,39,.04) 25%,
+    rgba(201,162,39,.09) 37%,
+    rgba(201,162,39,.04) 63%
+  );
+  background-size: 800px 100%;
+  animation: sk-shimmer 1.5s ease-in-out infinite;
+}
+.skeleton-card__body {
+  padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
+.skeleton-card__line {
+  height: 12px; border-radius: var(--r-sm);
+}
+.skeleton-card__line--title { width: 70% }
+.skeleton-card__line--text  { width: 90% }
+.skeleton-card__line--price { width: 35%; height: 18px }
+.skeleton-card__footer {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-top: var(--sp-2);
+}
+.skeleton-card__circle {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+}
+
+/* Combo card skeleton */
+.skeleton-combo {
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: var(--border-subtle);
+  height: 260px;
+}
+
+/* Stat card skeleton (dashboard) */
+.skeleton-stat {
+  background: var(--c-bg-card);
+  border: var(--border-subtle);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.skeleton-stat__icon {
+  width: 44px; height: 44px; border-radius: var(--r-md);
+}
+.skeleton-stat__val {
+  width: 60%; height: 32px; border-radius: var(--r-sm);
+  margin-top: 4px;
+}
+.skeleton-stat__label {
+  width: 80%; height: 12px; border-radius: var(--r-sm);
+}
+
+/* Table row skeleton */
+.skeleton-row {
+  display: flex; gap: var(--sp-5); align-items: center;
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: var(--border-faint);
+}
+.skeleton-row__cell { height: 14px; border-radius: var(--r-sm); flex: 1 }
+.skeleton-row__cell--sm { max-width: 80px }
+.skeleton-row__cell--md { max-width: 140px }
+
+/* ─────────────────────────────────────────────────────────────
+   §4  SCROLL REVEAL
+───────────────────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity var(--dur-slower) var(--ease-out),
+    transform var(--dur-slower) var(--ease-out);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+/* Stagger variants */
+.reveal--delay-1 { transition-delay: 80ms }
+.reveal--delay-2 { transition-delay: 160ms }
+.reveal--delay-3 { transition-delay: 240ms }
+.reveal--delay-4 { transition-delay: 320ms }
+
+/* Horizontal reveal */
+.reveal-left  { opacity:0; transform:translateX(-24px); transition: opacity var(--dur-slower) var(--ease-out), transform var(--dur-slower) var(--ease-out) }
+.reveal-right { opacity:0; transform:translateX( 24px); transition: opacity var(--dur-slower) var(--ease-out), transform var(--dur-slower) var(--ease-out) }
+.reveal-left.is-visible, .reveal-right.is-visible { opacity:1; transform:none }
+
+/* ─────────────────────────────────────────────────────────────
+   §5  RIPPLE EFFECT
+───────────────────────────────────────────────────────────── */
+.ripple-host { position: relative; overflow: hidden }
+.ripple-wave {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  pointer-events: none;
+  transform: scale(0);
+  animation: ripple-expand .55s var(--ease-out) forwards;
+}
+@keyframes ripple-expand {
+  to { transform: scale(4); opacity: 0 }
+}
+/* Gold ripple variant (for gold buttons) */
+.ripple-wave--dark {
+  background: rgba(0,0,0,.12);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   §6  BUTTON ENHANCEMENTS
+───────────────────────────────────────────────────────────── */
+
+/* Loading state — replaces text with spinner dot */
+.btn--loading {
+  pointer-events: none;
+  opacity: .75;
+  position: relative;
+  color: transparent !important;
+}
+.btn--loading::after {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  margin: -8px 0 0 -8px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  animation: btn-spin .65s linear infinite;
+}
+/* For gold buttons */
+.btn--primary.btn--loading::after,
+.btn--gold.btn--loading::after {
+  border-color: rgba(0,0,0,.2);
+  border-top-color: #0d0a00;
+}
+@keyframes btn-spin { to { transform: rotate(360deg) } }
+
+/* Active press feedback */
+.btn:active:not(:disabled) { transform: scale(.97) }
+.btn--primary:active:not(:disabled) { transform: translateY(0) scale(.98) }
+
+/* ─────────────────────────────────────────────────────────────
+   §7  FORM VALIDATION STATES
+───────────────────────────────────────────────────────────── */
+.input-valid {
+  border-color: var(--c-success) !important;
+  box-shadow: 0 0 0 2px var(--c-success-bg) !important;
+}
+.input-error {
+  border-color: var(--c-error) !important;
+  box-shadow: 0 0 0 2px var(--c-error-bg) !important;
+}
+.input-error-msg {
+  font-size: var(--text-xs);
+  color: var(--c-error);
+  margin-top: var(--sp-1);
+  display: flex; align-items: center; gap: var(--sp-1);
+}
+.input-error-msg::before {
+  content: '⚠';
+}
+.input-valid-icon {
+  position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--c-success);
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   §8  ENHANCED STATUS STATES
+───────────────────────────────────────────────────────────── */
+.badge-success { background: var(--c-success-bg); color: var(--c-success); border: 1px solid var(--c-success-border); padding: 3px 10px; border-radius: var(--r-full); font-size: var(--text-xs); font-weight: 700 }
+.badge-error   { background: var(--c-error-bg);   color: var(--c-error);   border: 1px solid var(--c-error-border);   padding: 3px 10px; border-radius: var(--r-full); font-size: var(--text-xs); font-weight: 700 }
+.badge-warning { background: var(--c-warning-bg); color: var(--c-warning); border: 1px solid var(--c-warning-border); padding: 3px 10px; border-radius: var(--r-full); font-size: var(--text-xs); font-weight: 700 }
+.badge-info    { background: var(--c-info-bg);    color: var(--c-info);    border: 1px solid var(--c-info-border);    padding: 3px 10px; border-radius: var(--r-full); font-size: var(--text-xs); font-weight: 700 }
+
+/* ─────────────────────────────────────────────────────────────
+   §9  PAGE TRANSITION
+───────────────────────────────────────────────────────────── */
+.page-enter {
+  animation: page-fade-in var(--dur-slow) var(--ease-out) both;
+}
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(10px) }
+  to   { opacity: 1; transform: none }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   §10  MOBILE TOUCH TARGETS
+───────────────────────────────────────────────────────────── */
+@media (pointer: coarse) {
+  /* Ensure all interactive elements hit 44×44px minimum */
+  button, [role="button"], a, input, select, .cat-tab, .filter-tab {
+    min-height: 44px;
+  }
+  .cat-tab, .filter-tab {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   §11  CARD HOVER GLOW (shared)
+───────────────────────────────────────────────────────────── */
+.card-glow {
+  transition: box-shadow var(--dur-base) var(--ease-inout),
+              border-color var(--dur-base) var(--ease-inout),
+              transform var(--dur-base) var(--ease-inout);
+}
+.card-glow:hover {
+  box-shadow: 0 0 0 1px rgba(201,162,39,.45),
+              0 12px 36px rgba(0,0,0,.5),
+              0 0 28px rgba(201,162,39,.12);
+  border-color: rgba(201,162,39,.45) !important;
+  transform: translateY(-4px);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   §12  IMAGE LAZY FADE
+───────────────────────────────────────────────────────────── */
+img[loading="lazy"] { transition: opacity var(--dur-slow) var(--ease-out) }
+img[loading="lazy"].loaded { opacity: 1 }
+
+/* ─────────────────────────────────────────────────────────────
+   §13  PROMOTED / FEATURED RIBBON
+───────────────────────────────────────────────────────────── */
+.ribbon {
+  position: absolute;
+  top: 14px; right: -6px;
+  background: linear-gradient(135deg, var(--c-gold-200), var(--c-gold-300));
+  color: #0d0a00;
+  font-family: var(--font-display);
+  font-size: .6rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: var(--r-xs) 0 0 var(--r-xs);
+  box-shadow: 0 2px 8px rgba(201,162,39,.35);
+}
+.ribbon::after {
+  content: '';
+  position: absolute;
+  right: 0; bottom: -6px;
+  border-top: 6px solid var(--c-gold-400);
+  border-right: 6px solid transparent;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   §14  PRODUCT CARD OVERLAY (see-more on hover)
+───────────────────────────────────────────────────────────── */
+.product-card__hover-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(6,4,1,.75) 0%,
+    rgba(6,4,1,.3)  50%,
+    transparent     100%
+  );
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: var(--sp-3);
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-inout);
+}
+.product-card__hover-label {
+  font-family: var(--font-display);
+  font-size: .62rem; font-weight: 700;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--c-gold-200);
+  transform: translateY(6px);
+  transition: transform var(--dur-base) var(--ease-inout);
+}
+.product-card:hover .product-card__hover-overlay { opacity: 1 }
+.product-card:hover .product-card__hover-label   { transform: translateY(0) }
+
+/* ─────────────────────────────────────────────────────────────
+   §15  DASHBOARD KPI ENHANCEMENTS
+───────────────────────────────────────────────────────────── */
+.kpi-trend {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: var(--text-xs); font-weight: 700;
+  padding: 2px 7px; border-radius: var(--r-full);
+  margin-left: var(--sp-2);
+}
+.kpi-trend--up   { color: var(--c-success); background: var(--c-success-bg) }
+.kpi-trend--down { color: var(--c-error);   background: var(--c-error-bg) }
+.kpi-trend--flat { color: var(--c-gold-400); background: rgba(201,162,39,.08) }
+
+/* ─────────────────────────────────────────────────────────────
+   §16  IMPROVED STORE CLOSED BANNER
+───────────────────────────────────────────────────────────── */
+#storeClosedBanner {
+  display: none;
+  background: linear-gradient(135deg, #6b1a1a, #8b2020);
+  color: #fff;
+  text-align: center;
+  padding: 12px 24px;
+  font-size: .85rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  z-index: var(--z-sticky);
+  position: relative;
+  border-bottom: 1px solid rgba(255,100,100,.25);
+  box-shadow: 0 2px 16px rgba(139,26,26,.4);
+}
+#storeClosedBanner.show { display: block }
+
+/* ─────────────────────────────────────────────────────────────
+   §17  HERO PROMO BADGE
+───────────────────────────────────────────────────────────── */
+.hero-promo-badge {
+  display: inline-flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  background: rgba(201,162,39,.12);
+  border: 1px solid rgba(201,162,39,.35);
+  border-radius: var(--r-full);
+  font-family: var(--font-display);
+  font-size: .58rem; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--c-gold-200);
+  margin-bottom: var(--sp-5);
+  width: fit-content;
+  animation: badge-pulse 3s ease-in-out infinite;
+}
+@keyframes badge-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(201,162,39,.2) }
+  50%      { box-shadow: 0 0 0 8px rgba(201,162,39,0) }
+}
+.hero-promo-badge__dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--c-gold-200);
+  box-shadow: 0 0 6px var(--c-gold-200);
+  animation: blink 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ─────────────────────────────────────────────────────────────
+   §18  PANEL HEADER IMPROVEMENTS
+───────────────────────────────────────────────────────────── */
+.panel-header {
+  display: flex; align-items: center;
+  padding: 0 28px;
+  height: 64px;
+  background: rgba(13,10,3,.96);
+  border-bottom: 1px solid rgba(201,162,39,.18);
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: var(--z-sticky);
+  gap: 14px;
+  grid-column: 2; /* for panel-layout grid */
+}
+.panel-header__info { flex: 1; min-width: 0 }
+.panel-header__title {
+  font-family: var(--font-display);
+  font-size: .85rem; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: #e8d4a8;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.panel-header__sub {
+  font-size: .72rem; color: #8c7a52;
+  margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.panel-content {
+  padding: 28px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   §19  TOAST IMPROVEMENTS (panel)
+───────────────────────────────────────────────────────────── */
+.toast--success .toast__icon::before { content: '✓' }
+.toast--error   .toast__icon::before { content: '✕' }
+.toast--info    .toast__icon::before { content: 'ℹ' }
+
+/* ─────────────────────────────────────────────────────────────
+   §20  DIVIDER
+───────────────────────────────────────────────────────────── */
+.divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    to right, transparent, rgba(201,162,39,.2) 25%, rgba(201,162,39,.2) 75%, transparent
+  );
+  margin: var(--sp-6) 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   §21  SCROLL BAR (global fine-tune)
+───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px }
+::-webkit-scrollbar-track { background: transparent }
+::-webkit-scrollbar-thumb {
+  background: rgba(201,162,39,.25);
+  border-radius: var(--r-full);
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(201,162,39,.5) }
+
+/* ─────────────────────────────────────────────────────────────
+   §22  PRINT
+───────────────────────────────────────────────────────────── */
+@media print {
+  .loader, .header, .cart-drawer, .cart-overlay,
+  .fab-cart, .sidebar, .topbar { display: none !important }
+  body { background: #fff !important; color: #000 !important }
+}

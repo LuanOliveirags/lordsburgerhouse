@@ -263,6 +263,9 @@ function renderProducts(filter) {
 
   productsGrid.innerHTML = '';
 
+  /* Remove skeleton placeholders + mark grid as loaded */
+  productsGrid.removeAttribute('aria-busy');
+
   if (!currentProducts.length) {
     productsGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--cream-muted)">Nenhum produto disponível.</p>';
     return;
@@ -270,14 +273,19 @@ function renderProducts(filter) {
 
   items.forEach((p, i) => {
     const card = document.createElement('article');
-    card.className = 'product-card';
+    card.className = 'product-card ripple-host';
     card.setAttribute('role', 'listitem');
+    card.setAttribute('aria-label', p.name);
     card.style.animationDelay = `${i * 0.06}s`;
     card.innerHTML = `
       <div class="product-card__img">
         <img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}" loading="lazy" />
         ${p.badge ? `<span class="product-card__badge ${escapeHtml(p.badgeClass)}">${escapeHtml(p.badge)}</span>` : ''}
         <span class="ilustrativa-tag">Imagem meramente ilustrativa</span>
+        <!-- Hover overlay (P7.3) -->
+        <div class="product-card__hover-overlay" aria-hidden="true">
+          <span class="product-card__hover-label">Ver detalhes</span>
+        </div>
       </div>
       <div class="product-card__body">
         <span class="product-card__category">${escapeHtml(p.catLabel || p.categoryLabel || '')}</span>
@@ -307,6 +315,7 @@ function renderProducts(filter) {
 ══════════════════════════════════════════════════════ */
 function renderCombos() {
   combosGrid.innerHTML = '';
+  combosGrid.removeAttribute('aria-busy');
   currentCombos.forEach(c => {
     const card = document.createElement('article');
     card.className = 'combo-card';
@@ -580,13 +589,55 @@ function showToast(msg) {
 }
 
 /* ══════════════════════════════════════════════════════
-   SCROLL EFFECTS
+   SCROLL EFFECTS  (P7.4)
 ══════════════════════════════════════════════════════ */
 function scrollEffects() {
   const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 40);
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
+
+  /* Scroll reveal — triggers .is-visible when element enters viewport */
+  if ('IntersectionObserver' in window) {
+    const revealObs = new IntersectionObserver(
+      entries => entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-visible');
+          revealObs.unobserve(e.target);
+        }
+      }),
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    );
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right')
+            .forEach(el => revealObs.observe(el));
+  } else {
+    /* Fallback: show all immediately */
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right')
+            .forEach(el => el.classList.add('is-visible'));
+  }
 }
+
+/* ══════════════════════════════════════════════════════
+   RIPPLE EFFECT  (P7.4)
+══════════════════════════════════════════════════════ */
+function addRipple(el, e) {
+  const rect   = el.getBoundingClientRect();
+  const size   = Math.max(rect.width, rect.height) * 1.6;
+  const x      = e.clientX - rect.left - size / 2;
+  const y      = e.clientY - rect.top  - size / 2;
+  const wave   = document.createElement('span');
+  wave.className = 'ripple-wave' + (el.classList.contains('btn--primary') ? ' ripple-wave--dark' : '');
+  Object.assign(wave.style, {
+    width: `${size}px`, height: `${size}px`,
+    left:  `${x}px`,   top:   `${y}px`
+  });
+  el.appendChild(wave);
+  wave.addEventListener('animationend', () => wave.remove());
+}
+
+document.addEventListener('click', e => {
+  const host = e.target.closest('.ripple-host');
+  if (host) addRipple(host, e);
+}, { passive: true });
 
 /* ══════════════════════════════════════════════════════
    EVENT BINDING

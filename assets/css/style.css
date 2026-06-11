@@ -1228,6 +1228,210 @@ input,textarea,select{font:inherit;color:inherit}
 }
 .fab-total{font-size:.88rem;font-weight:700}
 
+/* ── P7: PRODUCT CARD ENHANCEMENTS ─────────────────────── */
+
+/* Refined image aspect container */
+.product-card__img {
+  position:relative;width:100%;padding-top:66%;
+  overflow:hidden;background:var(--bg-600);
+}
+/* Remove existing selector so next rule wins */
+
+/* Tighter shine sweep on hover */
+.product-card::before {
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(201,162,39,.04) 50%,
+    transparent 70%
+  );
+  opacity:0;transition:opacity var(--t);
+  pointer-events:none;z-index:2;
+  transform:translateX(-100%);
+}
+.product-card:hover::before {
+  opacity:1;
+  animation:card-shine .55s var(--ease) forwards;
+}
+@keyframes card-shine {
+  to { transform:translateX(100%) }
+}
+
+/* Price shimmer highlight */
+.product-card__price {
+  position:relative;
+}
+.product-card__price::after {
+  content:'';
+  position:absolute;
+  inset:-2px -4px;
+  background:radial-gradient(ellipse at center, rgba(201,162,39,.08) 0%, transparent 70%);
+  opacity:0;
+  transition:opacity var(--t);
+  pointer-events:none;
+}
+.product-card:hover .product-card__price::after { opacity:1 }
+
+/* Add button enhanced */
+.product-card__add {
+  position:relative;overflow:hidden;
+}
+.product-card__add::after {
+  content:'';
+  position:absolute;inset:0;
+  border-radius:50%;
+  background:rgba(255,255,255,.2);
+  transform:scale(0);
+  transition:transform .35s var(--ease);
+}
+.product-card__add:hover::after { transform:scale(1.5);opacity:0 }
+.product-card__add:active { transform:scale(.9) }
+
+/* ── P7.2: HERO IMPROVEMENTS ───────────────────────────── */
+
+/* CTA button pulse */
+.btn--primary.btn--hero-cta {
+  animation:cta-pulse 3.5s ease-in-out infinite;
+}
+@keyframes cta-pulse {
+  0%,100% { box-shadow:0 4px 20px rgba(201,162,39,.3),inset 0 1px 0 rgba(255,255,255,.25) }
+  50%     { box-shadow:0 6px 30px rgba(201,162,39,.55),inset 0 1px 0 rgba(255,255,255,.25) }
+}
+
+/* Hero stats improved */
+.hero__stats {
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+}
+.hero__stat strong {
+  transition:color var(--t);
+}
+.hero__stat:hover strong { color:var(--gold-light) }
+
+/* Store closed banner — override inline style (P7) */
+#storeClosedBanner {
+  background:linear-gradient(135deg,#6b1a1a,#8b2020) !important;
+  border-bottom:1px solid rgba(255,100,100,.2);
+  box-shadow:0 2px 16px rgba(139,26,26,.35);
+  font-size:.85rem !important;
+  padding:12px 24px !important;
+}
+
+/* ── P7.4: MICROINTERACTIONS ────────────────────────────── */
+
+/* Nav link active glow */
+.nav-link:focus-visible {
+  outline:2px solid var(--gold);
+  outline-offset:4px;
+  border-radius:var(--r-full);
+}
+
+/* Mobile nav improved enter animation */
+.mobile-nav.open .mobile-nav__link {
+  animation:nav-item-in .25s var(--ease) both;
+}
+.mobile-nav.open .mobile-nav__link:nth-child(1){animation-delay:.05s}
+.mobile-nav.open .mobile-nav__link:nth-child(2){animation-delay:.10s}
+.mobile-nav.open .mobile-nav__link:nth-child(3){animation-delay:.15s}
+.mobile-nav.open .mobile-nav__link:nth-child(4){animation-delay:.20s}
+.mobile-nav.open .mobile-nav__link:nth-child(5){animation-delay:.25s}
+@keyframes nav-item-in{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+
+/* Category tab enhanced active */
+.cat-tab.active {
+  box-shadow:0 2px 14px rgba(201,162,39,.4),0 0 0 1px rgba(201,162,39,.3);
+}
+
+/* Cart item add animation */
+.cart-item {
+  transform-origin:top;
+}
+
+/* Info strip hover items */
+.info-strip__item {
+  transition:transform var(--t);
+}
+.info-strip__item:hover { transform:translateY(-1px) }
+
+/* Combo card enhanced */
+.combo-card {
+  position:relative;
+}
+.combo-card::before {
+  content:'';
+  position:absolute;inset:0;
+  border-radius:var(--r-lg);
+  border:1px solid transparent;
+  transition:border-color var(--t);
+  pointer-events:none;z-index:2;
+}
+.combo-card:hover::before { border-color:rgba(201,162,39,.5) }
+
+/* Modal open/close improved */
+.product-modal.open {
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s var(--ease);
+}
+
+/* Section fade-in targets */
+.section { opacity:1 }
+
+/* ── P7.8: MOBILE FIRST IMPROVEMENTS ──────────────────── */
+
+/* Responsive typography */
+@media(max-width:360px){
+  :root { font-size:15px }
+  .hero__title-big { font-size:3.2rem }
+  .container { padding:0 14px }
+  .btn--lg { padding:12px 20px }
+  .hero__actions { gap:10px }
+  .hero__actions .btn--lg { font-size:.82rem }
+}
+
+/* Better product grid on very small screens */
+@media(max-width:320px){
+  .products-grid { grid-template-columns:1fr }
+}
+
+/* Touch-friendly category tabs on mobile */
+@media(max-width:768px){
+  .category-tabs {
+    overflow-x:auto;
+    flex-wrap:nowrap;
+    justify-content:flex-start;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding:10px 14px;
+  }
+  .category-tabs::-webkit-scrollbar { display:none }
+  .cat-tab {
+    scroll-snap-align:start;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+}
+
+/* Cart drawer mobile improvements */
+@media(max-width:480px){
+  .cart-drawer { width:100vw }
+  .cart-item { padding:10px }
+  .cart-item__img { width:56px;height:56px }
+  .cart-footer { padding:14px 16px }
+  .modal-close { top:8px;right:8px }
+  .product-modal__body { padding:18px 18px 24px }
+  .product-modal__name { font-size:1.3rem }
+}
+
+/* Improved bottom FAB for mobile (avoid system UI) */
+@media(max-width:768px){
+  .fab-cart {
+    bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+    right:16px;
+  }
+}
+
 /* ── RESPONSIVE ─────────────────────────────────────────── */
 @media (max-width:1100px){
   .about__inner{grid-template-columns:1fr;gap:48px}

@@ -16,7 +16,7 @@
    Firebase APIs           → NUNCA interceptar (Firestore, Auth, Functions)
    ────────────────────────────────────────────────────────────── */
 
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const STATIC_CACHE  = `lords-static-${CACHE_VERSION}`;
 const PAGES_CACHE   = `lords-pages-${CACHE_VERSION}`;
 const IMAGES_CACHE  = `lords-images-${CACHE_VERSION}`;
@@ -28,6 +28,7 @@ const PRECACHE_ASSETS = [
   './',
   './offline.html',
   './manifest.json',
+  './assets/css/theme.css',
   './assets/css/style.css',
   './assets/css/panel.css',
   './assets/js/firebase-config.js',
