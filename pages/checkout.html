@@ -516,6 +516,11 @@
 
     function fmt(n) { return n.toFixed(2).replace('.', ','); }
 
+    function escapeHtml(str) {
+      if (str == null) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+    }
+
     // Load cart from sessionStorage or localStorage
     function loadData() {
       try {
@@ -552,9 +557,9 @@
 
       el.innerHTML = items.map(i => `
         <div class="summary__item">
-          <img class="summary__item-img" src="${i.img}" alt="${i.name}" loading="lazy" />
+          <img class="summary__item-img" src="${escapeHtml(i.img)}" alt="${escapeHtml(i.name)}" loading="lazy" />
           <div class="summary__item-info">
-            <div class="summary__item-name">${i.name}</div>
+            <div class="summary__item-name">${escapeHtml(i.name)}</div>
             <div class="summary__item-qty">${i.qty}x · R$ ${fmt(i.price)} cada</div>
           </div>
           <div class="summary__item-price">R$ ${fmt(i.price * i.qty)}</div>
@@ -739,6 +744,10 @@
     /* ── pré-preenche campos se logado ── */
     onAuthStateChanged(auth, async user => {
       window.__currentUser__ = user || null;
+      // Re-render tracking CTA if success screen is already showing
+      if (document.getElementById('successScreen')?.classList.contains('show')) {
+        window.__renderTrackingCta__?.();
+      }
       if (!user) return;
       try {
         const snap = await getDoc(doc(db, 'users', user.uid));

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Set-Location \"c:\\\\Users\\\\F15-LuanGs\\\\OneDrive\\\\Anexos\\\\Desktop\\\\Project developer\\\\Marketing\\\\lordsburgerhouse\"; Get-ChildItem -Recurse -Force | Select-Object FullName | ForEach-Object { $_.FullName -replace [regex]::Escape\\(\\(Get-Location\\).Path + '\\\\'\\), '' } | Sort-Object)",
+      "Bash(dir /b \"c:\\\\Users\\\\F15-LuanGs\\\\OneDrive\\\\Anexos\\\\Desktop\\\\Project developer\\\\Marketing\\\\lordsburgerhouse\")"
+    ]
+  }
+}

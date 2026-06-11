@@ -11,14 +11,75 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="assets/images/logos/icon-192.png" />
   <link rel="apple-touch-icon" href="assets/images/logos/icon-192.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Lord's Burger" />
+  <meta name="msapplication-TileColor" content="#c9a227" />
+  <meta name="msapplication-TileImage" content="assets/images/logos/icon-192.png" />
 
-  <!-- Google Fonts -->
+  <!-- SEO -->
+  <link rel="canonical" href="https://lordsburgerhouse.com.br/" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Lord's Burger House" />
+  <meta name="keywords" content="hambúrguer artesanal, delivery, smash burger, combo, lord's burger house" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Lord's Burger House" />
+  <meta property="og:title" content="Lord's Burger House — O Sabor Digno da Realeza" />
+  <meta property="og:description" content="Hambúrgueres artesanais premium. Ingredientes selecionados, receitas exclusivas e delivery em 30 minutos." />
+  <meta property="og:image" content="assets/images/logos/icon-512.png" />
+  <meta property="og:url" content="https://lordsburgerhouse.com.br/" />
+  <meta property="og:locale" content="pt_BR" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Lord's Burger House — O Sabor Digno da Realeza" />
+  <meta name="twitter:description" content="Hambúrgueres artesanais premium. Peça online com delivery em 30 min." />
+  <meta name="twitter:image" content="assets/images/logos/icon-512.png" />
+
+  <!-- Preload crítico: logo (LCP candidate) -->
+  <link rel="preload" as="image" href="assets/images/logos/logo.png" fetchpriority="high" />
+
+  <!-- Google Fonts — carregamento não-bloqueante (P3.6) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" /></noscript>
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="assets/css/style.css" />
+
+  <!-- Schema.org: Restaurant -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    "name": "Lord's Burger House",
+    "description": "Hambúrgueres artesanais premium. O sabor digno da realeza.",
+    "url": "https://lordsburgerhouse.com.br",
+    "logo": "https://lordsburgerhouse.com.br/assets/images/logos/logo.png",
+    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80",
+    "telephone": "+5511940737953",
+    "servesCuisine": "Hambúrgueres Artesanais",
+    "priceRange": "$$",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Rua das Realezas, 123",
+      "addressLocality": "Centro",
+      "addressCountry": "BR"
+    },
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "11:00", "closes": "23:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday","Sunday"], "opens": "11:00", "closes": "00:00" }
+    ],
+    "menu": "https://lordsburgerhouse.com.br/#menu",
+    "acceptsReservations": "false",
+    "potentialAction": { "@type": "OrderAction", "target": "https://lordsburgerhouse.com.br/" }
+  }
+  </script>
 </head>
 <body>
 
@@ -56,7 +117,7 @@
             stroke-dasharray="60 404"/>
         </svg>
         <div class="loader__logo-bg"></div>
-        <img class="loader__logo" src="assets/images/logos/logo.png" alt="Lord's Burger House"/>
+        <img class="loader__logo" src="assets/images/logos/logo.png" alt="Lord's Burger House" width="120" height="120"/>
       </div>
 
       <!-- nome da marca -->
@@ -79,7 +140,7 @@
   <header class="header" id="header">
     <div class="container header__inner">
       <a href="#hero" class="header__logo">
-        <img src="assets/images/logos/logo.png" alt="Lord's Burger House" />
+        <img src="assets/images/logos/logo.png" alt="Lord's Burger House" width="56" height="56" fetchpriority="high" />
       </a>
 
       <nav class="header__nav" id="mainNav">
@@ -122,7 +183,7 @@
 
     <!-- Logo atmosférico como marca d'água no fundo -->
     <div class="hero__watermark" aria-hidden="true">
-      <img src="assets/images/logos/logo.png" alt="" />
+      <img src="assets/images/home/logo(sem-fundo).png" alt="" />
     </div>
     <!-- Glow dourado posicionado sobre a marca d'água -->
     <div class="hero__glow" aria-hidden="true"></div>
@@ -360,7 +421,7 @@
   <footer class="footer">
     <div class="container footer__inner">
       <div class="footer__brand">
-        <img src="assets/images/logos/logo.png" alt="Lord's Burger House" class="footer__logo" />
+        <img src="assets/images/logos/logo.png" alt="Lord's Burger House" class="footer__logo" width="80" height="80" loading="lazy" />
         <p>O sabor digno da realeza.</p>
         <p class="footer__copy">&copy; 2025 Lord's Burger House. Todos os direitos reservados.</p>
       </div>
@@ -513,7 +574,115 @@
     <span class="fab-total" id="fabTotal">R$ 0,00</span>
   </button>
 
+  <!-- ═══════════════════════════ PWA INSTALL BANNER (P3.4) ═══════════════════════════ -->
+  <div id="pwaInstallBanner" role="banner" aria-label="Instalar aplicativo" style="
+    display:none;position:fixed;bottom:0;left:0;right:0;z-index:600;
+    background:rgba(13,10,3,.97);border-top:1px solid rgba(201,162,39,.3);
+    padding:14px 20px;backdrop-filter:blur(12px);
+    display:none;align-items:center;justify-content:space-between;gap:12px;
+    animation:slideUp .3s ease;
+  ">
+    <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+      <img src="assets/images/logos/icon-192.png" alt="" width="40" height="40"
+           style="border-radius:10px;flex-shrink:0"/>
+      <div style="min-width:0">
+        <div style="font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:#c9a227">Lord's Burger House</div>
+        <div style="font-size:.78rem;color:rgba(232,213,163,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Adicione à tela inicial para acesso rápido</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <button id="pwaInstallBtn" style="
+        background:linear-gradient(135deg,#c9a227,#a07a18);color:#000;border:none;
+        padding:9px 18px;border-radius:9999px;cursor:pointer;
+        font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+        white-space:nowrap;transition:transform .2s;
+      " onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+        Instalar
+      </button>
+      <button id="pwaInstallDismiss" aria-label="Fechar" style="
+        background:none;border:none;color:rgba(232,213,163,.4);cursor:pointer;
+        font-size:1.3rem;padding:6px 4px;line-height:1;transition:color .2s;
+      " onmouseover="this.style.color='rgba(232,213,163,.9)'" onmouseout="this.style.color='rgba(232,213,163,.4)'">
+        ×
+      </button>
+    </div>
+  </div>
+  <style>@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}</style>
+
   <script type="module" src="assets/js/firebase-store.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script type="module" src="assets/js/app.js"></script>
+
+  <!-- ═══════════════════════════ SERVICE WORKER + PWA (P3.1 / P3.4) ═══════════════════════════ -->
+  <script>
+    /* ── Service Worker registration ── */
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js', { scope: './' })
+          .then(reg => {
+            /* Verifica updates a cada 60s quando rodando como PWA instalado */
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+              setInterval(() => reg.update(), 60000);
+            }
+            /* Notifica quando há nova versão disponível */
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              newWorker?.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('[PWA] Nova versão disponível — recarregue para atualizar.');
+                }
+              });
+            });
+          })
+          .catch(err => console.warn('[SW] Falha no registro:', err));
+      });
+    }
+
+    /* ── Install Prompt (P3.4) ── */
+    (function () {
+      const DISMISSED_KEY = 'pwa_install_dismissed';
+      let deferredPrompt = null;
+      const banner  = document.getElementById('pwaInstallBanner');
+      const installBtn  = document.getElementById('pwaInstallBtn');
+      const dismissBtn  = document.getElementById('pwaInstallDismiss');
+
+      function showBanner() {
+        if (!banner || sessionStorage.getItem(DISMISSED_KEY)) return;
+        banner.style.display = 'flex';
+      }
+      function hideBanner() {
+        if (!banner) return;
+        banner.style.display = 'none';
+      }
+
+      window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+        /* Pequeno delay para não competir com o loader */
+        setTimeout(showBanner, 3000);
+      });
+
+      installBtn?.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        hideBanner();
+        if (outcome === 'accepted') {
+          console.log('[PWA] App instalado com sucesso.');
+        }
+      });
+
+      dismissBtn?.addEventListener('click', () => {
+        sessionStorage.setItem(DISMISSED_KEY, '1');
+        hideBanner();
+      });
+
+      window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        hideBanner();
+        console.log('[PWA] App instalado.');
+      });
+    })();
+  </script>
 </body>
 </html>

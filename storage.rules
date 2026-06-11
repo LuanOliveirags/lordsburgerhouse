@@ -1,0 +1,27 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null
+          && firestore.get(
+               /databases/(default)/documents/users/$(request.auth.uid)
+             ).data.get('role', '') == 'admin';
+    }
+
+    // Product images: public read, admin-only write/delete, max 4 MB, images only
+    match /products/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin()
+                   && request.resource != null
+                   && request.resource.size <= 4 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+      allow delete: if isAdmin();
+    }
+
+    // Deny everything else
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

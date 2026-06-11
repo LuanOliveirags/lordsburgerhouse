@@ -12,7 +12,7 @@
 
 import { initializeApp }                          from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth }                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { initializeFirestore, persistentLocalCache } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { getStorage }                             from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
 
 // ⚠️  Falta preencher: apiKey e appId
@@ -29,11 +29,10 @@ const firebaseConfig = {
 
 export const app     = initializeApp(firebaseConfig);
 export const auth    = getAuth(app);
-export const db      = getFirestore(app);
+export const db      = initializeFirestore(app, {
+  localCache: persistentLocalCache()
+});
 export const storage = getStorage(app);
-
-// Persistência offline: pedidos ficam no cache mesmo sem internet
-enableIndexedDbPersistence(db).catch(() => {});
 
 /* ── ROLES ─────────────────────────────────────────────── */
 export const ROLES = {

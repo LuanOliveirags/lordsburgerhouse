@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Analytics — Lord's Burger House</title>
+  <link rel="icon" href="../../assets/images/logos/icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../../assets/css/panel.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    /* Period bar */
+    .period-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:24px;
+      background:var(--panel-card); border:1px solid var(--panel-border); border-radius:10px; padding:12px 16px; }
+    .period-btn { background:transparent; border:1px solid var(--panel-border); color:var(--cream-muted);
+      border-radius:6px; padding:6px 14px; font-size:.82rem; cursor:pointer; transition:all .2s; }
+    .period-btn:hover { border-color:var(--gold-dim); color:var(--cream); }
+    .period-btn.active { background:var(--gold-dim); border-color:var(--gold-dim); color:#0d0a03; font-weight:600; }
+    .period-separator { width:1px; height:20px; background:var(--panel-border); margin:0 4px; }
+    .period-custom { display:none; align-items:center; gap:8px; }
+    .period-custom.show { display:flex; }
+    .period-custom input[type=date] { background:var(--panel-bg); border:1px solid var(--panel-border);
+      color:var(--cream); border-radius:6px; padding:5px 10px; font-size:.82rem; }
+    .period-custom input[type=date]::-webkit-calendar-picker-indicator { filter:invert(.6); cursor:pointer; }
+    .period-label { margin-left:auto; font-size:.78rem; color:var(--cream-muted); font-style:italic; }
+
+    /* Summary KPIs */
+    .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+    @media(max-width:1200px){ .kpi-grid { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:600px){ .kpi-grid { grid-template-columns:1fr; } }
+    .kpi-card { background:var(--panel-card); border:1px solid var(--panel-border); border-radius:12px;
+      padding:18px 20px; position:relative; overflow:hidden; }
+    .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .kpi-card--gold::before  { background:linear-gradient(to right,var(--gold-dim),var(--gold-light)); }
+    .kpi-card--green::before { background:linear-gradient(to right,#1a6b3a,#2ecc71); }
+    .kpi-card--blue::before  { background:linear-gradient(to right,#1a3b6b,#3b8ee0); }
+    .kpi-card--red::before   { background:linear-gradient(to right,#6b1a1a,#e74c3c); }
+    .kpi-card--purple::before{ background:linear-gradient(to right,#4b1a6b,#9b59b6); }
+    .kpi-card__label { font-size:.72rem; color:var(--cream-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+    .kpi-card__value { font-size:1.75rem; font-weight:700; color:var(--cream); line-height:1; margin-bottom:6px; }
+    .kpi-card__sub   { font-size:.73rem; color:var(--cream-muted); }
+    .kpi-card__icon  { position:absolute; top:16px; right:16px; opacity:.12; font-size:2rem; line-height:1; }
+
+    /* Charts */
+    .charts-grid { display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:24px; }
+    @media(max-width:900px){ .charts-grid { grid-template-columns:1fr; } }
+    .chart-wrap { position:relative; padding:8px; }
+    canvas { max-height:260px; }
+
+    /* Section label */
+    .section-label { font-size:.68rem; color:var(--cream-muted); text-transform:uppercase; letter-spacing:.1em;
+      margin:0 0 14px; padding-bottom:6px; border-bottom:1px solid var(--panel-border); }
+
+    /* Export bar */
+    .export-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
+
+    /* Top products progress */
+    .prog-bar { height:4px; background:var(--cream-faint); border-radius:9999px; overflow:hidden; flex:1; }
+    .prog-fill { height:100%; background:linear-gradient(to right,var(--gold-dim),var(--gold-light)); border-radius:9999px; transition:width .5s; }
+
+    /* Print styles (P4.5) */
+    .print-header { display:none; }
+    @media print {
+      .sidebar, .sidebar-overlay, .topbar, .period-bar, .charts-grid, .export-bar,
+      .no-print, #toastContainer { display:none !important; }
+      .panel-layout { display:block; }
+      .main { padding:0; margin:0; }
+      body { background:#fff !important; color:#111 !important; font-family:Arial,sans-serif; }
+      .print-header { display:flex !important; align-items:center; gap:16px; margin-bottom:24px; padding-bottom:16px; border-bottom:2px solid #c9a227; }
+      .print-header img { width:48px; height:48px; object-fit:contain; }
+      .print-header h1 { font-size:20px; margin:0; color:#111; }
+      .print-header p  { font-size:12px; color:#666; margin:2px 0 0; }
+      .kpi-card { background:#fff !important; border:1px solid #ccc !important; break-inside:avoid; }
+      .kpi-card__value { color:#111 !important; }
+      .kpi-card__label, .kpi-card__sub { color:#666 !important; }
+      .kpi-card::before { display:none; }
+      .card { background:#fff !important; border:1px solid #ccc !important; break-inside:avoid; }
+      .card__title, .section-label { color:#111 !important; }
+      table { font-size:10px; width:100%; }
+      th { background:#f5f0e0 !important; color:#111 !important; }
+      td { color:#111 !important; }
+      .status-badge { border:1px solid #ccc; color:#111 !important; background:#f5f5f5 !important; }
+      .btn { display:none !important; }
+      .prog-fill { background:#c9a227 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    }
+  </style>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="panel-layout">
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <span class="topbar__title">Analytics &amp; Relatórios</span>
+    </div>
+    <div class="topbar__actions">
+      <div class="online-dot"></div>
+      <span class="topbar__time" id="topbarTime"></span>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Print header (hidden on screen, visible on print) -->
+    <div class="print-header" id="printHeader">
+      <img src="../../assets/images/logos/logo.png" alt="Lord's Burger House" onerror="this.style.display='none'"/>
+      <div>
+        <h1>Lord's Burger House — Relatório de Vendas</h1>
+        <p>Período: <span id="printPeriod">—</span> &nbsp;|&nbsp; Gerado em: <span id="printDate">—</span></p>
+      </div>
+    </div>
+
+    <div class="page-header no-print">
+      <h1>Analytics &amp; Relatórios</h1>
+      <p id="dateLabel">Carregando…</p>
+    </div>
+
+    <!-- PERIOD PICKER (P4.3) -->
+    <div class="period-bar no-print">
+      <button class="period-btn" data-period="today">Hoje</button>
+      <button class="period-btn" data-period="yesterday">Ontem</button>
+      <button class="period-btn" data-period="7d">7 dias</button>
+      <button class="period-btn" data-period="30d">30 dias</button>
+      <div class="period-separator"></div>
+      <button class="period-btn" data-period="custom">Personalizado</button>
+      <div class="period-custom" id="customDates">
+        <input type="date" id="dateFrom" aria-label="Data inicial"/>
+        <span style="color:var(--cream-muted)">até</span>
+        <input type="date" id="dateTo" aria-label="Data final"/>
+        <button class="btn btn--sm btn--primary" id="applyCustom">Aplicar</button>
+      </div>
+      <span class="period-label" id="periodLabel">—</span>
+    </div>
+
+    <!-- SUMMARY KPIs (P4.3) -->
+    <p class="section-label">Resumo do Período</p>
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-card--gold">
+        <div class="kpi-card__icon">🍔</div>
+        <div class="kpi-card__label">Pedidos</div>
+        <div class="kpi-card__value" id="sumOrders">—</div>
+        <div class="kpi-card__sub">excluindo cancelados</div>
+      </div>
+      <div class="kpi-card kpi-card--green">
+        <div class="kpi-card__icon">💰</div>
+        <div class="kpi-card__label">Receita Total</div>
+        <div class="kpi-card__value" id="sumRevenue">—</div>
+        <div class="kpi-card__sub">pedidos válidos</div>
+      </div>
+      <div class="kpi-card kpi-card--blue">
+        <div class="kpi-card__icon">🎯</div>
+        <div class="kpi-card__label">Ticket Médio</div>
+        <div class="kpi-card__value" id="sumTicket">—</div>
+        <div class="kpi-card__sub">por pedido</div>
+      </div>
+      <div class="kpi-card kpi-card--red">
+        <div class="kpi-card__icon">❌</div>
+        <div class="kpi-card__label">Cancelados</div>
+        <div class="kpi-card__value" id="sumCancelled">—</div>
+        <div class="kpi-card__sub">pedidos cancelados</div>
+      </div>
+    </div>
+
+    <!-- CHARTS (P4.2) -->
+    <div class="charts-grid no-print">
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
+            </svg>
+            Vendas por Dia
+          </span>
+        </div>
+        <div class="chart-wrap card__body">
+          <canvas id="chartSales"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="12"/>
+            </svg>
+            Categorias
+          </span>
+        </div>
+        <div class="chart-wrap card__body" style="display:flex;justify-content:center">
+          <canvas id="chartCategories" style="max-width:260px"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP PRODUCTS CHART -->
+    <div class="card no-print" style="margin-bottom:24px">
+      <div class="card__header">
+        <span class="card__title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+          </svg>
+          Top 5 Produtos por Quantidade
+        </span>
+      </div>
+      <div class="chart-wrap card__body">
+        <canvas id="chartTopProducts" style="max-height:220px"></canvas>
+      </div>
+    </div>
+
+    <!-- TOP 10 PRODUCTS (P4.6) -->
+    <p class="section-label">Top 10 Produtos</p>
+    <div class="card" style="margin-bottom:24px">
+      <div class="card__body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px">#</th>
+                <th>Produto</th>
+                <th style="width:80px">Qtd</th>
+                <th style="width:120px">Receita</th>
+                <th>% Participação</th>
+              </tr>
+            </thead>
+            <tbody id="topProductsBody">
+              <tr><td colspan="5" style="text-align:center"><div class="spinner" style="margin:16px auto"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMER METRICS (P4.7) -->
+    <p class="section-label">Métricas de Clientes</p>
+    <div class="kpi-grid" style="margin-bottom:24px">
+      <div class="kpi-card kpi-card--purple">
+        <div class="kpi-card__icon">👥</div>
+        <div class="kpi-card__label">Clientes Únicos</div>
+        <div class="kpi-card__value" id="custUnique">—</div>
+        <div class="kpi-card__sub">no período</div>
+      </div>
+      <div class="kpi-card kpi-card--blue">
+        <div class="kpi-card__icon">🆕</div>
+        <div class="kpi-card__label">Novos Cadastros</div>
+        <div class="kpi-card__value" id="custNew">—</div>
+        <div class="kpi-card__sub">registros no período</div>
+      </div>
+      <div class="kpi-card kpi-card--gold">
+        <div class="kpi-card__icon">🔄</div>
+        <div class="kpi-card__label">Recorrentes</div>
+        <div class="kpi-card__value" id="custRecurring">—</div>
+        <div class="kpi-card__sub">2+ pedidos no período</div>
+      </div>
+      <div class="kpi-card kpi-card--green">
+        <div class="kpi-card__icon">📊</div>
+        <div class="kpi-card__label">Média Pedidos</div>
+        <div class="kpi-card__value" id="custAvg">—</div>
+        <div class="kpi-card__sub">pedidos por cliente</div>
+      </div>
+    </div>
+
+    <!-- ORDERS REPORT (P4.3 / P4.4 / P4.5) -->
+    <p class="section-label">Relatório de Pedidos</p>
+    <div class="card">
+      <div class="card__header no-print">
+        <span class="card__title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+            <rect x="9" y="3" width="6" height="4" rx="1"/>
+          </svg>
+          Todos os Pedidos
+        </span>
+        <div class="export-bar">
+          <button class="btn btn--outline btn--sm" id="btnCsv">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Exportar CSV
+          </button>
+          <button class="btn btn--outline btn--sm" id="btnPdf">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+              <rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            Gerar PDF
+          </button>
+        </div>
+      </div>
+      <div class="card__body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nº Pedido</th>
+                <th>Cliente</th>
+                <th>Telefone</th>
+                <th>Data/Hora</th>
+                <th>Total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <tr><td colspan="6" style="text-align:center"><div class="spinner" style="margin:16px auto"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module">
+  import { auth, db, ORDER_STATUS } from '../../assets/js/firebase-config.js';
+  import { onAuthStateChanged, signOut }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import {
+    collection, query, orderBy, getDocs, doc, getDoc,
+    where, Timestamp
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { escapeHtml } from '../../assets/js/shared/sanitizer.js';
+  import { fmt, fmtTime, fmtDatetime } from '../../assets/js/shared/formatters.js';
+  import { showToast } from '../../assets/js/shared/toast.js';
+  import { initSidebar, bindSidebarToggle, setSidebarUser } from '../../assets/js/shared/sidebar.js';
+
+  /* ── Clock ── */
+  function tick() {
+    const n = new Date();
+    document.getElementById('topbarTime').textContent =
+      n.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('dateLabel').textContent =
+      n.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+  }
+  tick(); setInterval(tick, 1000);
+
+  initSidebar({ role: 'admin', activePage: 'analytics' });
+  bindSidebarToggle();
+
+  /* ── Chart.js dark theme defaults ── */
+  Chart.defaults.color = '#c4ad7b';
+  Chart.defaults.borderColor = 'rgba(196,173,123,0.1)';
+
+  const CHART_COLORS = ['#c9a227','#9b59b6','#3b8ee0','#2ecc71','#e67e22','#e74c3c','#1abc9c','#f39c12'];
+
+  let salesChart = null;
+  let catChart = null;
+  let topChart = null;
+  let currentOrders = [];
+  let currentPeriodLabel = '';
+
+  /* ── Helper ── */
+  function set(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+
+  /* ── Period ranges ── */
+  function getRange(period) {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+    if (period === 'today')     return { start: today, end: tomorrow, label: 'Hoje' };
+    if (period === 'yesterday') {
+      const y = new Date(today); y.setDate(y.getDate() - 1);
+      return { start: y, end: today, label: 'Ontem' };
+    }
+    if (period === '7d') {
+      const s = new Date(today); s.setDate(s.getDate() - 6);
+      return { start: s, end: tomorrow, label: 'Últimos 7 dias' };
+    }
+    if (period === '30d') {
+      const s = new Date(today); s.setDate(s.getDate() - 29);
+      return { start: s, end: tomorrow, label: 'Últimos 30 dias' };
+    }
+  }
+
+  /* ── Load period data (P4.9 performance: getDocs with date range) ── */
+  async function loadPeriod(start, end, label) {
+    currentPeriodLabel = label;
+    document.getElementById('periodLabel').textContent = label;
+    document.getElementById('printPeriod').textContent = label;
+    document.getElementById('printDate').textContent = new Date().toLocaleDateString('pt-BR');
+
+    const col = collection(db, 'orders');
+    const ts = Timestamp.fromDate(start);
+    const te = Timestamp.fromDate(end);
+
+    const [ordersSnap, usersSnap] = await Promise.all([
+      getDocs(query(col, where('createdAt', '>=', ts), where('createdAt', '<', te), orderBy('createdAt', 'desc'))),
+      getDocs(query(collection(db, 'users'), where('createdAt', '>=', ts), where('createdAt', '<', te))),
+    ]);
+
+    currentOrders = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const newCustCount = usersSnap.docs.filter(d => d.data().role === 'customer').length;
+
+    renderSummary(currentOrders);
+    renderCharts(currentOrders, start, end);
+    renderTopProducts(currentOrders);
+    renderCustomerMetrics(currentOrders, newCustCount);
+    renderOrdersTable(currentOrders);
+  }
+
+  /* ── Summary KPIs ── */
+  function renderSummary(orders) {
+    const valid = orders.filter(o => o.status !== 'cancelled');
+    const revenue = valid.reduce((s, o) => s + Number(o.total || 0), 0);
+    const ticket = valid.length ? revenue / valid.length : 0;
+    const cancelled = orders.filter(o => o.status === 'cancelled').length;
+    set('sumOrders', valid.length);
+    set('sumRevenue', `R$ ${fmt(revenue)}`);
+    set('sumTicket', `R$ ${fmt(ticket)}`);
+    set('sumCancelled', cancelled);
+  }
+
+  /* ── Charts (P4.2) ── */
+  function renderCharts(orders, start, end) {
+    const valid = orders.filter(o => o.status !== 'cancelled');
+
+    // Build day buckets
+    const days = [];
+    const cursor = new Date(start);
+    while (cursor < end) { days.push(new Date(cursor)); cursor.setDate(cursor.getDate() + 1); }
+
+    const fmt2 = d => d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    const dayLabels = days.map(fmt2);
+
+    const dayRevenue = days.map(day => {
+      const next = new Date(day); next.setDate(next.getDate() + 1);
+      return valid
+        .filter(o => { const t = o.createdAt?.toDate?.() ?? new Date(o.createdAt || 0); return t >= day && t < next; })
+        .reduce((s, o) => s + Number(o.total || 0), 0);
+    });
+    const dayCount = days.map(day => {
+      const next = new Date(day); next.setDate(next.getDate() + 1);
+      return valid.filter(o => { const t = o.createdAt?.toDate?.() ?? new Date(o.createdAt || 0); return t >= day && t < next; }).length;
+    });
+
+    // Category counts from items
+    const catCounts = {};
+    valid.forEach(o => o.items?.forEach(i => {
+      const cat = i.categoryLabel || i.category || 'Outros';
+      catCounts[cat] = (catCounts[cat] || 0) + i.qty;
+    }));
+
+    // Top 5 for chart
+    const prods5 = {};
+    valid.forEach(o => o.items?.forEach(i => {
+      prods5[i.name] = (prods5[i.name] || 0) + i.qty;
+    }));
+    const top5 = Object.entries(prods5).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+    buildSalesChart(dayLabels, dayRevenue, dayCount);
+    buildCatChart(catCounts);
+    buildTopProductsChart(top5);
+  }
+
+  function buildSalesChart(labels, revenue, count) {
+    if (salesChart) { salesChart.destroy(); salesChart = null; }
+    const ctx = document.getElementById('chartSales').getContext('2d');
+    salesChart = new Chart(ctx, {
+      data: {
+        labels,
+        datasets: [
+          {
+            type: 'bar',
+            label: 'Receita (R$)',
+            data: revenue,
+            backgroundColor: 'rgba(201,162,39,0.65)',
+            borderColor: '#c9a227',
+            borderWidth: 1,
+            yAxisID: 'yRev',
+          },
+          {
+            type: 'line',
+            label: 'Pedidos',
+            data: count,
+            borderColor: '#3b8ee0',
+            backgroundColor: 'rgba(59,142,224,0.12)',
+            pointBackgroundColor: '#3b8ee0',
+            pointRadius: 3,
+            borderWidth: 2,
+            tension: 0.3,
+            yAxisID: 'yCnt',
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { labels: { color: '#c4ad7b', font: { size: 12 } } },
+          tooltip: {
+            callbacks: {
+              label: ctx => ctx.dataset.yAxisID === 'yRev'
+                ? ` R$ ${fmt(ctx.parsed.y)}`
+                : ` ${ctx.parsed.y} pedidos`,
+            },
+          },
+        },
+        scales: {
+          x: { ticks: { color: '#8a7a5a' }, grid: { color: 'rgba(196,173,123,0.07)' } },
+          yRev: {
+            type: 'linear', position: 'left',
+            ticks: { color: '#8a7a5a', callback: v => `R$${fmt(v)}` },
+            grid: { color: 'rgba(196,173,123,0.07)' },
+          },
+          yCnt: {
+            type: 'linear', position: 'right',
+            ticks: { color: '#3b8ee0', stepSize: 1 },
+            grid: { drawOnChartArea: false },
+          },
+        },
+      },
+    });
+  }
+
+  function buildCatChart(catCounts) {
+    if (catChart) { catChart.destroy(); catChart = null; }
+    const keys = Object.keys(catCounts);
+    if (!keys.length) return;
+    const ctx = document.getElementById('chartCategories').getContext('2d');
+    catChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: keys,
+        datasets: [{
+          data: keys.map(k => catCounts[k]),
+          backgroundColor: CHART_COLORS.slice(0, keys.length),
+          borderColor: '#1a1208',
+          borderWidth: 2,
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#c4ad7b', padding: 14, font: { size: 11 } } },
+        },
+      },
+    });
+  }
+
+  function buildTopProductsChart(top5) {
+    if (topChart) { topChart.destroy(); topChart = null; }
+    if (!top5.length) return;
+    const ctx = document.getElementById('chartTopProducts').getContext('2d');
+    topChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: top5.map(([name]) => name.length > 20 ? name.slice(0, 20) + '…' : name),
+        datasets: [{
+          label: 'Quantidade vendida',
+          data: top5.map(([, qty]) => qty),
+          backgroundColor: CHART_COLORS.slice(0, top5.length),
+          borderRadius: 4,
+        }],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} unidades` } },
+        },
+        scales: {
+          x: { ticks: { color: '#8a7a5a', stepSize: 1 }, grid: { color: 'rgba(196,173,123,0.07)' } },
+          y: { ticks: { color: '#c4ad7b' }, grid: { display: false } },
+        },
+      },
+    });
+  }
+
+  /* ── Top 10 products (P4.6) ── */
+  function renderTopProducts(orders) {
+    const valid = orders.filter(o => o.status !== 'cancelled');
+    const prods = {};
+    valid.forEach(o => o.items?.forEach(i => {
+      if (!prods[i.name]) prods[i.name] = { qty: 0, rev: 0 };
+      prods[i.name].qty += i.qty;
+      prods[i.name].rev += Number(i.price || 0) * i.qty;
+    }));
+    const sorted = Object.entries(prods).sort((a, b) => b[1].qty - a[1].qty).slice(0, 10);
+    const totalQty = sorted.reduce((s, [, v]) => s + v.qty, 0);
+    const el = document.getElementById('topProductsBody');
+    if (!sorted.length) {
+      el.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--cream-muted);padding:24px">Sem dados no período</td></tr>';
+      return;
+    }
+    el.innerHTML = sorted.map(([name, v], i) => `<tr>
+      <td style="color:var(--gold-light);font-weight:700">${i + 1}</td>
+      <td>${escapeHtml(name)}</td>
+      <td style="font-weight:600">${v.qty}x</td>
+      <td style="color:var(--gold-light)">R$ ${fmt(v.rev)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="prog-bar">
+            <div class="prog-fill" style="width:${totalQty ? (v.qty / totalQty * 100).toFixed(0) : 0}%"></div>
+          </div>
+          <span style="font-size:.78rem;color:var(--cream-muted);min-width:34px">
+            ${totalQty ? (v.qty / totalQty * 100).toFixed(0) : 0}%
+          </span>
+        </div>
+      </td>
+    </tr>`).join('');
+  }
+
+  /* ── Customer metrics (P4.7) ── */
+  function renderCustomerMetrics(orders, newCustCount) {
+    const valid = orders.filter(o => o.status !== 'cancelled');
+    const byCustomer = {};
+    valid.forEach(o => {
+      const key = o.customerUid || o.customerEmail || o.customerName || 'anon';
+      byCustomer[key] = (byCustomer[key] || 0) + 1;
+    });
+    const unique = Object.keys(byCustomer).length;
+    const recurring = Object.values(byCustomer).filter(c => c > 1).length;
+    const avg = unique ? (valid.length / unique).toFixed(1) : '0';
+    set('custUnique', unique);
+    set('custNew', newCustCount);
+    set('custRecurring', recurring);
+    set('custAvg', avg);
+  }
+
+  /* ── Orders table ── */
+  function renderOrdersTable(orders) {
+    const el = document.getElementById('ordersTableBody');
+    if (!orders.length) {
+      el.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--cream-muted);padding:24px">Sem pedidos no período selecionado</td></tr>';
+      return;
+    }
+    el.innerHTML = orders.map(o => `<tr>
+      <td class="td-mono">${escapeHtml(o.orderNumber || o.id.slice(0, 6).toUpperCase())}</td>
+      <td>${escapeHtml(o.customerName || '—')}</td>
+      <td>${escapeHtml(o.customerPhone || '—')}</td>
+      <td style="color:var(--cream-muted);white-space:nowrap">${fmtDatetime(o.createdAt)}</td>
+      <td style="color:var(--gold-light);font-weight:700">R$ ${fmt(o.total)}</td>
+      <td><span class="status-badge status-badge--${o.status}">
+        ${ORDER_STATUS[o.status]?.icon || ''} ${ORDER_STATUS[o.status]?.label || o.status}
+      </span></td>
+    </tr>`).join('');
+  }
+
+  /* ── CSV Export (P4.4) ── */
+  function exportCsv() {
+    if (!currentOrders.length) { showToast('Sem dados para exportar', 'warning'); return; }
+    const BOM = '﻿';
+    const header = 'Número;Cliente;Telefone;Data;Total;Status';
+    const rows = currentOrders.map(o => [
+      o.orderNumber || o.id.slice(0, 6).toUpperCase(),
+      o.customerName || '',
+      o.customerPhone || '',
+      fmtDatetime(o.createdAt),
+      String(Number(o.total || 0).toFixed(2)).replace('.', ','),
+      ORDER_STATUS[o.status]?.label || o.status,
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(';'));
+    const csv = BOM + header + '\n' + rows.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pedidos-${currentPeriodLabel.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('CSV exportado com sucesso!', 'success');
+  }
+
+  /* ── Event bindings ── */
+  document.querySelectorAll('.period-btn[data-period]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const period = btn.dataset.period;
+      if (period === 'custom') {
+        document.getElementById('customDates').classList.toggle('show', true);
+        return;
+      }
+      document.getElementById('customDates').classList.remove('show');
+      const range = getRange(period);
+      loadPeriod(range.start, range.end, range.label);
+    });
+  });
+
+  document.getElementById('applyCustom').addEventListener('click', () => {
+    const from = document.getElementById('dateFrom').value;
+    const to = document.getElementById('dateTo').value;
+    if (!from || !to) { showToast('Selecione as duas datas', 'warning'); return; }
+    const start = new Date(from + 'T00:00:00');
+    const end = new Date(to + 'T23:59:59');
+    if (start > end) { showToast('Data inicial deve ser anterior à final', 'warning'); return; }
+    end.setDate(end.getDate() + 1); end.setHours(0, 0, 0, 0);
+    const label = `${new Date(from + 'T12:00:00').toLocaleDateString('pt-BR')} – ${new Date(to + 'T12:00:00').toLocaleDateString('pt-BR')}`;
+    loadPeriod(start, end, label);
+  });
+
+  document.getElementById('btnCsv').addEventListener('click', exportCsv);
+
+  document.getElementById('btnPdf').addEventListener('click', () => {
+    window.print();
+  });
+
+  /* ── Auth guard ── */
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = '../auth/login.html'; return; }
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (!snap.exists() || snap.data().role !== 'admin') { window.location.href = '../customer/orders.html'; return; }
+    setSidebarUser(snap.data()?.name || 'Admin', user.email || '');
+
+    const range = getRange('7d');
+    document.querySelector('[data-period="7d"]').classList.add('active');
+    loadPeriod(range.start, range.end, range.label);
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await signOut(auth); window.location.href = '../auth/login.html';
+  });
+</script>
+</body>
+</html>

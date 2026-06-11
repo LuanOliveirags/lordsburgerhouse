@@ -217,7 +217,7 @@
           <input type="checkbox" id="rememberMe" />
           Lembrar de mim
         </label>
-        <a href="#" class="link-gold">Esqueci a senha</a>
+        <a href="#" class="link-gold" id="forgotPassLink">Esqueci a senha</a>
       </div>
 
       <button type="submit" class="btn-submit" id="submitBtn">
@@ -241,6 +241,33 @@
     <div class="spinner"></div>
   </div>
 
+  <!-- PASSWORD RESET OVERLAY -->
+  <div id="resetOverlay" style="display:none;position:fixed;inset:0;z-index:200;
+       background:rgba(6,4,1,.85);backdrop-filter:blur(4px);
+       align-items:center;justify-content:center">
+    <div style="background:var(--bg-card);border:1px solid var(--gold-border);border-radius:24px;
+                padding:36px;max-width:400px;width:90%;box-shadow:0 24px 80px rgba(0,0,0,.6);
+                animation:fadeUp .35s ease both">
+      <h2 style="font-family:var(--font-serif);font-size:1.4rem;font-weight:700;
+                 color:var(--cream);margin-bottom:8px">Redefinir senha</h2>
+      <p style="font-size:.86rem;color:var(--cream-muted);margin-bottom:20px;line-height:1.6">
+        Informe seu e-mail e enviaremos um link para criar uma nova senha.
+      </p>
+      <div id="resetMsg" style="display:none;padding:10px 14px;border-radius:var(--r-md);
+           font-size:.82rem;margin-bottom:14px;line-height:1.5"></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <input id="resetEmail" type="email" class="form-control"
+               placeholder="seu@email.com" autocomplete="email"/>
+        <button id="resetSendBtn" class="btn-submit">Enviar link de redefinição</button>
+        <button id="resetCancelBtn"
+                style="background:none;border:none;color:var(--cream-muted);
+                       font-size:.85rem;cursor:pointer;padding:8px">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { auth, db, ROLE_HOME } from '../../assets/js/firebase-config.js';
     import {
@@ -248,7 +275,8 @@
       setPersistence,
       browserLocalPersistence,
       browserSessionPersistence,
-      onAuthStateChanged
+      onAuthStateChanged,
+      sendPasswordResetEmail
     } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
     import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
@@ -275,6 +303,61 @@
         customer:  '../customer/orders.html'
       }[role] || '../customer/orders.html';
     }
+
+    /* ── password reset ── */
+    const resetOverlay = document.getElementById('resetOverlay');
+    const resetMsg     = document.getElementById('resetMsg');
+    const resetEmailEl = document.getElementById('resetEmail');
+
+    function openReset() {
+      resetMsg.style.display = 'none';
+      resetEmailEl.value = document.getElementById('email').value.trim();
+      resetOverlay.style.display = 'flex';
+      setTimeout(() => resetEmailEl.focus(), 50);
+    }
+    function closeReset() {
+      resetOverlay.style.display = 'none';
+    }
+
+    document.getElementById('forgotPassLink').addEventListener('click', e => {
+      e.preventDefault();
+      openReset();
+    });
+    document.getElementById('resetCancelBtn').addEventListener('click', closeReset);
+    resetOverlay.addEventListener('click', e => { if (e.target === resetOverlay) closeReset(); });
+
+    document.getElementById('resetSendBtn').addEventListener('click', async () => {
+      const email = resetEmailEl.value.trim();
+      resetMsg.style.display = 'none';
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        resetMsg.style.cssText += ';display:block;background:rgba(192,57,43,.12);border:1px solid rgba(192,57,43,.3);color:var(--red)';
+        resetMsg.textContent = 'Informe um e-mail válido.';
+        return;
+      }
+
+      const btn = document.getElementById('resetSendBtn');
+      btn.disabled = true;
+      btn.textContent = 'Enviando…';
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        resetMsg.style.cssText = 'display:block;background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.3);color:#25d366;padding:10px 14px;border-radius:var(--r-md);font-size:.82px;margin-bottom:14px;line-height:1.5';
+        resetMsg.textContent = `Link enviado para ${email}. Verifique sua caixa de entrada (e o spam).`;
+        btn.textContent = 'Enviado!';
+        setTimeout(closeReset, 3500);
+      } catch (err) {
+        const msgs = {
+          'auth/user-not-found':  'Nenhuma conta com este e-mail.',
+          'auth/invalid-email':   'E-mail inválido.',
+          'auth/too-many-requests': 'Muitas tentativas. Aguarde alguns minutos.'
+        };
+        resetMsg.style.cssText = 'display:block;background:rgba(192,57,43,.12);border:1px solid rgba(192,57,43,.3);color:var(--red);padding:10px 14px;border-radius:var(--r-md);font-size:.82px;margin-bottom:14px;line-height:1.5';
+        resetMsg.textContent = msgs[err.code] || 'Erro ao enviar. Tente novamente.';
+        btn.disabled = false;
+        btn.textContent = 'Enviar link de redefinição';
+      }
+    });
 
     form.addEventListener('submit', async e => {
       e.preventDefault();

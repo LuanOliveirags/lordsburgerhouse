@@ -61,50 +61,8 @@
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 <div class="panel-layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar__logo">
-      <img src="../../assets/images/logos/logo.png" alt=""/>
-      <div class="sidebar__logo-text">
-        <span class="sidebar__logo-name">Lord's Burger</span>
-        <span class="sidebar__logo-role">Administrador</span>
-      </div>
-    </div>
-    <nav class="sidebar__nav">
-      <div class="sidebar__section">Painel</div>
-      <a href="dashboard.html" class="sidebar__link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Dashboard
-      </a>
-      <div class="sidebar__section">Gestão</div>
-      <a href="products.html" class="sidebar__link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        Cardápio
-      </a>
-      <a href="orders.html" class="sidebar__link active">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-        Pedidos
-        <span class="sidebar__badge" id="pendingBadge">0</span>
-      </a>
-      <a href="users.html" class="sidebar__link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        Usuários
-      </a>
-    </nav>
-    <div class="sidebar__footer">
-      <div class="sidebar__user">
-        <div class="sidebar__avatar" id="avatarInitial">A</div>
-        <div class="sidebar__user-info">
-          <div class="sidebar__user-name" id="userName">Admin</div>
-          <div class="sidebar__user-email" id="userEmail"></div>
-        </div>
-      </div>
-      <button class="btn-logout" id="logoutBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Sair
-      </button>
-    </div>
-  </aside>
+  <!-- SIDEBAR (gerado por sidebar.js) -->
+  <aside class="sidebar" id="sidebar"></aside>
 
   <!-- TOPBAR -->
   <header class="topbar">
@@ -174,6 +132,11 @@
         </div>
       </div>
     </div>
+    <div id="loadMoreWrap" style="display:none;text-align:center;padding:20px 0">
+      <button id="loadMoreBtn" class="btn btn--outline">
+        Carregar mais pedidos
+      </button>
+    </div>
   </main>
 </div>
 
@@ -184,35 +147,24 @@
   import { onAuthStateChanged, signOut }
     from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
   import {
-    collection, query, orderBy, onSnapshot, doc, getDoc, updateDoc, deleteDoc, serverTimestamp
+    collection, query, orderBy, onSnapshot, doc, getDoc, updateDoc, deleteDoc, serverTimestamp,
+    limit, startAfter, getDocs
   } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { escapeHtml } from '../../assets/js/shared/sanitizer.js';
+  import { fmt, fmtDatetime } from '../../assets/js/shared/formatters.js';
+  import { showToast } from '../../assets/js/shared/toast.js';
+  import { initSidebar, bindSidebarToggle, setSidebarUser } from '../../assets/js/shared/sidebar.js';
 
-  function fmt(n){ return Number(n||0).toFixed(2).replace('.',',') }
-  function fmtDatetime(ts){
-    if(!ts) return '—';
-    const d=ts.toDate?ts.toDate():new Date(ts);
-    return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})
-      +' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  }
   function isToday(ts){
     if(!ts) return false;
     const d=ts.toDate?ts.toDate():new Date(ts);
     const t=new Date();t.setHours(0,0,0,0);
     return d>=t;
   }
-  function toast(msg,type='info'){
-    const el=document.createElement('div');
-    el.className=`toast toast--${type}`;
-    el.innerHTML=`<span class="toast__icon">${{success:'✅',error:'❌',info:'ℹ️'}[type]||'ℹ️'}</span> ${msg}`;
-    document.getElementById('toastContainer').appendChild(el);
-    setTimeout(()=>{el.classList.add('removing');setTimeout(()=>el.remove(),300)},3500);
-  }
 
   /* sidebar */
-  const sb=document.getElementById('sidebar');
-  const ov=document.getElementById('sidebarOverlay');
-  document.getElementById('sidebarToggle').addEventListener('click',()=>{sb.classList.toggle('open');ov.classList.toggle('show')});
-  ov.addEventListener('click',()=>{sb.classList.remove('open');ov.classList.remove('show')});
+  initSidebar({ role: 'admin', activePage: 'orders' });
+  bindSidebarToggle();
 
   /* filter */
   let activeFilter='all';
@@ -251,14 +203,46 @@
   async function updateStatus(orderId, status){
     try{
       await updateDoc(doc(db,'orders',orderId),{status,updatedAt:serverTimestamp()});
-      toast(`Status atualizado: ${ORDER_STATUS[status]?.label}`,'success');
-    }catch(e){toast('Erro: '+e.message,'error')}
+      showToast(`Status atualizado: ${ORDER_STATUS[status]?.label}`,'success');
+    }catch(e){showToast('Erro: '+e.message,'error')}
   }
 
   /* render */
+  const PAGE_SIZE=30;
+  const loadedOrders=new Map();
   let allOrders=[];
+  let lastVisible=null;
+  let hasMore=false;
+
+  function rebuildAndRender(){
+    allOrders=[...loadedOrders.values()].sort((a,b)=>{
+      const ta=a.createdAt?.seconds||0;
+      const tb=b.createdAt?.seconds||0;
+      return tb-ta;
+    });
+    renderTable(allOrders);
+    updateLoadMoreBtn();
+  }
+  function updateLoadMoreBtn(){
+    const wrap=document.getElementById('loadMoreWrap');
+    if(wrap) wrap.style.display=hasMore?'':'none';
+  }
+  async function loadMoreOrders(){
+    if(!lastVisible||!hasMore) return;
+    const btn=document.getElementById('loadMoreBtn');
+    if(btn){btn.disabled=true;btn.textContent='Carregando...';}
+    try{
+      const q2=query(collection(db,'orders'),orderBy('createdAt','desc'),startAfter(lastVisible),limit(PAGE_SIZE));
+      const snap=await getDocs(q2);
+      if(!snap.empty) lastVisible=snap.docs[snap.docs.length-1];
+      hasMore=snap.docs.length===PAGE_SIZE;
+      snap.docs.forEach(d=>loadedOrders.set(d.id,{id:d.id,...d.data()}));
+      rebuildAndRender();
+    }catch(e){showToast('Erro ao carregar mais pedidos','error');}
+    finally{if(btn){btn.disabled=false;btn.textContent='Carregar mais pedidos';}}
+  }
+
   function renderTable(orders){
-    allOrders=orders;
     updateRevenue(orders);
     let filtered=orders.filter(o=>{
       if(activeFilter==='all') return true;
@@ -293,27 +277,27 @@
       <tbody id="tbodyOrders">${filtered.map(o=>`
         <tr class="${expanded.has(o.id)?'expanded':''}">
           <td style="width:32px;padding:8px 4px 8px 14px">
-            <button class="expand-btn ${expanded.has(o.id)?'open':''}" onclick="toggleRow('${o.id}')">
+            <button class="expand-btn ${expanded.has(o.id)?'open':''}" data-action="expand" data-id="${o.id}">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           </td>
-          <td class="td-mono">${o.orderNumber||o.id.slice(0,8).toUpperCase()}</td>
+          <td class="td-mono">${escapeHtml(o.orderNumber||o.id.slice(0,8).toUpperCase())}</td>
           <td>
-            <div style="font-size:.85rem;color:var(--cream)">${o.customerName||'—'}</div>
-            <div style="font-size:.73rem;color:var(--cream-muted)">${o.customerPhone||''}</div>
+            <div style="font-size:.85rem;color:var(--cream)">${escapeHtml(o.customerName||'—')}</div>
+            <div style="font-size:.73rem;color:var(--cream-muted)">${escapeHtml(o.customerPhone||'')}</div>
           </td>
           <td style="font-size:.82rem;color:var(--cream-2)">${o.deliveryMode==='delivery'?'🛵 Delivery':'🏠 Retirada'}</td>
           <td style="color:var(--gold-light);font-weight:700;font-family:var(--font-serif)">R$ ${fmt(o.total)}</td>
-          <td style="font-size:.82rem;color:var(--cream-2)">${o.payment||'—'}</td>
+          <td style="font-size:.82rem;color:var(--cream-2)">${escapeHtml(o.payment||'—')}</td>
           <td><span class="status-badge status-badge--${o.status}">${ORDER_STATUS[o.status]?.icon} ${ORDER_STATUS[o.status]?.label||o.status}</span></td>
           <td style="font-size:.78rem;color:var(--cream-muted)">${fmtDatetime(o.createdAt)}</td>
           <td>
-            <select class="form-control" style="font-size:.78rem;padding:5px 8px;min-width:140px" onchange="updateStatus('${o.id}',this.value)">
+            <select class="form-control" style="font-size:.78rem;padding:5px 8px;min-width:140px" data-action="status" data-id="${o.id}">
               ${Object.entries(ORDER_STATUS).map(([k,v])=>`<option value="${k}" ${k===o.status?'selected':''}>${v.icon} ${v.label}</option>`).join('')}
             </select>
           </td>
           <td style="padding:8px 10px 8px 4px">
-            <button onclick="deleteOrder('${o.id}','${o.orderNumber||o.id.slice(0,8).toUpperCase()}')"
+            <button data-action="delete" data-id="${o.id}" data-num="${escapeHtml(o.orderNumber||o.id.slice(0,8).toUpperCase())}"
               title="Excluir pedido"
               style="background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);color:#e74c3c;
                      border-radius:6px;padding:5px 7px;cursor:pointer;transition:.2s;display:flex;align-items:center"
@@ -328,7 +312,7 @@
             <div class="order-detail">
               <ul class="order-items-list">
                 ${(o.items||[]).map(i=>`<li>
-                  <span><span class="item-qty">${i.qty}x</span> ${i.name}</span>
+                  <span><span class="item-qty">${i.qty}x</span> ${escapeHtml(i.name)}</span>
                   <span style="color:var(--gold-light)">R$ ${fmt(i.price*i.qty)}</span>
                 </li>`).join('')}
               </ul>
@@ -336,8 +320,8 @@
                 <span class="order-total-label">Total</span>
                 <span class="order-total-val">R$ ${fmt(o.total)}</span>
               </div>
-              ${o.address?`<div style="margin-top:10px;font-size:.8rem;color:var(--cream-muted)">📍 ${o.address}</div>`:''}
-              ${o.obs?`<div style="margin-top:6px;font-size:.8rem;color:var(--cream-muted)">📝 ${o.obs}</div>`:''}
+              ${o.address?`<div style="margin-top:10px;font-size:.8rem;color:var(--cream-muted)">📍 ${escapeHtml(o.address)}</div>`:''}
+              ${o.obs?`<div style="margin-top:6px;font-size:.8rem;color:var(--cream-muted)">📝 ${escapeHtml(o.obs)}</div>`:''}
             </div>
           </td>
         </tr>`:''}
@@ -350,26 +334,37 @@
     if(!confirm(`Excluir pedido #${orderNum} permanentemente? Esta ação não pode ser desfeita.`)) return;
     try{
       await deleteDoc(doc(db,'orders',orderId));
-      toast('Pedido excluído','success');
-    }catch(e){toast('Erro ao excluir: '+e.message,'error')}
+      showToast('Pedido excluído','success');
+    }catch(e){showToast('Erro ao excluir: '+e.message,'error')}
   }
 
-  window.updateStatus=updateStatus;
-  window.toggleRow=toggleRow;
-  window.deleteOrder=deleteOrder;
+  /* event delegation — substitui window.* e onclick inline */
+  const tableEl = document.getElementById('ordersTable');
+  tableEl.addEventListener('click', e => {
+    const expandBtn = e.target.closest('[data-action="expand"]');
+    if (expandBtn) { toggleRow(expandBtn.dataset.id); return; }
+    const deleteBtn = e.target.closest('[data-action="delete"]');
+    if (deleteBtn) { deleteOrder(deleteBtn.dataset.id, deleteBtn.dataset.num); }
+  });
+  tableEl.addEventListener('change', e => {
+    const sel = e.target.closest('[data-action="status"]');
+    if (sel) updateStatus(sel.dataset.id, sel.value);
+  });
+  document.getElementById('loadMoreBtn').addEventListener('click', loadMoreOrders);
 
   /* auth guard */
   onAuthStateChanged(auth,async user=>{
     if(!user){window.location.href='../auth/login.html';return;}
     const snap=await getDoc(doc(db,'users',user.uid));
     if(!snap.exists()||snap.data().role!=='admin'){window.location.href='../customer/orders.html';return;}
-    document.getElementById('avatarInitial').textContent=(snap.data()?.name||'A')[0].toUpperCase();
-    document.getElementById('userName').textContent=snap.data()?.name||'Admin';
-    document.getElementById('userEmail').textContent=user.email||'';
+    setSidebarUser(snap.data()?.name||'Admin', user.email||'');
 
-    onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')),snap=>{
-      allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
-      renderTable(allOrders);
+    const q=query(collection(db,'orders'),orderBy('createdAt','desc'),limit(PAGE_SIZE));
+    onSnapshot(q,snap=>{
+      if(!snap.empty) lastVisible=snap.docs[snap.docs.length-1];
+      hasMore=snap.docs.length===PAGE_SIZE;
+      snap.docs.forEach(d=>loadedOrders.set(d.id,{id:d.id,...d.data()}));
+      rebuildAndRender();
     });
   });
 

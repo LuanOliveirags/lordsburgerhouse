@@ -430,8 +430,8 @@ input,textarea,select{font:inherit;color:inherit}
 /* ── foto background mais visível e cinematográfica */
 .hero__bg{
   position:absolute;inset:0;
-  background:url('https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1800&q=80')
-    60% center / cover no-repeat;
+  background:url('../images/home/capa.png')
+    center center / cover no-repeat;
   filter:brightness(.38) saturate(.8) contrast(1.08);
   transform:scale(1.08);transition:transform 12s ease-out;
 }

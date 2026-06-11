@@ -14,46 +14,8 @@
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <div class="panel-layout">
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar__logo">
-      <img src="../../assets/images/logos/logo.png" alt=""/>
-      <div class="sidebar__logo-text">
-        <span class="sidebar__logo-name">Lord's Burger</span>
-        <span class="sidebar__logo-role">Atendente</span>
-      </div>
-    </div>
-    <nav class="sidebar__nav">
-      <div class="sidebar__section">Pedidos</div>
-      <a href="#" class="sidebar__link active" data-view="queue">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-        Fila de Pedidos
-        <span class="sidebar__badge" id="queueBadge">0</span>
-      </a>
-      <a href="#" class="sidebar__link" data-view="all">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        Todos os Pedidos
-      </a>
-      <div class="sidebar__section" style="margin-top:8px">Ações</div>
-      <a href="#" class="sidebar__link" id="btnNewOrder">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        Novo Pedido Manual
-      </a>
-    </nav>
-    <div class="sidebar__footer">
-      <div class="sidebar__user">
-        <div class="sidebar__avatar" id="avatarInitial">?</div>
-        <div class="sidebar__user-info">
-          <div class="sidebar__user-name" id="userName">Carregando...</div>
-          <div class="sidebar__user-email" id="userEmail"></div>
-        </div>
-      </div>
-      <button class="btn-logout" id="logoutBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Sair
-      </button>
-    </div>
-  </aside>
+  <!-- SIDEBAR (gerado por sidebar.js) -->
+  <aside class="sidebar" id="sidebar"></aside>
 
   <!-- TOPBAR -->
   <header class="topbar">
@@ -118,6 +80,11 @@
             </tbody>
           </table>
         </div>
+      </div>
+      <div id="loadMoreWrap" style="display:none;text-align:center;padding:20px 0">
+        <button id="loadMoreBtn" class="btn btn--outline">
+          Carregar mais pedidos
+        </button>
       </div>
     </div>
 
@@ -196,35 +163,21 @@
     from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
   import {
     collection, query, orderBy, onSnapshot, doc,
-    updateDoc, addDoc, serverTimestamp, getDoc, getDocs, where
+    updateDoc, addDoc, serverTimestamp, getDoc, getDocs, where,
+    limit, startAfter
   } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { escapeHtml } from '../../assets/js/shared/sanitizer.js';
+  import { fmt, fmtDate } from '../../assets/js/shared/formatters.js';
+  import { showToast } from '../../assets/js/shared/toast.js';
+  import { DELIVERY_FEE } from '../../assets/js/shared/constants.js';
+  import { initSidebar, bindSidebarToggle, setSidebarUser } from '../../assets/js/shared/sidebar.js';
 
   /* ── helpers ── */
-  const DELIVERY_FEE = 5.00;
-  function fmt(n){ return Number(n||0).toFixed(2).replace('.',',') }
-  function fmtDate(ts){
-    if (!ts) return '—';
-    const d = ts.toDate ? ts.toDate() : new Date(ts);
-    return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-  }
   function genNumber(){ return 'LBH-' + Math.floor(10000+Math.random()*90000) }
 
-  /* ── toast ── */
-  function toast(msg, type='info'){
-    const el = document.createElement('div');
-    el.className = `toast toast--${type}`;
-    el.innerHTML = `<span class="toast__icon">${{success:'✅',error:'❌',info:'ℹ️'}[type]}</span> ${msg}`;
-    document.getElementById('toastContainer').appendChild(el);
-    setTimeout(()=>{ el.classList.add('removing'); setTimeout(()=>el.remove(),300) },3000);
-  }
-
-  /* ── sidebar toggle ── */
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  document.getElementById('sidebarToggle').addEventListener('click',()=>{
-    sidebar.classList.toggle('open'); overlay.classList.toggle('show');
-  });
-  overlay.addEventListener('click',()=>{ sidebar.classList.remove('open'); overlay.classList.remove('show') });
+  /* ── sidebar ── */
+  initSidebar({ role: 'attendant' });
+  bindSidebarToggle();
 
   /* ── clock ── */
   function tick(){ document.getElementById('topbarTime').textContent = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) }
@@ -258,8 +211,8 @@
   async function updateStatus(orderId, status){
     try {
       await updateDoc(doc(db,'orders',orderId),{ status, updatedAt:serverTimestamp() });
-      toast(`Status atualizado: ${ORDER_STATUS[status]?.label}`,'success');
-    } catch(e){ toast('Erro ao atualizar status','error') }
+      showToast(`Status atualizado: ${ORDER_STATUS[status]?.label}`,'success');
+    } catch(e){ showToast('Erro ao atualizar status','error') }
   }
 
   /* ── render queue ── */
@@ -290,16 +243,16 @@
         .join('');
       return `<div class="order-card" id="oc-${o.id}">
         <div class="order-card__header">
-          <span class="order-card__num">#${o.orderNumber||o.id.slice(0,8).toUpperCase()}</span>
+          <span class="order-card__num">#${escapeHtml(o.orderNumber||o.id.slice(0,8).toUpperCase())}</span>
           <span class="order-card__time">${fmtDate(o.createdAt)}</span>
         </div>
         <div class="order-card__body">
-          <div class="order-card__customer">${o.customerName||'—'}</div>
-          <div class="order-card__mode">${o.deliveryMode==='delivery'?'🛵 Delivery':'🏠 Retirada'}${o.deliveryMode==='delivery'&&o.address?' · '+o.address:''}</div>
+          <div class="order-card__customer">${escapeHtml(o.customerName||'—')}</div>
+          <div class="order-card__mode">${o.deliveryMode==='delivery'?'🛵 Delivery':'🏠 Retirada'}${o.deliveryMode==='delivery'&&o.address?' · '+escapeHtml(o.address):''}</div>
           <div class="order-card__items">
-            ${o.items?.map(i=>`▸ ${i.qty}x ${i.name}`).join('<br>')||'—'}
+            ${o.items?.map(i=>`▸ ${i.qty}x ${escapeHtml(i.name)}`).join('<br>')||'—'}
           </div>
-          ${o.obs?`<p style="font-size:.78rem;color:var(--cream-muted);margin-bottom:10px">📝 ${o.obs}</p>`:''}
+          ${o.obs?`<p style="font-size:.78rem;color:var(--cream-muted);margin-bottom:10px">📝 ${escapeHtml(o.obs)}</p>`:''}
           <div class="order-card__total">
             <span class="status-badge status-badge--${o.status}">${ORDER_STATUS[o.status]?.icon||''} ${ORDER_STATUS[o.status]?.label||o.status}</span>
             <span>R$ ${fmt(o.total)}</span>
@@ -324,6 +277,42 @@
     });
   }
 
+  /* ── pagination for "all orders" view ── */
+  const PAGE_SIZE=50;
+  const loadedOrders=new Map();
+  let lastVisible=null;
+  let hasMore=false;
+
+  function rebuildAll(){
+    allOrders=[...loadedOrders.values()].sort((a,b)=>{
+      const ta=a.createdAt?.seconds||0;
+      const tb=b.createdAt?.seconds||0;
+      return tb-ta;
+    });
+    renderQueue(allOrders);
+    renderTable(allOrders);
+    updateLoadMoreBtn();
+  }
+  function updateLoadMoreBtn(){
+    const wrap=document.getElementById('loadMoreWrap');
+    if(wrap) wrap.style.display=hasMore?'':'none';
+  }
+  async function loadMoreOrders(){
+    if(!lastVisible||!hasMore) return;
+    const btn=document.getElementById('loadMoreBtn');
+    if(btn){btn.disabled=true;btn.textContent='Carregando...';}
+    try{
+      const q2=query(collection(db,'orders'),orderBy('createdAt','desc'),startAfter(lastVisible),limit(PAGE_SIZE));
+      const snap=await getDocs(q2);
+      if(!snap.empty) lastVisible=snap.docs[snap.docs.length-1];
+      hasMore=snap.docs.length===PAGE_SIZE;
+      snap.docs.forEach(d=>loadedOrders.set(d.id,{id:d.id,...d.data()}));
+      rebuildAll();
+    }catch(e){showToast('Erro ao carregar mais','error');}
+    finally{if(btn){btn.disabled=false;btn.textContent='Carregar mais pedidos';}}
+  }
+  document.getElementById('loadMoreBtn').addEventListener('click', loadMoreOrders);
+
   /* ── render all orders table ── */
   function renderTable(orders){
     const body = document.getElementById('allOrdersTable');
@@ -341,9 +330,9 @@
     }
     const payMap={pix:'PIX',credito:'Crédito',debito:'Débito',dinheiro:'Dinheiro'};
     body.innerHTML = filtered.map(o=>`<tr>
-      <td class="td-mono">${o.orderNumber||o.id.slice(0,8).toUpperCase()}</td>
-      <td class="td-bold">${o.customerName||'—'}</td>
-      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.items?.map(i=>`${i.qty}x ${i.name}`).join(', ')||'—'}</td>
+      <td class="td-mono">${escapeHtml(o.orderNumber||o.id.slice(0,8).toUpperCase())}</td>
+      <td class="td-bold">${escapeHtml(o.customerName||'—')}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.items?.map(i=>`${i.qty}x ${escapeHtml(i.name)}`).join(', ')||'—'}</td>
       <td style="color:var(--gold-light);font-weight:700">R$ ${fmt(o.total)}</td>
       <td>${o.deliveryMode==='delivery'?'🛵':'🏠'}</td>
       <td>${payMap[o.payment]||o.payment||'—'}</td>
@@ -429,7 +418,7 @@
 
     const items=manualItems.filter(i=>i.productId&&i.qty>0);
     if(!nome||!tel||!items.length){
-      toast('Preencha nome, telefone e pelo menos um item','error'); return;
+      showToast('Preencha nome, telefone e pelo menos um item','error'); return;
     }
     const subtotal=items.reduce((s,i)=>s+i.price*i.qty,0);
     const fee=mode==='delivery'?DELIVERY_FEE:0;
@@ -447,8 +436,8 @@
         createdAt:serverTimestamp(),updatedAt:serverTimestamp()
       });
       document.getElementById('newOrderModal').classList.remove('open');
-      toast(`Pedido ${orderNumber} registrado!`,'success');
-    }catch(e){ toast('Erro ao salvar pedido','error') }
+      showToast(`Pedido ${orderNumber} registrado!`,'success');
+    }catch(e){ showToast('Erro ao salvar pedido','error') }
   });
 
   /* ── auth guard ── */
@@ -458,16 +447,15 @@
     const snap=await getDoc(doc(db,'users',user.uid));
     const role=snap.exists()?snap.data().role:'customer';
     if(role!=='attendant'&&role!=='admin'){ window.location.href='../customer/orders.html'; return; }
-    document.getElementById('avatarInitial').textContent=(snap.data()?.name||user.email||'?')[0].toUpperCase();
-    document.getElementById('userName').textContent=snap.data()?.name||user.displayName||'Atendente';
-    document.getElementById('userEmail').textContent=user.email||'';
+    setSidebarUser(snap.data()?.name||user.displayName||'Atendente', user.email||'');
 
-    /* live orders */
-    const q=query(collection(db,'orders'),orderBy('createdAt','desc'));
+    /* live orders — first page */
+    const q=query(collection(db,'orders'),orderBy('createdAt','desc'),limit(PAGE_SIZE));
     onSnapshot(q,snap=>{
-      allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
-      renderQueue(allOrders);
-      renderTable(allOrders);
+      if(!snap.empty) lastVisible=snap.docs[snap.docs.length-1];
+      hasMore=snap.docs.length===PAGE_SIZE;
+      snap.docs.forEach(d=>loadedOrders.set(d.id,{id:d.id,...d.data()}));
+      rebuildAll();
     });
   });
 

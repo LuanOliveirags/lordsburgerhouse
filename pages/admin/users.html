@@ -30,6 +30,14 @@
     }
     .role-select:focus{outline:none;border-color:var(--gold)}
 
+    /* delete row button */
+    .btn-row-delete{
+      background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);
+      color:#e74c3c;border-radius:6px;padding:5px 7px;
+      cursor:pointer;transition:background .2s;display:flex;align-items:center;
+    }
+    .btn-row-delete:hover{background:rgba(192,57,43,.25)}
+
     /* create attendant modal */
     .form-group{display:flex;flex-direction:column;gap:6px}
     .form-group label{font-family:var(--font-display);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--cream-muted)}
@@ -40,49 +48,8 @@
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 <div class="panel-layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar__logo">
-      <img src="../../assets/images/logos/logo.png" alt=""/>
-      <div class="sidebar__logo-text">
-        <span class="sidebar__logo-name">Lord's Burger</span>
-        <span class="sidebar__logo-role">Administrador</span>
-      </div>
-    </div>
-    <nav class="sidebar__nav">
-      <div class="sidebar__section">Painel</div>
-      <a href="dashboard.html" class="sidebar__link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Dashboard
-      </a>
-      <div class="sidebar__section">Gestão</div>
-      <a href="products.html" class="sidebar__link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        Cardápio
-      </a>
-      <a href="orders.html" class="sidebar__link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-        Pedidos
-      </a>
-      <a href="users.html" class="sidebar__link active">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        Usuários
-      </a>
-    </nav>
-    <div class="sidebar__footer">
-      <div class="sidebar__user">
-        <div class="sidebar__avatar" id="avatarInitial">A</div>
-        <div class="sidebar__user-info">
-          <div class="sidebar__user-name" id="userName">Admin</div>
-          <div class="sidebar__user-email" id="userEmail"></div>
-        </div>
-      </div>
-      <button class="btn-logout" id="logoutBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Sair
-      </button>
-    </div>
-  </aside>
+  <!-- SIDEBAR (gerado por sidebar.js) -->
+  <aside class="sidebar" id="sidebar"></aside>
 
   <!-- TOPBAR -->
   <header class="topbar">
@@ -189,7 +156,7 @@
         </div>
       </div>
       <p style="font-size:.78rem;color:var(--cream-muted);line-height:1.6">
-        ⚠️ Você será redirecionado para re-autenticar após a criação, pois Firebase exige isso para criar usuários adicionais no cliente.
+        A criação é feita de forma segura via Cloud Function. Você permanecerá logado após a criação.
       </p>
     </div>
     <div class="modal__footer">
@@ -202,92 +169,88 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script type="module">
-  import { auth, db, ROLE_LABELS } from '../../assets/js/firebase-config.js';
-  import { onAuthStateChanged, signOut, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword }
+  import { auth, db, app, ROLE_LABELS } from '../../assets/js/firebase-config.js';
+  import { onAuthStateChanged, signOut }
     from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
   import {
-    collection, query, orderBy, onSnapshot, doc, getDoc, updateDoc, deleteDoc, setDoc, serverTimestamp
+    collection, query, orderBy, onSnapshot, doc, getDoc, updateDoc, deleteDoc, serverTimestamp
   } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { getFunctions, httpsCallable }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
+  import { escapeHtml } from '../../assets/js/shared/sanitizer.js';
+  import { fmtDay } from '../../assets/js/shared/formatters.js';
+  import { showToast } from '../../assets/js/shared/toast.js';
+  import { initSidebar, bindSidebarToggle, setSidebarUser } from '../../assets/js/shared/sidebar.js';
 
-  function toast(msg,type='info'){
-    const el=document.createElement('div');
-    el.className=`toast toast--${type}`;
-    el.innerHTML=`<span class="toast__icon">${{success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'}[type]||'ℹ️'}</span> ${msg}`;
-    document.getElementById('toastContainer').appendChild(el);
-    setTimeout(()=>{el.classList.add('removing');setTimeout(()=>el.remove(),300)},3500);
-  }
+  /* ── sidebar ── */
+  initSidebar({ role: 'admin', activePage: 'users' });
+  bindSidebarToggle();
 
-  /* sidebar */
-  const sb=document.getElementById('sidebar');
-  const ov=document.getElementById('sidebarOverlay');
-  document.getElementById('sidebarToggle').addEventListener('click',()=>{sb.classList.toggle('open');ov.classList.toggle('show')});
-  ov.addEventListener('click',()=>{sb.classList.remove('open');ov.classList.remove('show')});
-
-  /* filter */
-  let activeRole='all',searchQ='';
+  /* ── filter ── */
+  let activeRole='all', searchQ='';
   document.getElementById('roleFilter').querySelectorAll('.filter-tab').forEach(btn=>{
     btn.addEventListener('click',()=>{
       document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');activeRole=btn.dataset.role;renderTable(allUsers);
+      btn.classList.add('active');
+      activeRole=btn.dataset.role;
+      renderTable(allUsers);
     });
   });
   document.getElementById('searchInput').addEventListener('input',e=>{
-    searchQ=e.target.value.toLowerCase();renderTable(allUsers);
+    searchQ=e.target.value.toLowerCase();
+    renderTable(allUsers);
   });
 
-  /* counters */
+  /* ── counters ── */
   function updateCounts(users){
     document.getElementById('countCustomers').textContent=users.filter(u=>u.role==='customer').length;
     document.getElementById('countAttendants').textContent=users.filter(u=>u.role==='attendant').length;
     document.getElementById('countAdmins').textContent=users.filter(u=>u.role==='admin').length;
   }
 
-  /* role change */
-  window.deleteUser = async (uid, name, currentAdminUid) => {
-    if(uid === currentAdminUid){ toast('Não é possível excluir sua própria conta','warning'); return; }
+  /* ── actions ── */
+  async function deleteUser(uid, name) {
+    if(uid === currentAdminUid){ showToast('Não é possível excluir sua própria conta','warning'); return; }
     if(!confirm(`Excluir o cadastro de "${name}" permanentemente?\n\nO acesso ao sistema será removido imediatamente.`)) return;
     try{
       await deleteDoc(doc(db,'users',uid));
-      toast(`Cadastro de ${name} excluído`,'success');
-    }catch(e){ toast('Erro ao excluir: '+e.message,'error') }
-  };
+      showToast(`Cadastro de ${name} excluído`,'success');
+    }catch(e){ showToast('Erro ao excluir: '+e.message,'error'); }
+  }
 
-  window.changeRole = async (uid, newRole, currentAdminUid) => {
-    if(uid===currentAdminUid&&newRole!=='admin'){
-      toast('Não é possível rebaixar sua própria conta','warning');
-      document.querySelector(`select[data-uid="${uid}"]`).value='admin';
+  async function changeRole(uid, newRole) {
+    if(uid===currentAdminUid && newRole!=='admin'){
+      showToast('Não é possível rebaixar sua própria conta','warning');
+      renderTable(allUsers);
       return;
     }
     if(!confirm(`Alterar função para "${ROLE_LABELS[newRole]||newRole}"?`)){
-      renderTable(allUsers);return;
+      renderTable(allUsers);
+      return;
     }
     try{
       await updateDoc(doc(db,'users',uid),{role:newRole,updatedAt:serverTimestamp()});
-      toast('Função atualizada','success');
-    }catch(e){toast('Erro: '+e.message,'error')}
-  };
+      showToast('Função atualizada','success');
+    }catch(e){ showToast('Erro: '+e.message,'error'); }
+  }
 
+  /* ── render ── */
   let allUsers=[];
   let currentAdminUid='';
+
   function renderTable(users){
     allUsers=users;
     updateCounts(users);
     let filtered=users.filter(u=>activeRole==='all'||u.role===activeRole);
-    if(searchQ) filtered=filtered.filter(u=>{
-      return (u.name||'').toLowerCase().includes(searchQ)||(u.email||'').toLowerCase().includes(searchQ);
-    });
+    if(searchQ) filtered=filtered.filter(u=>
+      (u.name||'').toLowerCase().includes(searchQ)||(u.email||'').toLowerCase().includes(searchQ)
+    );
 
     const el=document.getElementById('usersTable');
     if(!filtered.length){
       el.innerHTML='<div class="state-empty" style="padding:60px"><p>Nenhum usuário encontrado</p></div>';
       return;
     }
-
-    const fmtDate=ts=>{
-      if(!ts) return '—';
-      const d=ts.toDate?ts.toDate():new Date(ts);
-      return d.toLocaleDateString('pt-BR');
-    };
 
     el.innerHTML=`<div class="table-wrap"><table>
       <thead><tr>
@@ -303,16 +266,16 @@
           <div class="user-row">
             <div class="avatar-lg">${(u.name||u.email||'?')[0].toUpperCase()}</div>
             <div>
-              <div class="user-info__name">${u.name||'Sem nome'}</div>
-              <div class="user-info__email">${u.email||'—'}</div>
+              <div class="user-info__name">${escapeHtml(u.name||'Sem nome')}</div>
+              <div class="user-info__email">${escapeHtml(u.email||'—')}</div>
             </div>
           </div>
         </td>
-        <td style="font-size:.82rem;color:var(--cream-2)">${u.phone||'—'}</td>
+        <td style="font-size:.82rem;color:var(--cream-2)">${escapeHtml(u.phone||'—')}</td>
         <td><span class="role-badge role-badge--${u.role}">${ROLE_LABELS[u.role]||u.role}</span></td>
-        <td style="font-size:.78rem;color:var(--cream-muted)">${fmtDate(u.createdAt)}</td>
+        <td style="font-size:.78rem;color:var(--cream-muted)">${fmtDay(u.createdAt)}</td>
         <td>
-          <select class="role-select" data-uid="${u.id}" onchange="changeRole('${u.id}',this.value,'${currentAdminUid}')">
+          <select class="role-select" data-action="role" data-uid="${u.id}">
             <option value="customer" ${u.role==='customer'?'selected':''}>Cliente</option>
             <option value="attendant" ${u.role==='attendant'?'selected':''}>Atendente</option>
             <option value="admin" ${u.role==='admin'?'selected':''}>Administrador</option>
@@ -320,12 +283,7 @@
         </td>
         <td style="padding:8px 10px 8px 4px">
           ${u.id !== currentAdminUid ? `
-          <button onclick="deleteUser('${u.id}','${(u.name||'usuário').replace(/'/g,"\\'")}','${currentAdminUid}')"
-            title="Excluir cadastro"
-            style="background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);color:#e74c3c;
-                   border-radius:6px;padding:5px 7px;cursor:pointer;transition:.2s;display:flex;align-items:center"
-            onmouseover="this.style.background='rgba(192,57,43,.25)'"
-            onmouseout="this.style.background='rgba(192,57,43,.1)'">
+          <button class="btn-row-delete" data-action="delete" data-uid="${u.id}" data-name="${escapeHtml(u.name||'usuário')}" title="Excluir cadastro">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
           </button>` : `<span style="font-size:.7rem;color:var(--cream-faint)">você</span>`}
         </td>
@@ -334,14 +292,24 @@
     </table></div>`;
   }
 
-  /* create staff modal */
+  /* ── event delegation ── */
+  document.getElementById('usersTable').addEventListener('change', e => {
+    const sel = e.target.closest('[data-action="role"]');
+    if (sel) changeRole(sel.dataset.uid, sel.value);
+  });
+  document.getElementById('usersTable').addEventListener('click', e => {
+    const btn = e.target.closest('[data-action="delete"]');
+    if (btn) deleteUser(btn.dataset.uid, btn.dataset.name);
+  });
+
+  /* ── create staff modal ── */
   const createModal=document.getElementById('createModal');
   document.getElementById('createStaffBtn').addEventListener('click',()=>createModal.classList.add('open'));
   document.getElementById('createModalClose').addEventListener('click',()=>createModal.classList.remove('open'));
   document.getElementById('createModalCancel').addEventListener('click',()=>createModal.classList.remove('open'));
   createModal.addEventListener('click',e=>{if(e.target===createModal)createModal.classList.remove('open')});
 
-  let adminEmail='',adminPass='';
+  const createStaffFn = httpsCallable(getFunctions(app), 'createStaffUser');
 
   document.getElementById('createSaveBtn').addEventListener('click',async()=>{
     const name=document.getElementById('cName').value.trim();
@@ -349,44 +317,30 @@
     const pass=document.getElementById('cPass').value;
     const phone=document.getElementById('cPhone').value.trim();
     const role=document.getElementById('cRole').value;
-    if(!name||!email||pass.length<6){toast('Preencha todos os campos (senha mín. 6 chars)','warning');return;}
+    if(!name||!email||pass.length<6){showToast('Preencha todos os campos (senha mín. 6 chars)','warning');return;}
 
     const btn=document.getElementById('createSaveBtn');
     btn.disabled=true;btn.textContent='Criando…';
 
     try{
-      /* create new user (signs out current admin temporarily) */
-      const cred=await createUserWithEmailAndPassword(auth,email,pass);
-      await updateProfile(cred.user,{displayName:name});
-      await setDoc(doc(db,'users',cred.user.uid),{
-        name,email,phone,role,
-        createdAt:serverTimestamp(),updatedAt:serverTimestamp()
-      });
-      /* sign admin back in */
-      if(adminEmail&&adminPass){
-        await signInWithEmailAndPassword(auth,adminEmail,adminPass);
-      }
-      toast(`Conta de ${ROLE_LABELS[role]||role} criada para ${name}`,'success');
+      await createStaffFn({name,email,password:pass,phone,role});
+      showToast(`Conta de ${ROLE_LABELS[role]||role} criada para ${name}`,'success');
       createModal.classList.remove('open');
     }catch(e){
-      toast('Erro: '+e.message,'error');
-      /* try to restore admin session */
-      if(adminEmail&&adminPass) await signInWithEmailAndPassword(auth,adminEmail,adminPass).catch(()=>{});
+      const msg=e?.details||e?.message||'Erro ao criar conta. Tente novamente.';
+      showToast('Erro: '+msg,'error');
     }finally{
       btn.disabled=false;btn.textContent='Criar conta';
     }
   });
 
-  /* auth guard */
+  /* ── auth guard ── */
   onAuthStateChanged(auth,async user=>{
     if(!user){window.location.href='../auth/login.html';return;}
     const snap=await getDoc(doc(db,'users',user.uid));
     if(!snap.exists()||snap.data().role!=='admin'){window.location.href='../customer/orders.html';return;}
     currentAdminUid=user.uid;
-    adminEmail=user.email;
-    document.getElementById('avatarInitial').textContent=(snap.data()?.name||'A')[0].toUpperCase();
-    document.getElementById('userName').textContent=snap.data()?.name||'Admin';
-    document.getElementById('userEmail').textContent=user.email||'';
+    setSidebarUser(snap.data()?.name||'Admin', user.email||'');
 
     onSnapshot(query(collection(db,'users'),orderBy('createdAt','desc')),snap=>{
       allUsers=snap.docs.map(d=>({id:d.id,...d.data()}));

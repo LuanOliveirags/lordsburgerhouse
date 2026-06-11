@@ -53,7 +53,9 @@ service cloud.firestore {
 
     // ── guestProfiles (pré-cadastro por telefone) ─────────────────────────────
     match /guestProfiles/{phone} {
-      allow read, write: if true;
+      allow read:   if isAdmin() || (isAuth() && userPhone() == phone);
+      allow write:  if true;   // guest checkout precisa escrever sem autenticação
+      allow delete: if isAdmin();
     }
 
     // ── orders ───────────────────────────────────────────────────────────────
@@ -68,16 +70,20 @@ service cloud.firestore {
       );
 
       // CRIAÇÃO:
+      //   - status deve ser 'pending' (impede escalação de privilégio via payload)
       //   - guest sem conta (customerId == null, sem auth)
       //   - cliente logado criando próprio pedido (customerId == uid) ou pedido guest
       //   - atendente/admin
       allow create: if (
-        (request.auth == null && request.resource.data.customerId == null)
-        || (isAuth() && (
-              request.resource.data.customerId == request.auth.uid
-              || request.resource.data.customerId == null
-           ))
-        || isAttendant()
+        request.resource.data.status == 'pending'
+        && (
+          (request.auth == null && request.resource.data.customerId == null)
+          || (isAuth() && (
+                request.resource.data.customerId == request.auth.uid
+                || request.resource.data.customerId == null
+             ))
+          || isAttendant()
+        )
       );
 
       // ATUALIZAÇÃO:

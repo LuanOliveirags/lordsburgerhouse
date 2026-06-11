@@ -168,6 +168,12 @@
         <p style="color:var(--cream-muted)">Carregando pedidos...</p>
       </div>
     </div>
+    <div id="loadMoreWrap" style="display:none;text-align:center;padding:20px 0">
+      <button id="loadMoreBtn" class="btn btn--outline"
+              style="border-color:rgba(201,162,39,.4);color:var(--gold);padding:10px 28px;border-radius:9999px">
+        Carregar mais pedidos
+      </button>
+    </div>
   </div>
 </div>
 
@@ -177,6 +183,16 @@
     from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
   import { collection, query, where, onSnapshot, doc, getDoc }
     from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { escapeHtml } from '../../assets/js/shared/sanitizer.js';
+  import { fmt, fmtDatetime } from '../../assets/js/shared/formatters.js';
+
+  const PAGE_SIZE = 10;
+  let visibleLimit = PAGE_SIZE;
+  function loadMoreOrders() {
+    visibleLimit += PAGE_SIZE;
+    mergeAndRender();
+  }
+  document.getElementById('loadMoreBtn').addEventListener('click', loadMoreOrders);
 
   const wrap = document.getElementById('ordersWrap');
 
@@ -194,13 +210,6 @@
     { key: 'ready',     emoji: '🟢', label: 'Pronto' },
     { key: 'delivered', emoji: '🏁', label: 'Retirado' }
   ];
-
-  function fmt(n){ return Number(n).toFixed(2).replace('.',',') }
-  function fmtDate(ts){
-    if (!ts) return '';
-    const d = ts.toDate ? ts.toDate() : new Date(ts);
-    return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
-  }
 
   function statusIndex(order){
     const steps = order.deliveryMode === 'pickup' ? STEPS_PICKUP : STEPS;
@@ -237,24 +246,24 @@
           <span class="order-item__num">#${o.orderNumber || o.id.slice(0,8).toUpperCase()}</span>
           <div style="display:flex;align-items:center;gap:12px">
             <span class="status-badge status-badge--${o.status}">${ORDER_STATUS[o.status]?.icon || ''} ${ORDER_STATUS[o.status]?.label || o.status}</span>
-            <span class="order-item__date">${fmtDate(o.createdAt)}</span>
+            <span class="order-item__date">${fmtDatetime(o.createdAt)}</span>
           </div>
         </div>
         <div class="order-item__body">
           ${renderTimeline(o)}
           <div class="order-item__products">
-            ${o.items?.map(i => `<span><strong>${i.qty}x</strong> ${i.name}</span>`).join(' &nbsp;·&nbsp; ') || ''}
+            ${o.items?.map(i => `<span><strong>${i.qty}x</strong> ${escapeHtml(i.name)}</span>`).join(' &nbsp;·&nbsp; ') || ''}
           </div>
           <div class="order-item__meta">
-            <span class="order-item__mode">${o.deliveryMode === 'delivery' ? '🛵 Delivery' : '🏠 Retirada'} · ${o.payment || ''}</span>
+            <span class="order-item__mode">${o.deliveryMode === 'delivery' ? '🛵 Delivery' : '🏠 Retirada'} · ${escapeHtml(o.payment || '')}</span>
             <span class="order-item__total">R$ ${fmt(o.total || 0)}</span>
           </div>
-          ${o.obs ? `<p style="font-size:.8rem;color:var(--cream-muted);margin-top:10px">📝 ${o.obs}</p>` : ''}
+          ${o.obs ? `<p style="font-size:.8rem;color:var(--cream-muted);margin-top:10px">📝 ${escapeHtml(o.obs)}</p>` : ''}
         </div>
       </div>`).join('');
   }
 
-  /* ── merge two snapshots sem duplicatas ── */
+  /* ── merge two snapshots sem duplicatas + paginação cliente ── */
   let byUid = [], byPhone = [];
   function mergeAndRender() {
     const map = new Map();
@@ -264,7 +273,9 @@
       const tb = b.createdAt?.seconds || b.createdAt?.toMillis?.() / 1000 || 0;
       return tb - ta;
     });
-    renderOrders(all);
+    renderOrders(all.slice(0, visibleLimit));
+    const wrap = document.getElementById('loadMoreWrap');
+    if (wrap) wrap.style.display = visibleLimit < all.length ? '' : 'none';
   }
 
   /* ── auth guard ── */

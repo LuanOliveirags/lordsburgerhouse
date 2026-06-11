@@ -3,76 +3,60 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Admin — Lord's Burger House</title>
+  <title>Dashboard — Lord's Burger House</title>
   <link rel="icon" href="../../assets/images/logos/icon-192.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../../assets/css/panel.css"/>
+  <style>
+    .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+    @media(max-width:1200px){ .kpi-grid { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:600px){ .kpi-grid { grid-template-columns:1fr; } }
+
+    .kpi-card { background:var(--panel-card); border:1px solid var(--panel-border); border-radius:12px; padding:18px 20px; position:relative; overflow:hidden; }
+    .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .kpi-card--gold::before  { background:linear-gradient(to right,var(--gold-dim),var(--gold-light)); }
+    .kpi-card--green::before { background:linear-gradient(to right,#1a6b3a,#2ecc71); }
+    .kpi-card--blue::before  { background:linear-gradient(to right,#1a3b6b,#3b8ee0); }
+    .kpi-card--purple::before{ background:linear-gradient(to right,#4b1a6b,#9b59b6); }
+    .kpi-card--red::before   { background:linear-gradient(to right,#6b1a1a,#e74c3c); }
+
+    .kpi-card__label { font-size:.72rem; color:var(--cream-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+    .kpi-card__value { font-size:1.75rem; font-weight:700; color:var(--cream); line-height:1; margin-bottom:6px; }
+    .kpi-card__sub   { font-size:.73rem; color:var(--cream-muted); }
+    .kpi-card__icon  { position:absolute; top:16px; right:16px; opacity:.13; font-size:2rem; line-height:1; }
+
+    .kpi-section-label { font-size:.68rem; color:var(--cream-muted); text-transform:uppercase; letter-spacing:.1em;
+      margin:0 0 12px; padding-bottom:6px; border-bottom:1px solid var(--panel-border); }
+
+    .kpi-pending-warn .kpi-card__value { color:#e74c3c; }
+
+    .alert-banner { display:none; align-items:center; gap:12px; background:rgba(231,76,60,.1);
+      border:1px solid rgba(231,76,60,.28); border-radius:10px; padding:14px 18px; margin-bottom:20px; }
+    .alert-banner.show { display:flex; }
+    .alert-banner__dot { width:10px; height:10px; border-radius:50%; background:#e74c3c; flex-shrink:0;
+      animation:pulse-red 1.2s infinite; }
+    @keyframes pulse-red {
+      0%,100%{ box-shadow:0 0 0 0 rgba(231,76,60,.6); }
+      50%    { box-shadow:0 0 0 8px rgba(231,76,60,0); }
+    }
+    .alert-banner__text { flex:1; font-size:.88rem; color:var(--cream); }
+    .alert-banner__text strong { color:#e74c3c; }
+  </style>
 </head>
 <body>
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 <div class="panel-layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar__logo">
-      <img src="../../assets/images/logos/logo.png" alt=""/>
-      <div class="sidebar__logo-text">
-        <span class="sidebar__logo-name">Lord's Burger</span>
-        <span class="sidebar__logo-role">Administrador</span>
-      </div>
-    </div>
-    <nav class="sidebar__nav">
-      <div class="sidebar__section">Painel</div>
-      <a href="dashboard.html" class="sidebar__link active">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Dashboard
-      </a>
-      <div class="sidebar__section">Gestão</div>
-      <a href="products.html" class="sidebar__link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        Cardápio
-      </a>
-      <a href="orders.html" class="sidebar__link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-        Pedidos
-        <span class="sidebar__badge" id="pendingBadge">0</span>
-      </a>
-      <a href="users.html" class="sidebar__link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        Usuários
-      </a>
-      <div class="sidebar__section">Acesso Rápido</div>
-      <a href="../attendant/dashboard.html" class="sidebar__link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-        Painel Atendente
-      </a>
-      <a href="../../index.html" class="sidebar__link" target="_blank">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Ver Site
-      </a>
-    </nav>
-    <div class="sidebar__footer">
-      <div class="sidebar__user">
-        <div class="sidebar__avatar" id="avatarInitial">A</div>
-        <div class="sidebar__user-info">
-          <div class="sidebar__user-name" id="userName">Admin</div>
-          <div class="sidebar__user-email" id="userEmail"></div>
-        </div>
-      </div>
-      <button class="btn-logout" id="logoutBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Sair
-      </button>
-    </div>
-  </aside>
+  <aside class="sidebar" id="sidebar"></aside>
 
-  <!-- TOPBAR -->
   <header class="topbar">
     <div style="display:flex;align-items:center;gap:12px">
       <button class="sidebar-toggle" id="sidebarToggle">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
       </button>
       <span class="topbar__title">Dashboard</span>
     </div>
@@ -82,81 +66,147 @@
     </div>
   </header>
 
-  <!-- MAIN -->
   <main class="main">
     <div class="page-header">
       <h1>Visão Geral</h1>
       <p id="dateLabel">Hoje</p>
     </div>
 
-    <!-- STATS -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-card__icon stat-card__icon--gold">🍔</div>
-        <span class="stat-card__label">Pedidos Hoje</span>
-        <span class="stat-card__value" id="statToday">—</span>
-        <span class="stat-card__sub" id="statTodaySub"></span>
+    <!-- ALERT BANNER (P4.8) -->
+    <div class="alert-banner" id="alertBanner" role="alert" aria-live="polite">
+      <div class="alert-banner__dot"></div>
+      <div class="alert-banner__text">
+        <strong id="alertCount">0</strong> pedido(s) pendente(s) aguardando confirmação
       </div>
-      <div class="stat-card">
-        <div class="stat-card__icon stat-card__icon--green">💰</div>
-        <span class="stat-card__label">Receita Hoje</span>
-        <span class="stat-card__value" id="statRevenue">—</span>
-        <span class="stat-card__sub" id="statRevenueSub"></span>
+      <a href="orders.html" class="btn btn--sm" style="background:#e74c3c;color:#fff;border:none;flex-shrink:0">Ver agora</a>
+    </div>
+
+    <!-- KPIs: HOJE -->
+    <p class="kpi-section-label">Hoje</p>
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-card--gold">
+        <div class="kpi-card__icon">🍔</div>
+        <div class="kpi-card__label">Pedidos Hoje</div>
+        <div class="kpi-card__value" id="kpiOrdersToday">—</div>
+        <div class="kpi-card__sub" id="kpiOrdersTodaySub">carregando…</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-card__icon stat-card__icon--blue">⏳</div>
-        <span class="stat-card__label">Em Andamento</span>
-        <span class="stat-card__value" id="statActive">—</span>
-        <span class="stat-card__sub">pedidos ativos agora</span>
+      <div class="kpi-card kpi-card--green">
+        <div class="kpi-card__icon">💰</div>
+        <div class="kpi-card__label">Receita Hoje</div>
+        <div class="kpi-card__value" id="kpiRevenueToday">—</div>
+        <div class="kpi-card__sub">excluindo cancelados</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-card__icon stat-card__icon--purple">👥</div>
-        <span class="stat-card__label">Clientes</span>
-        <span class="stat-card__value" id="statUsers">—</span>
-        <span class="stat-card__sub">cadastrados</span>
+      <div class="kpi-card kpi-card--blue">
+        <div class="kpi-card__icon">🎯</div>
+        <div class="kpi-card__label">Ticket Médio</div>
+        <div class="kpi-card__value" id="kpiTicket">—</div>
+        <div class="kpi-card__sub">por pedido hoje</div>
+      </div>
+      <div class="kpi-card kpi-card--green">
+        <div class="kpi-card__icon">✅</div>
+        <div class="kpi-card__label">Entregues Hoje</div>
+        <div class="kpi-card__value" id="kpiDelivered">—</div>
+        <div class="kpi-card__sub">pedidos concluídos</div>
+      </div>
+    </div>
+
+    <!-- KPIs: SEMANA / MÊS -->
+    <p class="kpi-section-label">Semana e Mês</p>
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-card--gold">
+        <div class="kpi-card__icon">📅</div>
+        <div class="kpi-card__label">Pedidos Semana</div>
+        <div class="kpi-card__value" id="kpiOrdersWeek">—</div>
+        <div class="kpi-card__sub">últimos 7 dias</div>
+      </div>
+      <div class="kpi-card kpi-card--green">
+        <div class="kpi-card__icon">📈</div>
+        <div class="kpi-card__label">Receita Semana</div>
+        <div class="kpi-card__value" id="kpiRevenueWeek">—</div>
+        <div class="kpi-card__sub">últimos 7 dias</div>
+      </div>
+      <div class="kpi-card kpi-card--gold">
+        <div class="kpi-card__icon">🗓️</div>
+        <div class="kpi-card__label">Pedidos Mês</div>
+        <div class="kpi-card__value" id="kpiOrdersMonth">—</div>
+        <div class="kpi-card__sub" id="kpiOrdersMonthSub">este mês</div>
+      </div>
+      <div class="kpi-card kpi-card--green">
+        <div class="kpi-card__icon">💹</div>
+        <div class="kpi-card__label">Receita Mês</div>
+        <div class="kpi-card__value" id="kpiRevenueMonth">—</div>
+        <div class="kpi-card__sub" id="kpiRevenueMonthSub">este mês</div>
+      </div>
+    </div>
+
+    <!-- KPIs: OPERACIONAL -->
+    <p class="kpi-section-label">Operacional</p>
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-card--red" id="kpiPendingCard">
+        <div class="kpi-card__icon">⏳</div>
+        <div class="kpi-card__label">Pendentes</div>
+        <div class="kpi-card__value" id="kpiPending">—</div>
+        <div class="kpi-card__sub">aguardando confirmação</div>
+      </div>
+      <div class="kpi-card kpi-card--blue">
+        <div class="kpi-card__icon">🔥</div>
+        <div class="kpi-card__label">Em Preparo</div>
+        <div class="kpi-card__value" id="kpiPreparing">—</div>
+        <div class="kpi-card__sub">na cozinha agora</div>
+      </div>
+      <div class="kpi-card kpi-card--purple">
+        <div class="kpi-card__icon">🛍️</div>
+        <div class="kpi-card__label">Produtos Ativos</div>
+        <div class="kpi-card__value" id="kpiProducts">—</div>
+        <div class="kpi-card__sub">no cardápio</div>
+      </div>
+      <div class="kpi-card kpi-card--purple">
+        <div class="kpi-card__icon">👥</div>
+        <div class="kpi-card__label">Clientes</div>
+        <div class="kpi-card__value" id="kpiCustomers">—</div>
+        <div class="kpi-card__sub">cadastrados</div>
       </div>
     </div>
 
     <!-- QUICK ACTIONS -->
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px">
       <a href="products.html" class="btn btn--primary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
         Novo produto
       </a>
       <a href="orders.html" class="btn btn--outline">Ver todos pedidos</a>
+      <a href="analytics.html" class="btn btn--outline">Analytics &amp; Relatórios</a>
       <a href="users.html" class="btn btn--outline">Gerenciar usuários</a>
-      <button class="btn btn--outline" id="seedBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M12 8v4l3 3"/></svg>
-        Popular cardápio inicial
-      </button>
+      <button class="btn btn--outline" id="seedBtn">Popular cardápio inicial</button>
     </div>
 
+    <!-- RECENT ORDERS + TOP PRODUCTS -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-      <!-- RECENT ORDERS -->
       <div class="card">
         <div class="card__header">
           <span class="card__title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Pedidos Recentes
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Pedidos de Hoje
           </span>
           <a href="orders.html" class="btn btn--ghost btn--sm">Ver todos</a>
         </div>
-        <div id="recentOrders">
-          <div class="state-loading"><div class="spinner"></div></div>
-        </div>
+        <div id="recentOrders"><div class="state-loading"><div class="spinner"></div></div></div>
       </div>
-
-      <!-- TOP PRODUCTS -->
       <div class="card">
         <div class="card__header">
           <span class="card__title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-            Mais Pedidos
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+            </svg>
+            Mais Pedidos (Hoje)
           </span>
+          <a href="analytics.html" class="btn btn--ghost btn--sm">Ver analytics</a>
         </div>
-        <div class="card__body" id="topProducts">
-          <div class="state-loading"><div class="spinner"></div></div>
-        </div>
+        <div class="card__body" id="topProducts"><div class="state-loading"><div class="spinner"></div></div></div>
       </div>
     </div>
   </main>
@@ -165,156 +215,233 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script type="module">
-  import { auth, db, ORDER_STATUS, ROLES } from '../../assets/js/firebase-config.js';
+  import { auth, db, ORDER_STATUS } from '../../assets/js/firebase-config.js';
   import { onAuthStateChanged, signOut }
     from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
   import {
     collection, query, orderBy, onSnapshot, doc, getDoc, getDocs,
-    where, Timestamp, writeBatch, addDoc, serverTimestamp
+    where, Timestamp, writeBatch, serverTimestamp, getCountFromServer
   } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { escapeHtml } from '../../assets/js/shared/sanitizer.js';
+  import { fmt, fmtTime } from '../../assets/js/shared/formatters.js';
+  import { showToast } from '../../assets/js/shared/toast.js';
+  import { initSidebar, bindSidebarToggle, setSidebarUser } from '../../assets/js/shared/sidebar.js';
 
-  function fmt(n){ return Number(n||0).toFixed(2).replace('.',',') }
-  function fmtDate(ts){
-    if(!ts) return '—';
-    const d=ts.toDate?ts.toDate():new Date(ts);
-    return d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  /* ── Clock ── */
+  function tick() {
+    const n = new Date();
+    document.getElementById('topbarTime').textContent =
+      n.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('dateLabel').textContent =
+      n.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+  }
+  tick(); setInterval(tick, 1000);
+
+  initSidebar({ role: 'admin', activePage: 'dashboard' });
+  bindSidebarToggle();
+
+  /* ── Web Audio alert (P4.8) ── */
+  let audioCtx = null;
+  function playAlertSound() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const t = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.frequency.setValueAtTime(880, t);
+      osc.frequency.setValueAtTime(660, t + 0.15);
+      gain.gain.setValueAtTime(0.3, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+      osc.start(t); osc.stop(t + 0.45);
+    } catch (_) {}
   }
 
-  function toast(msg,type='info'){
-    const el=document.createElement('div');
-    el.className=`toast toast--${type}`;
-    el.innerHTML=`<span class="toast__icon">${{success:'✅',error:'❌',info:'ℹ️'}[type]}</span> ${msg}`;
-    document.getElementById('toastContainer').appendChild(el);
-    setTimeout(()=>{el.classList.add('removing');setTimeout(()=>el.remove(),300)},3500);
+  /* ── Helper ── */
+  function set(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
   }
 
-  /* clock */
-  function tick(){
-    const n=new Date();
-    document.getElementById('topbarTime').textContent=n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('dateLabel').textContent=n.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+  function getTodayStart() {
+    const d = new Date(); d.setHours(0, 0, 0, 0); return Timestamp.fromDate(d);
   }
-  tick();setInterval(tick,1000);
-
-  /* sidebar */
-  const sb=document.getElementById('sidebar');
-  const ov=document.getElementById('sidebarOverlay');
-  document.getElementById('sidebarToggle').addEventListener('click',()=>{sb.classList.toggle('open');ov.classList.toggle('show')});
-  ov.addEventListener('click',()=>{sb.classList.remove('open');ov.classList.remove('show')});
-
-  /* stats from orders */
-  function calcStats(orders){
-    const today=new Date(); today.setHours(0,0,0,0);
-    const todayOrders=orders.filter(o=>{
-      const d=o.createdAt?.toDate?o.createdAt.toDate():new Date(o.createdAt||0);
-      return d>=today && o.status!=='cancelled';
-    });
-    const activeStatuses=['pending','confirmed','preparing','delivering','ready'];
-    const active=orders.filter(o=>activeStatuses.includes(o.status));
-    const revenue=todayOrders.reduce((s,o)=>s+Number(o.total||0),0);
-    document.getElementById('statToday').textContent=todayOrders.length;
-    document.getElementById('statRevenue').textContent=`R$ ${fmt(revenue)}`;
-    document.getElementById('statActive').textContent=active.length;
-    document.getElementById('pendingBadge').textContent=active.length;
+  function getWeekStart() {
+    const d = new Date(); d.setDate(d.getDate() - 6); d.setHours(0, 0, 0, 0); return Timestamp.fromDate(d);
+  }
+  function getMonthStart() {
+    const d = new Date(); d.setDate(1); d.setHours(0, 0, 0, 0); return Timestamp.fromDate(d);
   }
 
-  function renderRecent(orders){
-    const el=document.getElementById('recentOrders');
-    const recent=orders.slice(0,8);
-    if(!recent.length){el.innerHTML='<div class="state-empty" style="padding:32px"><p>Nenhum pedido ainda</p></div>';return;}
-    el.innerHTML=`<div class="table-wrap"><table>
+  /* ── Week + month aggregates (one-time, P4.9) ── */
+  async function loadPeriodKpis() {
+    const col = collection(db, 'orders');
+
+    const [weekSnap, monthSnap] = await Promise.all([
+      getDocs(query(col, where('createdAt', '>=', getWeekStart()), orderBy('createdAt', 'desc'))),
+      getDocs(query(col, where('createdAt', '>=', getMonthStart()), orderBy('createdAt', 'desc'))),
+    ]);
+
+    const calc = snap => {
+      const orders = snap.docs.map(d => d.data()).filter(o => o.status !== 'cancelled');
+      return { cnt: orders.length, rev: orders.reduce((s, o) => s + Number(o.total || 0), 0) };
+    };
+
+    const week = calc(weekSnap);
+    set('kpiOrdersWeek', week.cnt);
+    set('kpiRevenueWeek', `R$ ${fmt(week.rev)}`);
+
+    const month = calc(monthSnap);
+    set('kpiOrdersMonth', month.cnt);
+    set('kpiRevenueMonth', `R$ ${fmt(month.rev)}`);
+    const monthName = new Date().toLocaleDateString('pt-BR', { month: 'long' });
+    set('kpiOrdersMonthSub', monthName);
+    set('kpiRevenueMonthSub', monthName);
+  }
+
+  /* ── Live subscription: today only (P4.9 performance fix) ── */
+  let prevPendingIds = new Set();
+
+  function subscribeToday() {
+    return onSnapshot(
+      query(collection(db, 'orders'), where('createdAt', '>=', getTodayStart()), orderBy('createdAt', 'desc')),
+      snap => {
+        const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const valid = orders.filter(o => o.status !== 'cancelled');
+
+        const revenue = valid.reduce((s, o) => s + Number(o.total || 0), 0);
+        const delivered = orders.filter(o => o.status === 'delivered').length;
+        const pending = orders.filter(o => o.status === 'pending').length;
+        const preparing = orders.filter(o => ['confirmed', 'preparing', 'ready', 'delivering'].includes(o.status)).length;
+        const ticket = valid.length ? revenue / valid.length : 0;
+
+        set('kpiOrdersToday', valid.length);
+        set('kpiOrdersTodaySub', valid.length === 1 ? '1 pedido' : `${valid.length} pedidos`);
+        set('kpiRevenueToday', `R$ ${fmt(revenue)}`);
+        set('kpiTicket', `R$ ${fmt(ticket)}`);
+        set('kpiDelivered', delivered);
+        set('kpiPending', pending);
+        set('kpiPreparing', preparing);
+
+        const badge = document.getElementById('pendingBadge');
+        if (badge) badge.textContent = pending + preparing;
+
+        document.getElementById('kpiPendingCard')?.classList.toggle('kpi-pending-warn', pending > 0);
+
+        // Alert banner
+        const banner = document.getElementById('alertBanner');
+        document.getElementById('alertCount').textContent = pending;
+        banner.classList.toggle('show', pending > 0);
+
+        // New pending orders alert sound + toast (P4.8)
+        const currentPendingIds = new Set(orders.filter(o => o.status === 'pending').map(o => o.id));
+        const newPending = [...currentPendingIds].filter(id => !prevPendingIds.has(id));
+        if (newPending.length > 0 && prevPendingIds.size > 0) {
+          playAlertSound();
+          showToast(`🍔 ${newPending.length} novo(s) pedido(s) pendente(s)!`, 'warning');
+        }
+        prevPendingIds = currentPendingIds;
+
+        renderRecent(orders);
+        renderTopProducts(valid);
+      }
+    );
+  }
+
+  function renderRecent(orders) {
+    const el = document.getElementById('recentOrders');
+    const recent = orders.slice(0, 8);
+    if (!recent.length) {
+      el.innerHTML = '<div class="state-empty" style="padding:32px"><p>Nenhum pedido hoje</p></div>';
+      return;
+    }
+    el.innerHTML = `<div class="table-wrap"><table>
       <thead><tr><th>Pedido</th><th>Cliente</th><th>Total</th><th>Status</th><th>Hora</th></tr></thead>
-      <tbody>${recent.map(o=>`<tr>
-        <td class="td-mono">${o.orderNumber||o.id.slice(0,6).toUpperCase()}</td>
-        <td>${o.customerName||'—'}</td>
+      <tbody>${recent.map(o => `<tr>
+        <td class="td-mono">${escapeHtml(o.orderNumber || o.id.slice(0, 6).toUpperCase())}</td>
+        <td>${escapeHtml(o.customerName || '—')}</td>
         <td style="color:var(--gold-light);font-weight:700">R$ ${fmt(o.total)}</td>
-        <td><span class="status-badge status-badge--${o.status}">${ORDER_STATUS[o.status]?.icon} ${ORDER_STATUS[o.status]?.label||o.status}</span></td>
-        <td style="color:var(--cream-muted)">${fmtDate(o.createdAt)}</td>
+        <td><span class="status-badge status-badge--${o.status}">
+          ${ORDER_STATUS[o.status]?.icon || ''} ${ORDER_STATUS[o.status]?.label || o.status}
+        </span></td>
+        <td style="color:var(--cream-muted)">${fmtTime(o.createdAt)}</td>
       </tr>`).join('')}</tbody>
     </table></div>`;
   }
 
-  function renderTopProducts(orders){
-    const el=document.getElementById('topProducts');
-    const counts={};
-    orders.forEach(o=>o.items?.forEach(i=>{
-      if(!counts[i.name]) counts[i.name]=0;
-      counts[i.name]+=i.qty;
+  function renderTopProducts(orders) {
+    const el = document.getElementById('topProducts');
+    const counts = {};
+    orders.forEach(o => o.items?.forEach(i => {
+      counts[i.name] = (counts[i.name] || 0) + i.qty;
     }));
-    const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,6);
-    if(!sorted.length){el.innerHTML='<p style="color:var(--cream-muted)">Sem dados</p>';return;}
-    const max=sorted[0][1];
-    el.innerHTML=sorted.map(([name,qty])=>`
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    if (!sorted.length) { el.innerHTML = '<p style="color:var(--cream-muted)">Sem pedidos hoje</p>'; return; }
+    const max = sorted[0][1];
+    el.innerHTML = sorted.map(([name, qty]) => `
       <div style="margin-bottom:14px">
         <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-          <span style="font-size:.85rem;color:var(--cream)">${name}</span>
+          <span style="font-size:.85rem;color:var(--cream)">${escapeHtml(name)}</span>
           <span style="font-size:.82rem;color:var(--gold-light);font-weight:700">${qty}x</span>
         </div>
         <div style="height:4px;background:var(--cream-faint);border-radius:9999px;overflow:hidden">
-          <div style="height:100%;width:${(qty/max*100).toFixed(0)}%;background:linear-gradient(to right,var(--gold-dim),var(--gold-light));border-radius:9999px;transition:width .6s"></div>
+          <div style="height:100%;width:${(qty / max * 100).toFixed(0)}%;background:linear-gradient(to right,var(--gold-dim),var(--gold-light));border-radius:9999px;transition:width .6s"></div>
         </div>
       </div>`).join('');
   }
 
-  /* ── Seed initial products ── */
+  /* ── Seed products ── */
   const INITIAL_PRODUCTS = [
     {name:"Lord's Classic",desc:"Pão brioche, hambúrguer 180g, cheddar, alface, tomate e molho especial.",price:24.90,category:'royale',categoryLabel:'Hambúrguer Royale',badge:'Mais Pedido',badgeClass:'badge--popular',available:true,sortOrder:1,img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80'},
     {name:"Rei Supremo",desc:"Dois hambúrgueres 180g, cheddar duplo, bacon crocante, cebola caramelizada.",price:39.90,category:'royale',categoryLabel:'Hambúrguer Royale',badge:null,badgeClass:'',available:true,sortOrder:2,img:'https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=800&q=80'},
     {name:"Duque Bacon",desc:"Hambúrguer 180g, cheddar, bacon defumado e maionese defumada.",price:34.90,category:'royale',categoryLabel:'Hambúrguer Royale',badge:null,badgeClass:'',available:true,sortOrder:3,img:'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=800&q=80'},
     {name:"Majestade Angus",desc:"Angus premium 250g, gouda envelhecido, rúcula e tomate confit.",price:44.90,category:'royale',categoryLabel:'Hambúrguer Royale',badge:'Premium',badgeClass:'badge--especial',available:true,sortOrder:4,img:'https://images.unsplash.com/photo-1607013251379-e6eecfffe234?w=800&q=80'},
     {name:"Lord's Veggie",desc:"Hambúrguer de grão-de-bico 180g, queijo brie, rúcula e aioli de ervas.",price:28.90,category:'royale',categoryLabel:'Hambúrguer Royale',badge:'Veggie',badgeClass:'badge--veg',available:true,sortOrder:5,img:'https://images.unsplash.com/photo-1520072959219-c595dc870360?w=800&q=80'},
-    {name:"Batata Clássica",desc:"Batatas fritas crocantes com sal e orégano.",price:14.90,category:'acompanhamentos',categoryLabel:'Acompanhamentos',badge:null,badgeClass:'',available:true,sortOrder:10,img:'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=800&q=80'},
-    {name:"Onion Rings",desc:"Anéis de cebola empanados e fritos, crocantes por fora.",price:16.90,category:'acompanhamentos',categoryLabel:'Acompanhamentos',badge:null,badgeClass:'',available:true,sortOrder:11,img:'https://images.unsplash.com/photo-1639024471283-03518883512d?w=800&q=80'},
-    {name:"Refrigerante 350ml",desc:"Coca-Cola, Guaraná, Sprite ou Fanta.",price:6.90,category:'bebidas',categoryLabel:'Bebidas',badge:null,badgeClass:'',available:true,sortOrder:20,img:'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=800&q=80'},
-    {name:"Suco Natural 500ml",desc:"Laranja, limão, maracujá ou abacaxi.",price:9.90,category:'bebidas',categoryLabel:'Bebidas',badge:null,badgeClass:'',available:true,sortOrder:21,img:'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=800&q=80'},
-    {name:"Milk Shake 400ml",desc:"Chocolate, morango ou baunilha. Cremoso e irresistível.",price:16.90,category:'bebidas',categoryLabel:'Bebidas',badge:null,badgeClass:'',available:true,sortOrder:22,img:'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=800&q=80'},
-    {name:"Brownie com Sorvete",desc:"Brownie quentinho de chocolate com bola de sorvete de creme.",price:18.90,category:'sobremesas',categoryLabel:'Sobremesas',badge:null,badgeClass:'',available:true,sortOrder:30,img:'https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=800&q=80'},
+    {name:"Batata Clássica",desc:"Batatas fritas crocantes com sal e orégano.",price:14.90,category:'acompanhamento',categoryLabel:'Acompanhamento',badge:null,badgeClass:'',available:true,sortOrder:10,img:'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=800&q=80'},
+    {name:"Onion Rings",desc:"Anéis de cebola empanados e fritos, crocantes por fora.",price:16.90,category:'acompanhamento',categoryLabel:'Acompanhamento',badge:null,badgeClass:'',available:true,sortOrder:11,img:'https://images.unsplash.com/photo-1639024471283-03518883512d?w=800&q=80'},
+    {name:"Refrigerante 350ml",desc:"Coca-Cola, Guaraná, Sprite ou Fanta.",price:6.90,category:'bebida',categoryLabel:'Bebida',badge:null,badgeClass:'',available:true,sortOrder:20,img:'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=800&q=80'},
+    {name:"Suco Natural 500ml",desc:"Laranja, limão, maracujá ou abacaxi.",price:9.90,category:'bebida',categoryLabel:'Bebida',badge:null,badgeClass:'',available:true,sortOrder:21,img:'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=800&q=80'},
+    {name:"Milk Shake 400ml",desc:"Chocolate, morango ou baunilha. Cremoso e irresistível.",price:16.90,category:'bebida',categoryLabel:'Bebida',badge:null,badgeClass:'',available:true,sortOrder:22,img:'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=800&q=80'},
+    {name:"Brownie com Sorvete",desc:"Brownie quentinho de chocolate com bola de sorvete de creme.",price:18.90,category:'sobremesa',categoryLabel:'Sobremesa',badge:null,badgeClass:'',available:true,sortOrder:30,img:'https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=800&q=80'},
   ];
-
   const INITIAL_COMBOS = [
     {name:"Combo Lord's Classic",items:"Lord's Classic + Batata Clássica + Refrigerante",price:38.90,available:true,sortOrder:1,img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80'},
     {name:"Combo Rei Supremo",items:"Rei Supremo + Onion Rings + Refrigerante",price:52.90,available:true,sortOrder:2,img:'https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=800&q=80'},
     {name:"Combo Família",items:"2x Lord's Classic + 2x Batata + 4x Refrigerante",price:89.90,available:true,sortOrder:3,img:'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=800&q=80'},
   ];
 
-  document.getElementById('seedBtn').addEventListener('click',async()=>{
-    if(!confirm('Isso irá adicionar os produtos iniciais ao Firestore. Continuar?')) return;
-    try{
-      const batch=writeBatch(db);
-      INITIAL_PRODUCTS.forEach(p=>{
-        batch.set(doc(collection(db,'products')),{...p,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
-      });
-      INITIAL_COMBOS.forEach(c=>{
-        batch.set(doc(collection(db,'combos')),{...c,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
-      });
+  document.getElementById('seedBtn').addEventListener('click', async () => {
+    if (!confirm('Isso irá adicionar os produtos iniciais ao Firestore. Continuar?')) return;
+    try {
+      const batch = writeBatch(db);
+      INITIAL_PRODUCTS.forEach(p => batch.set(doc(collection(db, 'products')), { ...p, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }));
+      INITIAL_COMBOS.forEach(c => batch.set(doc(collection(db, 'combos')), { ...c, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }));
       await batch.commit();
-      toast('Cardápio inicial adicionado com sucesso!','success');
-    }catch(e){toast('Erro: '+e.message,'error')}
+      showToast('Cardápio inicial adicionado com sucesso!', 'success');
+    } catch (e) { showToast('Erro: ' + e.message, 'error'); }
   });
 
-  /* ── auth guard ── */
-  onAuthStateChanged(auth,async user=>{
-    if(!user){window.location.href='../auth/login.html';return;}
-    const snap=await getDoc(doc(db,'users',user.uid));
-    if(!snap.exists()||snap.data().role!=='admin'){window.location.href='../customer/orders.html';return;}
-    document.getElementById('avatarInitial').textContent=(snap.data()?.name||'A')[0].toUpperCase();
-    document.getElementById('userName').textContent=snap.data()?.name||'Admin';
-    document.getElementById('userEmail').textContent=user.email||'';
+  /* ── Auth guard ── */
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = '../auth/login.html'; return; }
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (!snap.exists() || snap.data().role !== 'admin') { window.location.href = '../customer/orders.html'; return; }
+    setSidebarUser(snap.data()?.name || 'Admin', user.email || '');
 
-    /* users count */
-    const usersSnap=await getDocs(query(collection(db,'users'),where('role','==','customer')));
-    document.getElementById('statUsers').textContent=usersSnap.size;
+    const [prodSnap, custSnap] = await Promise.all([
+      getCountFromServer(query(collection(db, 'products'), where('available', '==', true))),
+      getCountFromServer(query(collection(db, 'users'), where('role', '==', 'customer'))),
+    ]);
+    set('kpiProducts', prodSnap.data().count);
+    set('kpiCustomers', custSnap.data().count);
 
-    /* live orders */
-    onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')),snap=>{
-      const orders=snap.docs.map(d=>({id:d.id,...d.data()}));
-      calcStats(orders);
-      renderRecent(orders);
-      renderTopProducts(orders);
-    });
+    loadPeriodKpis();
+    subscribeToday();
   });
 
-  document.getElementById('logoutBtn').addEventListener('click',async()=>{await signOut(auth);window.location.href='../auth/login.html'});
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await signOut(auth); window.location.href = '../auth/login.html';
+  });
 </script>
 </body>
 </html>
