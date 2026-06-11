@@ -40,7 +40,7 @@
   <meta name="twitter:image" content="assets/images/logos/icon-512.png" />
 
   <!-- Preload crítico: logo (LCP candidate) -->
-  <link rel="preload" as="image" href="assets/images/logos/logo.png" fetchpriority="high" />
+  <link rel="preload" as="image" href="assets/images/logos/logo(sem-fundo).png" fetchpriority="high" />
 
   <!-- Google Fonts — carregamento não-bloqueante (P3.6) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -144,7 +144,8 @@
   <header class="header" id="header">
     <div class="container header__inner">
       <a href="#hero" class="header__logo">
-        <img src="assets/images/logos/logo.png" alt="Lord's Burger House" width="56" height="56" fetchpriority="high" />
+        <img src="assets/images/logos/logo(sem-fundo).png" alt="Lord's Burger House" width="56" height="56" fetchpriority="high" />
+        <span class="header__brand" aria-hidden="true">LORD'S<em>Burger House</em></span>
       </a>
 
       <nav class="header__nav" id="mainNav">
@@ -152,6 +153,7 @@
         <a href="#combos" class="nav-link">Combos</a>
         <a href="#about" class="nav-link">Sobre</a>
         <a href="#contact" class="nav-link">Contato</a>
+        <a href="#menu" class="nav-link nav-link--cta">Peça Agora</a>
       </nav>
 
       <div class="header__actions">
@@ -173,16 +175,22 @@
 
   <!-- Mobile Nav -->
   <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav__brand">
+      <img src="assets/images/logos/logo(sem-fundo).png" alt="" width="36" height="36" />
+      <span>LORD'S<em>Burger House</em></span>
+    </div>
     <a href="#menu" class="mobile-nav__link">Cardápio</a>
     <a href="#combos" class="mobile-nav__link">Combos</a>
     <a href="#about" class="mobile-nav__link">Sobre</a>
     <a href="#contact" class="mobile-nav__link">Contato</a>
     <a href="pages/auth/login.html" class="mobile-nav__link" id="authMobileBtn">Entrar</a>
+    <a href="#menu" class="mobile-nav__link mobile-nav__link--cta">Peça Agora →</a>
   </div>
 
   <!-- Store Closed Banner (hidden by default, shown by app.js when closed) -->
-  <div id="storeClosedBanner" style="display:none;background:#8b1a1a;color:#fff;text-align:center;padding:10px 20px;font-size:.9rem;font-weight:600;letter-spacing:.03em;z-index:90;position:relative">
-    ⏰ Loja fechada no momento. Volte em breve!
+  <div id="storeClosedBanner" class="store-closed-banner" style="display:none">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 16L2 6l5.5 4L12 2l4.5 8L22 6l-3 10H5z"/></svg>
+    Loja fechada no momento. Volte em breve!
   </div>
 
   <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
@@ -202,7 +210,9 @@
       <span></span><span></span><span></span>
     </div>
 
-    <div class="container hero__content">
+    <div class="container">
+      <div class="hero__layout">
+        <div class="hero__content">
       <!-- Promo badge (P7.2) -->
       <div class="hero-promo-badge" aria-label="Promoção ativa">
         <span class="hero-promo-badge__dot"></span>
@@ -212,9 +222,8 @@
       <div class="hero__pre">
         <span class="hero__pre-line"></span>
         <span class="hero__pre-text">
-          <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--gold)"><path d="M5 16L2 6l5.5 4L12 2l4.5 8L22 6l-3 10H5z"/></svg>
           Hambúrgueres Artesanais
-          <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>
         </span>
         <span class="hero__pre-line"></span>
       </div>
@@ -224,6 +233,8 @@
         <em class="hero__title-accent">Digno da</em>
         <strong class="hero__title-big">Realeza</strong>
       </h1>
+
+      <div class="hero__stars" aria-label="5 estrelas de avaliação" aria-hidden="true">★★★★★</div>
 
       <div class="hero__divider">
         <span></span>
@@ -260,7 +271,24 @@
           <span>entrega</span>
         </div>
       </div>
-    </div>
+        </div><!-- /hero__content -->
+
+        <!-- hambúrguer premium — imagem à direita -->
+        <div class="hero__img-col" aria-hidden="true">
+          <div class="hero__img-frame">
+            <img src="assets/images/home/capa.png" alt="" class="hero__burger-img" loading="eager" />
+            <div class="hero__img-radial"></div>
+          </div>
+          <div class="hero__badge-circle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="color:var(--gold);opacity:.75"><path d="M5 16L2 6l5.5 4L12 2l4.5 8L22 6l-3 10H5z"/></svg>
+            <span class="hero__badge-text-sm">O Sabor</span>
+            <span class="hero__badge-text-lg">DIGNO</span>
+            <span class="hero__badge-text-sm">da Realeza</span>
+            <div class="hero__badge-stars-row">★★★★★</div>
+          </div>
+        </div>
+      </div><!-- /hero__layout -->
+    </div><!-- /container -->
 
     <div class="hero__scroll-hint">
       <span>Deslize</span>
@@ -272,20 +300,44 @@
   <div class="info-strip">
     <div class="container info-strip__inner">
       <div class="info-strip__item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <div>
-          <strong>Seg–Sex:</strong> 11h – 23h
-          <span class="info-strip__sep">|</span>
-          <strong>Sáb–Dom:</strong> 11h – 00h
+        <div class="info-strip__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="info-strip__body">
+          <span class="info-strip__label">Delivery em</span>
+          <strong class="info-strip__value">30 MIN</strong>
+          <span class="info-strip__sub">a partir de R$ <span id="infoStripFee">5,00</span></span>
         </div>
       </div>
       <div class="info-strip__item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        <div>Delivery a partir de <strong>R$ <span id="infoStripFee">5,00</span></strong> — Retirada <strong>grátis</strong></div>
+        <div class="info-strip__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="info-strip__body">
+          <span class="info-strip__label">Ingredientes</span>
+          <strong class="info-strip__value">PREMIUM</strong>
+          <span class="info-strip__sub">selecionados</span>
+        </div>
       </div>
       <div class="info-strip__item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-        <div>Pedidos via <strong>WhatsApp</strong> ou direto pelo site</div>
+        <div class="info-strip__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+        </div>
+        <div class="info-strip__body">
+          <span class="info-strip__label">Qualidade</span>
+          <strong class="info-strip__value">100%</strong>
+          <span class="info-strip__sub">garantida</span>
+        </div>
+      </div>
+      <div class="info-strip__item">
+        <div class="info-strip__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </div>
+        <div class="info-strip__body">
+          <span class="info-strip__label">Atendimento</span>
+          <strong class="info-strip__value">WHATSAPP</strong>
+          <span class="info-strip__sub">rápido e fácil</span>
+        </div>
       </div>
     </div>
   </div>
@@ -294,8 +346,8 @@
   <section class="section reveal" id="menu" aria-labelledby="menuHeading">
     <div class="container">
       <div class="section-header">
-        <span class="section-eyebrow">Nossa Seleção</span>
-        <h2 class="section-title" id="menuHeading">Cardápio <span class="text-gold">Real</span></h2>
+        <span class="section-eyebrow">Em Destaque</span>
+        <h2 class="section-title" id="menuHeading">Escolhas dos <span class="text-gold">Reais</span></h2>
         <p class="section-subtitle">Cada hambúrguer é uma obra-prima criada com ingredientes frescos e selecionados</p>
       </div>
 
