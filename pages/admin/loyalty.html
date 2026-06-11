@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Fidelidade — Admin Lord's Burger House</title>
+  <link rel="icon" href="../../assets/images/logos/icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../../assets/css/panel.css"/>
+  <style>
+    /* metrics */
+    .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px}
+    .metric-card{background:var(--bg-card);border:1px solid var(--gold-border);border-radius:var(--r-lg);padding:20px 24px}
+    .metric-card__label{font-size:.72rem;font-family:var(--font-display);letter-spacing:.14em;text-transform:uppercase;color:var(--cream-muted);margin-bottom:6px}
+    .metric-card__val{font-family:var(--font-serif);font-size:2rem;font-weight:700;color:var(--gold-light)}
+    .metric-card__sub{font-size:.76rem;color:var(--cream-muted);margin-top:4px}
+
+    /* tabs */
+    .admin-tabs{display:flex;gap:6px;margin-bottom:24px;border-bottom:1px solid var(--gold-border);padding-bottom:0}
+    .admin-tab{
+      padding:10px 20px;border:none;background:none;
+      font-family:var(--font-display);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--cream-muted);cursor:pointer;border-bottom:2px solid transparent;
+      margin-bottom:-1px;transition:all .2s;
+    }
+    .admin-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+    /* rewards table */
+    .rewards-table{width:100%;border-collapse:collapse}
+    .rewards-table th{text-align:left;padding:10px 14px;font-size:.7rem;font-family:var(--font-display);letter-spacing:.1em;text-transform:uppercase;color:var(--cream-muted);border-bottom:1px solid var(--gold-border)}
+    .rewards-table td{padding:12px 14px;border-bottom:1px solid rgba(201,162,39,.08);font-size:.85rem;color:var(--cream-2);vertical-align:middle}
+    .rewards-table tr:last-child td{border-bottom:none}
+    .rewards-table tr:hover td{background:rgba(201,162,39,.04)}
+
+    .reward-img-thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;border:1px solid var(--gold-border)}
+    .reward-placeholder{width:36px;height:36px;border-radius:6px;background:var(--bg-700);border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+
+    /* modal */
+    .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center}
+    .modal-backdrop.show{display:flex}
+    .modal-box{background:var(--bg-page);border:1px solid var(--gold-border);border-radius:var(--r-xl);padding:28px;width:min(480px,92vw);max-height:90vh;overflow-y:auto}
+    .modal-title{font-family:var(--font-serif);font-size:1.2rem;color:var(--cream);margin-bottom:20px}
+    .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+    .form-group label{font-size:.78rem;font-family:var(--font-display);letter-spacing:.1em;text-transform:uppercase;color:var(--cream-muted)}
+    .form-group input,.form-group textarea{background:var(--bg-700);border:1px solid var(--gold-border);border-radius:8px;padding:10px 14px;color:var(--cream);font-size:.9rem;font-family:var(--font-body);width:100%;box-sizing:border-box;transition:border-color .2s}
+    .form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--gold)}
+    .form-group textarea{resize:vertical;min-height:70px}
+    .form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
+
+    /* toggle */
+    .toggle-wrap{display:flex;align-items:center;gap:10px}
+    .toggle{position:relative;width:44px;height:24px;display:inline-block}
+    .toggle input{opacity:0;width:0;height:0}
+    .toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--bg-700);border-radius:9999px;transition:.3s;border:1px solid var(--gold-border)}
+    .toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:2px;bottom:2px;background:var(--cream-muted);border-radius:50%;transition:.3s}
+    .toggle input:checked + .toggle-slider{background:rgba(201,162,39,.25);border-color:var(--gold)}
+    .toggle input:checked + .toggle-slider::before{background:var(--gold);transform:translateX(20px)}
+    .toggle-label{font-size:.85rem;color:var(--cream-muted)}
+
+    .empty-state{text-align:center;padding:60px 20px;color:var(--cream-muted);font-size:.9rem}
+    .empty-state .icon{font-size:2.5rem;margin-bottom:12px;opacity:.3}
+  </style>
+</head>
+<body>
+<div class="panel-layout">
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <aside id="sidebar" class="sidebar"></aside>
+
+  <div class="panel-main">
+    <header class="panel-header">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="panel-header__info">
+        <h1 class="panel-header__title">👑 Fidelidade — Coroas Lord's</h1>
+        <p class="panel-header__sub" id="headerSub">Carregando métricas...</p>
+      </div>
+      <button class="btn btn--primary btn--sm" id="btnNewReward">+ Nova Recompensa</button>
+    </header>
+
+    <div class="panel-content">
+
+      <!-- ── Metrics ── -->
+      <div class="metrics-grid" id="metricsGrid">
+        <div class="metric-card">
+          <div class="metric-card__label">Coroas Emitidas</div>
+          <div class="metric-card__val" id="mIssued">—</div>
+          <div class="metric-card__sub">Total acumulado pelos clientes</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card__label">Coroas Resgatadas</div>
+          <div class="metric-card__val" id="mRedeemed">—</div>
+          <div class="metric-card__sub">Total trocado por recompensas</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card__label">Clientes Ativos</div>
+          <div class="metric-card__val" id="mClients">—</div>
+          <div class="metric-card__sub">Com saldo positivo</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card__label">Recompensa Popular</div>
+          <div class="metric-card__val" style="font-size:1rem;line-height:1.3" id="mTopReward">—</div>
+          <div class="metric-card__sub">Mais resgatada</div>
+        </div>
+      </div>
+
+      <!-- ── Tabs ── -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-atab="rewards">Catálogo de Recompensas</button>
+        <button class="admin-tab" data-atab="clients">Clientes</button>
+      </div>
+
+      <!-- ── Rewards tab ── -->
+      <div id="atab-rewards">
+        <div id="rewardsContainer">
+          <div class="empty-state"><div class="icon">⭐</div><p>Carregando recompensas...</p></div>
+        </div>
+      </div>
+
+      <!-- ── Clients tab ── -->
+      <div id="atab-clients" style="display:none">
+        <div id="clientsContainer">
+          <div class="empty-state"><div class="icon">👥</div><p>Carregando clientes...</p></div>
+        </div>
+      </div>
+
+    </div><!-- /panel-content -->
+  </div><!-- /panel-main -->
+</div><!-- /panel-layout -->
+
+<!-- ── Reward Modal ── -->
+<div class="modal-backdrop" id="rewardModal">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">Nova Recompensa</div>
+    <div class="form-group">
+      <label>Nome *</label>
+      <input type="text" id="rNome" placeholder="Ex: Hambúrguer Grátis" maxlength="80" required/>
+    </div>
+    <div class="form-group">
+      <label>Descrição</label>
+      <textarea id="rDesc" placeholder="Breve descrição da recompensa (opcional)"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Custo em Coroas *</label>
+      <input type="number" id="rCusto" min="1" step="1" placeholder="Ex: 100"/>
+    </div>
+    <div class="form-group">
+      <label>Imagem (URL)</label>
+      <input type="url" id="rImagem" placeholder="https://..."/>
+    </div>
+    <div class="form-group">
+      <div class="toggle-wrap">
+        <label class="toggle">
+          <input type="checkbox" id="rAtivo" checked/>
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-label">Recompensa ativa</span>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn--ghost" id="modalCancel">Cancelar</button>
+      <button class="btn btn--primary" id="modalSave">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer" style="position:fixed;bottom:24px;right:24px;z-index:300;display:flex;flex-direction:column-reverse;gap:8px"></div>
+
+<script type="module">
+  import { auth, db } from '../../assets/js/firebase-config.js';
+  import { onAuthStateChanged, signOut }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import {
+    collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc,
+    query, where, orderBy, onSnapshot, serverTimestamp
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { initSidebar, bindSidebarToggle, setSidebarUser } from '../../assets/js/shared/sidebar.js';
+  import { escapeHtml } from '../../assets/js/shared/sanitizer.js';
+  import { getLoyaltyMetrics } from '../../assets/js/shared/loyalty.js';
+  import { logAudit } from '../../assets/js/shared/settings.js';
+
+  /* ── toast ── */
+  function showToast(msg, type = 'success') {
+    const el = document.createElement('div');
+    el.className = `toast toast--${type}`;
+    el.textContent = msg;
+    document.getElementById('toastContainer').appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+
+  /* ── sidebar & auth ── */
+  initSidebar({ role: 'admin', activePage: 'loyalty' });
+  bindSidebarToggle();
+
+  onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = '../auth/login.html'; return; }
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (!snap.exists() || snap.data().role !== 'admin') {
+      window.location.href = '../auth/login.html'; return;
+    }
+    setSidebarUser(user.displayName || user.email, user.email);
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = '../auth/login.html';
+    });
+
+    loadMetrics();
+    loadRewards();
+    loadClients();
+  });
+
+  /* ── metrics ── */
+  async function loadMetrics() {
+    const m = await getLoyaltyMetrics(db);
+    document.getElementById('mIssued').textContent   = m.totalIssued.toLocaleString('pt-BR');
+    document.getElementById('mRedeemed').textContent = m.totalRedeemed.toLocaleString('pt-BR');
+    document.getElementById('mClients').textContent  = m.activeClients.toLocaleString('pt-BR');
+    document.getElementById('mTopReward').textContent = m.topReward;
+    document.getElementById('headerSub').textContent =
+      `${m.totalIssued.toLocaleString('pt-BR')} Coroas emitidas · ${m.activeClients} clientes ativos`;
+  }
+
+  /* ── tabs ── */
+  document.querySelectorAll('.admin-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.atab;
+      document.getElementById('atab-rewards').style.display = tab === 'rewards' ? '' : 'none';
+      document.getElementById('atab-clients').style.display = tab === 'clients' ? '' : 'none';
+    });
+  });
+
+  /* ── rewards CRUD ── */
+  let editingRewardId = null;
+
+  onSnapshot(
+    query(collection(db, 'rewards'), orderBy('custo')),
+    snap => {
+      const rewards = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderRewardsTable(rewards);
+    }
+  );
+
+  function loadRewards() {} // handled by onSnapshot above
+
+  function renderRewardsTable(rewards) {
+    const cont = document.getElementById('rewardsContainer');
+    if (!rewards.length) {
+      cont.innerHTML = `<div class="empty-state"><div class="icon">⭐</div><p>Nenhuma recompensa criada. Crie a primeira!</p></div>`;
+      return;
+    }
+    cont.innerHTML = `
+      <table class="rewards-table">
+        <thead><tr>
+          <th></th>
+          <th>Nome</th>
+          <th>Custo (Coroas)</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr></thead>
+        <tbody>
+          ${rewards.map(r => `
+            <tr>
+              <td>${r.imagem
+                ? `<img class="reward-img-thumb" src="${escapeHtml(r.imagem)}" alt=""/>`
+                : `<div class="reward-placeholder">🎁</div>`}</td>
+              <td>
+                <div style="font-weight:600;color:var(--cream)">${escapeHtml(r.nome)}</div>
+                ${r.descricao ? `<div style="font-size:.75rem;color:var(--cream-muted)">${escapeHtml(r.descricao)}</div>` : ''}
+              </td>
+              <td><span style="font-family:var(--font-display);color:var(--gold);font-size:.82rem">👑 ${r.custo}</span></td>
+              <td><span class="status-badge ${r.ativo ? 'status-badge--confirmed' : 'status-badge--cancelled'}">${r.ativo ? 'Ativa' : 'Inativa'}</span></td>
+              <td>
+                <button class="btn btn--ghost btn--sm" onclick="editReward('${r.id}')">Editar</button>
+                <button class="btn btn--ghost btn--sm" style="color:#e74c3c" onclick="deleteReward('${r.id}','${escapeHtml(r.nome)}')">Excluir</button>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  document.getElementById('btnNewReward').addEventListener('click', () => openModal(null));
+  document.getElementById('modalCancel').addEventListener('click', closeModal);
+  document.getElementById('rewardModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+
+  function openModal(reward) {
+    editingRewardId = reward?.id || null;
+    document.getElementById('modalTitle').textContent = reward ? 'Editar Recompensa' : 'Nova Recompensa';
+    document.getElementById('rNome').value   = reward?.nome      || '';
+    document.getElementById('rDesc').value   = reward?.descricao || '';
+    document.getElementById('rCusto').value  = reward?.custo     || '';
+    document.getElementById('rImagem').value = reward?.imagem    || '';
+    document.getElementById('rAtivo').checked = reward ? Boolean(reward.ativo) : true;
+    document.getElementById('rewardModal').classList.add('show');
+    document.getElementById('rNome').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('rewardModal').classList.remove('show');
+    editingRewardId = null;
+  }
+
+  document.getElementById('modalSave').addEventListener('click', async () => {
+    const nome   = document.getElementById('rNome').value.trim();
+    const custo  = parseInt(document.getElementById('rCusto').value, 10);
+    const desc   = document.getElementById('rDesc').value.trim();
+    const imagem = document.getElementById('rImagem').value.trim();
+    const ativo  = document.getElementById('rAtivo').checked;
+
+    if (!nome)               { showToast('Informe o nome da recompensa.', 'error'); return; }
+    if (!custo || custo < 1) { showToast('Informe um custo válido (≥ 1).', 'error'); return; }
+
+    const data = { nome, custo, ativo, updatedAt: serverTimestamp() };
+    if (desc)   data.descricao = desc;
+    if (imagem) data.imagem = imagem;
+
+    try {
+      const btn = document.getElementById('modalSave');
+      btn.disabled = true;
+      if (editingRewardId) {
+        await updateDoc(doc(db, 'rewards', editingRewardId), data);
+        const user = (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js')).getAuth().currentUser;
+        await logAudit({ uid: user?.uid, email: user?.email }, 'reward_update', { nome, rewardId: editingRewardId });
+        showToast('Recompensa atualizada!');
+      } else {
+        data.createdAt = serverTimestamp();
+        const ref = await addDoc(collection(db, 'rewards'), data);
+        const user = (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js')).getAuth().currentUser;
+        await logAudit({ uid: user?.uid, email: user?.email }, 'reward_create', { nome, rewardId: ref.id });
+        showToast('Recompensa criada!');
+      }
+      closeModal();
+      loadMetrics();
+      btn.disabled = false;
+    } catch(e) {
+      showToast('Erro: ' + e.message, 'error');
+      document.getElementById('modalSave').disabled = false;
+    }
+  });
+
+  window.editReward = async (id) => {
+    const snap = await getDoc(doc(db, 'rewards', id));
+    if (snap.exists()) openModal({ id, ...snap.data() });
+  };
+
+  window.deleteReward = async (id, nome) => {
+    if (!confirm(`Excluir a recompensa "${nome}"?`)) return;
+    try {
+      await deleteDoc(doc(db, 'rewards', id));
+      const { getAuth } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+      const user = getAuth().currentUser;
+      await logAudit({ uid: user?.uid, email: user?.email }, 'reward_delete', { nome, rewardId: id });
+      showToast('Recompensa excluída.');
+      loadMetrics();
+    } catch(e) {
+      showToast('Erro: ' + e.message, 'error');
+    }
+  };
+
+  /* ── clients tab ── */
+  async function loadClients() {
+    const cont = document.getElementById('clientsContainer');
+    try {
+      const snap = await getDocs(query(collection(db, 'loyalty'), orderBy('balance', 'desc')));
+      if (!snap.docs.length) {
+        cont.innerHTML = `<div class="empty-state"><div class="icon">👥</div><p>Nenhum cliente com pontos ainda.</p></div>`;
+        return;
+      }
+      const rows = await Promise.all(snap.docs.map(async d => {
+        const data = d.data();
+        let name = data.userId;
+        try {
+          const uSnap = await getDoc(doc(db, 'users', data.userId));
+          if (uSnap.exists()) {
+            const ud = uSnap.data();
+            name = ud.name || ud.displayName || ud.email || data.userId;
+          }
+        } catch {}
+        return { ...data, displayName: name };
+      }));
+
+      cont.innerHTML = `
+        <table class="rewards-table">
+          <thead><tr>
+            <th>Cliente</th>
+            <th>Saldo</th>
+            <th>Acumulado</th>
+            <th>Resgatado</th>
+          </tr></thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td style="font-weight:600;color:var(--cream)">${escapeHtml(r.displayName)}</td>
+                <td><span style="font-family:var(--font-display);color:var(--gold);font-size:.82rem">👑 ${r.balance || 0}</span></td>
+                <td style="color:var(--cream-2)">${r.totalEarned || 0}</td>
+                <td style="color:var(--cream-2)">${r.totalRedeemed || 0}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    } catch(e) {
+      cont.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>Erro ao carregar clientes.</p></div>`;
+    }
+  }
+</script>
+</body>
+</html>

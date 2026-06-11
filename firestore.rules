@@ -118,5 +118,28 @@ service cloud.firestore {
       allow create: if isAdmin();  // logAudit() escreve apenas quando logado como admin
       allow update, delete: if false;
     }
+
+    // ── loyalty (saldo por cliente) ──────────────────────────────────────────
+    match /loyalty/{userId} {
+      allow read:   if isAuth() && (request.auth.uid == userId || isAdmin());
+      allow write:  if isAdmin();
+      // Escrita pelo cliente só via runTransaction no módulo loyalty.js (via SDK)
+      // A transação roda com as credenciais do cliente logado, então permitimos
+      // update apenas para o próprio uid via runTransaction.
+      allow update: if isAuth() && request.auth.uid == userId;
+    }
+
+    // ── transactions (histórico de pontos) ───────────────────────────────────
+    match /transactions/{txId} {
+      allow read:   if isAuth() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuth() && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow update, delete: if isAdmin();
+    }
+
+    // ── rewards (catálogo de recompensas) ────────────────────────────────────
+    match /rewards/{id} {
+      allow read:  if isAuth();   // clientes logados podem ver o catálogo
+      allow write: if isAdmin();
+    }
   }
 }
