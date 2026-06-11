@@ -347,7 +347,7 @@
         <div class="delivery-toggle">
           <button class="delivery-opt active" id="optDelivery" onclick="setMode('delivery')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-            Delivery — R$ 5,00
+            Delivery — R$ <span id="checkoutFeeLabel">5,00</span>
           </button>
           <button class="delivery-opt" id="optPickup" onclick="setMode('pickup')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 9v11a2 2 0 01-2 2H6a2 2 0 01-2-2V9"/><path d="M9 22V12h6v10"/><path d="M2 10.6L12 2l10 8.6"/></svg>
@@ -508,8 +508,8 @@
   </div>
 
   <script>
-    const WHATSAPP = '5511940737953';
-    const DELIVERY_FEE = 5.00;
+    var WHATSAPP = '5511940737953';
+    var DELIVERY_FEE = 5.00;
     let cartData = null;
     let deliveryMode = 'delivery';
     let selectedPayment = null;
@@ -740,6 +740,19 @@
       from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
     import { collection, doc, getDoc, addDoc, setDoc, serverTimestamp }
       from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import { loadSettings } from '../assets/js/shared/settings.js';
+
+    /* ── Carrega settings e atualiza variáveis globais do script regular ── */
+    loadSettings().then(s => {
+      if (s.whatsapp)     window.WHATSAPP     = s.whatsapp.replace(/\D/g,'');
+      if (s.deliveryFee != null) {
+        window.DELIVERY_FEE = Number(s.deliveryFee);
+        const lbl = document.getElementById('checkoutFeeLabel');
+        if (lbl) lbl.textContent = Number(s.deliveryFee).toFixed(2).replace('.',',');
+      }
+      /* re-renderiza totais com a taxa correta */
+      if (typeof updateTotals === 'function') updateTotals();
+    }).catch(() => {});
 
     /* ── pré-preenche campos se logado ── */
     onAuthStateChanged(auth, async user => {

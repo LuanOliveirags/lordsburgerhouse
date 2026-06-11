@@ -1,17 +1,18 @@
 /**
  * LORD'S BURGER HOUSE — Firebase Store Bridge
- * Carrega produtos/combos do Firestore e os disponibiliza para o app.js
- * Disparado como <script type="module"> em index.html ANTES do app.js
+ * Carrega produtos/combos/settings/banners do Firestore.
+ * Disparado como <script type="module"> em index.html ANTES do app.js.
  */
 
 import { db, auth, ORDER_STATUS } from './firebase-config.js';
 import {
-  collection, onSnapshot, addDoc, serverTimestamp, query, orderBy
+  collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, where
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { onAuthStateChanged }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { loadSettings } from './shared/settings.js';
 
-/* ── Expose current user globally so app.js can use it ── */
+/* ── Expose current user globally ── */
 onAuthStateChanged(auth, user => {
   window.__FB_USER__ = user || null;
   updateAuthUI(user);
@@ -32,17 +33,30 @@ const qCombos   = query(collection(db, 'combos'),   orderBy('sortOrder'));
 
 let productsReady = false;
 let combosReady   = false;
+let settingsReady = false;
 let fbProducts    = [];
 let fbCombos      = [];
+let fbSettings    = null;
 
 function tryDispatch() {
-  if (!productsReady || !combosReady) return;
+  if (!productsReady || !combosReady || !settingsReady) return;
   window.__FB_PRODUCTS__ = fbProducts;
   window.__FB_COMBOS__   = fbCombos;
+  window.__FB_SETTINGS__ = fbSettings;
   document.dispatchEvent(new CustomEvent('firebaseStoreReady', {
-    detail: { products: fbProducts, combos: fbCombos }
+    detail: { products: fbProducts, combos: fbCombos, settings: fbSettings }
   }));
 }
+
+/* ── Load settings first (one-time) ── */
+loadSettings().then(s => {
+  fbSettings    = s;
+  settingsReady = true;
+  tryDispatch();
+}).catch(() => {
+  settingsReady = true;
+  tryDispatch();
+});
 
 onSnapshot(qProducts, snap => {
   fbProducts = snap.docs
@@ -50,10 +64,8 @@ onSnapshot(qProducts, snap => {
     .filter(p => p.available !== false);
   productsReady = true;
   tryDispatch();
-  /* live update — re-render if app already loaded */
   if (window.__APP_READY__) window.renderProducts?.(window.__ACTIVE_FILTER__ || 'all');
 }, () => {
-  /* Firestore not configured yet — app.js will use hardcoded data */
   productsReady = true;
   tryDispatch();
 });
@@ -68,6 +80,23 @@ onSnapshot(qCombos, snap => {
 }, () => {
   combosReady = true;
   tryDispatch();
+});
+
+/* ── Load banners independently (non-blocking) ── */
+const qBanners = query(
+  collection(db, 'banners'),
+  where('active', '==', true),
+  orderBy('ordem')
+);
+
+onSnapshot(qBanners, snap => {
+  const banners = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  window.__FB_BANNERS__ = banners;
+  document.dispatchEvent(new CustomEvent('firebaseBannersReady', {
+    detail: { banners }
+  }));
+}, () => {
+  window.__FB_BANNERS__ = [];
 });
 
 /* ── Save order to Firestore ── */

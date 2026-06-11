@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configurações — Lord's Burger House</title>
+  <link rel="icon" type="image/png" href="../../assets/images/logos/icon-192.png" />
+  <link rel="stylesheet" href="../../assets/css/panel.css" />
+  <style>
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .settings-grid.full { grid-template-columns: 1fr; }
+    @media (max-width: 900px) { .settings-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--gold-border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .card__title {
+      font-family: 'Cinzel', serif;
+      font-size: .72rem; font-weight: 700; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .form-row.single { grid-template-columns: 1fr; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: .8rem; font-weight: 600; color: var(--cream-muted); }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 10px 14px; border-radius: 10px;
+      border: 1px solid var(--gold-border);
+      background: var(--bg-card-alt);
+      font-size: .88rem; color: var(--cream);
+      transition: border-color .2s;
+      width: 100%;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { outline: none; border-color: var(--gold); }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: var(--cream-faint); }
+    .form-group select option { background: var(--bg-800); }
+
+    .hours-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+    .hours-row {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--gold-border);
+      border-radius: 10px; padding: 12px 14px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .hours-row__day { font-size: .8rem; font-weight: 600; color: var(--gold); min-width: 32px; }
+    .hours-row input[type=time] {
+      padding: 6px 10px; border-radius: 8px;
+      border: 1px solid var(--gold-border);
+      background: var(--bg-800);
+      color: var(--cream); font-size: .8rem;
+      width: 100px;
+    }
+    .hours-row input[type=checkbox] { accent-color: var(--gold); width: 16px; height: 16px; }
+    .hours-row label { font-size: .75rem; color: var(--cream-muted); }
+
+    /* Banners */
+    .banner-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+    .banner-item {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--gold-border);
+      border-radius: 10px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .banner-item__img {
+      width: 64px; height: 44px; border-radius: 6px;
+      object-fit: cover; background: var(--bg-700);
+      border: 1px solid var(--gold-border); flex-shrink: 0;
+    }
+    .banner-item__info { flex: 1; min-width: 0; }
+    .banner-item__title { font-size: .88rem; font-weight: 600; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .banner-item__sub { font-size: .75rem; color: var(--cream-muted); }
+    .banner-item__actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+    /* Audit log */
+    .audit-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .audit-table th { padding: 8px 12px; text-align: left; color: var(--gold); font-size: .72rem; letter-spacing: .08em; border-bottom: 1px solid var(--gold-border); }
+    .audit-table td { padding: 8px 12px; color: var(--cream-muted); border-bottom: 1px solid rgba(201,162,39,.07); }
+    .audit-table td:first-child { color: var(--cream); }
+
+    /* Buttons */
+    .btn-save {
+      background: linear-gradient(135deg, #e6c84a, #c9a227);
+      color: #0d0a00; border: none; border-radius: 9999px;
+      padding: 11px 28px; font-family: 'Cinzel', serif;
+      font-size: .75rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(201,162,39,.4); }
+    .btn-danger {
+      background: rgba(192,57,43,.15); color: #e74c3c;
+      border: 1px solid rgba(192,57,43,.3);
+      border-radius: 8px; padding: 7px 14px;
+      font-size: .78rem; cursor: pointer; transition: background .2s;
+    }
+    .btn-danger:hover { background: rgba(192,57,43,.28); }
+    .btn-outline-sm {
+      background: rgba(201,162,39,.1); color: var(--gold);
+      border: 1px solid var(--gold-border);
+      border-radius: 8px; padding: 7px 14px;
+      font-size: .78rem; cursor: pointer; transition: background .2s;
+    }
+    .btn-outline-sm:hover { background: rgba(201,162,39,.2); }
+
+    .toggle-switch { display: flex; align-items: center; gap: 10px; }
+    .toggle-switch input[type=checkbox] { accent-color: var(--gold); width: 18px; height: 18px; }
+
+    .section-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+    /* Modal for banner form */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.7); z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--gold-border);
+      border-radius: 16px; padding: 28px;
+      width: 100%; max-width: 480px;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-box h3 { font-family: 'Cinzel', serif; font-size: .85rem; letter-spacing: .12em; color: var(--gold); margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+
+    .toast-msg {
+      position: fixed; bottom: 24px; right: 24px; z-index: 300;
+      background: #1a1a1a; border: 1px solid var(--gold-border);
+      color: var(--cream); padding: 12px 20px; border-radius: 10px;
+      font-size: .85rem; opacity: 0; transform: translateY(8px);
+      transition: opacity .3s, transform .3s; pointer-events: none;
+    }
+    .toast-msg.show { opacity: 1; transform: translateY(0); }
+
+    .tabs { display: flex; gap: 4px; margin-bottom: 24px; flex-wrap: wrap; }
+    .tab-btn {
+      padding: 9px 18px; border-radius: 9999px;
+      border: 1px solid var(--gold-border); background: transparent;
+      color: var(--cream-muted); font-size: .8rem; cursor: pointer;
+      transition: all .2s;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #e6c84a, #c9a227);
+      color: #0d0a00; border-color: transparent; font-weight: 700;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="panel-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="panel-main">
+    <div class="topbar">
+      <button class="btn-icon" id="sidebarToggle" aria-label="Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <h1 class="topbar__title">Configurações</h1>
+    </div>
+
+    <div class="panel-content">
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="store">Loja</button>
+        <button class="tab-btn" data-tab="hours">Horários</button>
+        <button class="tab-btn" data-tab="banners">Banners</button>
+        <button class="tab-btn" data-tab="backup">Backup</button>
+        <button class="tab-btn" data-tab="logs">Logs</button>
+      </div>
+
+      <!-- ══ TAB: LOJA ══ -->
+      <div class="tab-panel active" id="tab-store">
+        <div class="card">
+          <div class="card__title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Identidade da Loja
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nome da Loja</label>
+              <input type="text" id="cfgStoreName" placeholder="Lord's Burger House" />
+            </div>
+            <div class="form-group">
+              <label>Slogan</label>
+              <input type="text" id="cfgSlogan" placeholder="O Sabor Digno da Realeza" />
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Subtítulo da Hero (site)</label>
+              <textarea id="cfgSubtitle" rows="2" placeholder="Ingredientes selecionados..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6z"/></svg>
+            Contato & Redes Sociais
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>WhatsApp (somente números)</label>
+              <input type="tel" id="cfgWhatsapp" placeholder="5511940737953" />
+            </div>
+            <div class="form-group">
+              <label>Tempo de Entrega</label>
+              <input type="text" id="cfgDeliveryTime" placeholder="30min" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Instagram (@ ou URL completa)</label>
+              <input type="text" id="cfgInstagram" placeholder="@lordsburgerhouse" />
+            </div>
+            <div class="form-group">
+              <label>Facebook (@ ou URL completa)</label>
+              <input type="text" id="cfgFacebook" placeholder="@lordsburgerhouse" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Endereço & Operação
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Endereço</label>
+              <input type="text" id="cfgAddress" placeholder="Rua das Realezas, 123 — Centro" />
+            </div>
+            <div class="form-group">
+              <label>Cidade / Estado</label>
+              <input type="text" id="cfgCity" placeholder="Sua Cidade, Estado" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Taxa de Entrega (R$)</label>
+              <input type="number" id="cfgDeliveryFee" min="0" step="0.50" placeholder="5.00" />
+            </div>
+            <div class="form-group">
+              <label>Pedido Mínimo (R$)</label>
+              <input type="number" id="cfgMinOrder" min="0" step="1" placeholder="20.00" />
+            </div>
+          </div>
+        </div>
+
+        <div class="section-actions">
+          <button class="btn-save" id="btnSaveStore">Salvar Configurações</button>
+          <span id="storeStatus" style="font-size:.82rem;color:var(--cream-muted)"></span>
+        </div>
+      </div>
+
+      <!-- ══ TAB: HORÁRIOS ══ -->
+      <div class="tab-panel" id="tab-hours">
+        <div class="card">
+          <div class="card__title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Horários de Funcionamento
+          </div>
+          <p style="font-size:.82rem;color:var(--cream-muted);margin-bottom:16px">Defina os horários de abertura e fechamento. Marque "Fechado" para dias sem funcionamento.</p>
+          <div class="hours-grid" id="hoursGrid">
+            <!-- preenchido por JS -->
+          </div>
+        </div>
+        <div class="section-actions">
+          <button class="btn-save" id="btnSaveHours">Salvar Horários</button>
+          <span id="hoursStatus" style="font-size:.82rem;color:var(--cream-muted)"></span>
+        </div>
+      </div>
+
+      <!-- ══ TAB: BANNERS ══ -->
+      <div class="tab-panel" id="tab-banners">
+        <div class="card">
+          <div class="card__title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            Banners Promocionais
+          </div>
+          <p style="font-size:.82rem;color:var(--cream-muted);margin-bottom:16px">Banners são exibidos na página principal entre o cardápio e a seção Sobre.</p>
+          <div class="banner-list" id="bannerList">
+            <p style="color:var(--cream-muted);font-size:.85rem">Carregando banners...</p>
+          </div>
+          <button class="btn-outline-sm" id="btnNewBanner">+ Novo Banner</button>
+        </div>
+      </div>
+
+      <!-- ══ TAB: BACKUP ══ -->
+      <div class="tab-panel" id="tab-backup">
+        <div class="card">
+          <div class="card__title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar Configurações
+          </div>
+          <p style="font-size:.85rem;color:var(--cream-muted);margin-bottom:16px">Gera um arquivo JSON com todas as configurações e banners atuais para backup ou migração.</p>
+          <button class="btn-save" id="btnExport">Exportar JSON</button>
+        </div>
+
+        <div class="card">
+          <div class="card__title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Importar Configurações
+          </div>
+          <p style="font-size:.85rem;color:var(--cream-muted);margin-bottom:16px">Selecione um arquivo JSON previamente exportado. As configurações atuais serão sobrescritas.</p>
+          <input type="file" id="importFile" accept=".json" style="color:var(--cream-muted);font-size:.85rem;margin-bottom:12px" />
+          <br/>
+          <button class="btn-save" id="btnImport">Importar e Aplicar</button>
+        </div>
+      </div>
+
+      <!-- ══ TAB: LOGS ══ -->
+      <div class="tab-panel" id="tab-logs">
+        <div class="card">
+          <div class="card__title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Log de Auditoria
+          </div>
+          <p style="font-size:.82rem;color:var(--cream-muted);margin-bottom:16px">Últimas 50 ações administrativas registradas.</p>
+          <div id="auditTableWrap">
+            <p style="color:var(--cream-muted);font-size:.85rem">Carregando...</p>
+          </div>
+        </div>
+      </div>
+    </div><!-- /panel-content -->
+  </div>
+</div>
+
+<!-- Sidebar overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Banner Form Modal -->
+<div class="modal-backdrop" id="bannerModal">
+  <div class="modal-box">
+    <h3 id="bannerModalTitle">Novo Banner</h3>
+    <input type="hidden" id="bannerEditId" />
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Título</label>
+      <input type="text" id="bannerTitle" placeholder="Ex: Promoção de Domingo" />
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Subtítulo</label>
+      <input type="text" id="bannerSubtitle" placeholder="Ex: 20% de desconto em combos" />
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>URL da Imagem (Firebase Storage ou externa)</label>
+      <input type="url" id="bannerImage" placeholder="https://..." />
+    </div>
+    <div class="form-row" style="margin-bottom:0">
+      <div class="form-group">
+        <label>Ordem (número)</label>
+        <input type="number" id="bannerOrdem" value="0" min="0" />
+      </div>
+      <div class="form-group">
+        <label style="margin-bottom:10px">Ativo</label>
+        <div class="toggle-switch">
+          <input type="checkbox" id="bannerActive" checked />
+          <span style="font-size:.85rem;color:var(--cream-muted)">Exibir no site</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-save" id="btnSaveBanner">Salvar Banner</button>
+      <button class="btn-outline-sm" onclick="document.getElementById('bannerModal').classList.remove('open')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-msg" id="toastMsg"></div>
+
+<script type="module">
+  import { db, auth } from '../../assets/js/firebase-config.js';
+  import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import {
+    collection, doc, getDocs, addDoc, setDoc, deleteDoc,
+    orderBy, query, limit, serverTimestamp
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { initSidebar, bindSidebarToggle, setSidebarUser } from '../../assets/js/shared/sidebar.js';
+  import { loadSettings, saveSettings, DEFAULT_SETTINGS, logAudit } from '../../assets/js/shared/settings.js';
+
+  /* ── Auth guard ── */
+  let currentUser = null;
+  onAuthStateChanged(auth, async user => {
+    if (!user) { location.href = '../auth/login.html'; return; }
+    try {
+      const { getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.data()?.role !== 'admin') { location.href = '../auth/login.html'; return; }
+    } catch { location.href = '../auth/login.html'; return; }
+    currentUser = user;
+    initSidebar({ role: 'admin', activePage: 'settings' });
+    bindSidebarToggle();
+    setSidebarUser(user.displayName || user.email, user.email);
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+      const { signOut } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+      await signOut(auth);
+      location.href = '../auth/login.html';
+    });
+    init();
+  });
+
+  /* ── Toast ── */
+  let toastTimer;
+  function toast(msg, ok = true) {
+    const el = document.getElementById('toastMsg');
+    el.textContent = msg;
+    el.style.borderColor = ok ? 'rgba(201,162,39,.5)' : 'rgba(192,57,43,.5)';
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+  }
+
+  /* ── Tabs ── */
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab)?.classList.add('active');
+      if (btn.dataset.tab === 'logs') loadAuditLogs();
+      if (btn.dataset.tab === 'banners') loadBanners();
+    });
+  });
+
+  /* ── Init ── */
+  async function init() {
+    const s = await loadSettings();
+    fillStoreForm(s);
+    buildHoursGrid(s.openingHours || DEFAULT_SETTINGS.openingHours);
+    loadBanners();
+  }
+
+  /* ══ STORE SETTINGS ══ */
+  function fillStoreForm(s) {
+    document.getElementById('cfgStoreName').value    = s.storeName    || '';
+    document.getElementById('cfgSlogan').value       = s.slogan       || '';
+    document.getElementById('cfgSubtitle').value     = s.subtitle     || '';
+    document.getElementById('cfgWhatsapp').value     = s.whatsapp     || '';
+    document.getElementById('cfgDeliveryTime').value = s.deliveryTime || '';
+    document.getElementById('cfgInstagram').value    = s.instagram    || '';
+    document.getElementById('cfgFacebook').value     = s.facebook     || '';
+    document.getElementById('cfgAddress').value      = s.address      || '';
+    document.getElementById('cfgCity').value         = s.city         || '';
+    document.getElementById('cfgDeliveryFee').value  = s.deliveryFee  != null ? s.deliveryFee : 5;
+    document.getElementById('cfgMinOrder').value     = s.minOrder     != null ? s.minOrder    : 20;
+  }
+
+  document.getElementById('btnSaveStore').addEventListener('click', async () => {
+    const s = await loadSettings();
+    const updated = {
+      ...s,
+      storeName:    document.getElementById('cfgStoreName').value.trim(),
+      slogan:       document.getElementById('cfgSlogan').value.trim(),
+      subtitle:     document.getElementById('cfgSubtitle').value.trim(),
+      whatsapp:     document.getElementById('cfgWhatsapp').value.replace(/\D/g,''),
+      deliveryTime: document.getElementById('cfgDeliveryTime').value.trim(),
+      instagram:    document.getElementById('cfgInstagram').value.trim(),
+      facebook:     document.getElementById('cfgFacebook').value.trim(),
+      address:      document.getElementById('cfgAddress').value.trim(),
+      city:         document.getElementById('cfgCity').value.trim(),
+      deliveryFee:  Number(document.getElementById('cfgDeliveryFee').value) || 0,
+      minOrder:     Number(document.getElementById('cfgMinOrder').value)    || 0,
+    };
+    try {
+      await saveSettings(updated);
+      await logAudit(currentUser, 'settings_update', { fields: Object.keys(updated) });
+      toast('Configurações salvas!');
+      document.getElementById('storeStatus').textContent = 'Salvo em ' + new Date().toLocaleTimeString('pt-BR');
+    } catch(e) {
+      toast('Erro ao salvar: ' + e.message, false);
+    }
+  });
+
+  /* ══ HOURS ══ */
+  const DAY_NAMES = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+  function buildHoursGrid(openingHours) {
+    const grid = document.getElementById('hoursGrid');
+    grid.innerHTML = '';
+    for (let d = 0; d <= 6; d++) {
+      const r = openingHours[d] || { open: '11:00', close: '23:00', closed: false };
+      const row = document.createElement('div');
+      row.className = 'hours-row';
+      row.dataset.day = d;
+      row.innerHTML = `
+        <span class="hours-row__day">${DAY_NAMES[d]}</span>
+        <input type="time" class="h-open" value="${r.open || '11:00'}" ${r.closed ? 'disabled' : ''} />
+        <span style="font-size:.75rem;color:var(--cream-muted)">às</span>
+        <input type="time" class="h-close" value="${r.close || '23:00'}" ${r.closed ? 'disabled' : ''} />
+        <label style="display:flex;align-items:center;gap:6px;margin-left:auto">
+          <input type="checkbox" class="h-closed" ${r.closed ? 'checked' : ''} />
+          <span style="font-size:.72rem;color:var(--cream-muted)">Fechado</span>
+        </label>`;
+      row.querySelector('.h-closed').addEventListener('change', e => {
+        const closed = e.target.checked;
+        row.querySelector('.h-open').disabled  = closed;
+        row.querySelector('.h-close').disabled = closed;
+      });
+      grid.appendChild(row);
+    }
+  }
+
+  document.getElementById('btnSaveHours').addEventListener('click', async () => {
+    const openingHours = {};
+    document.querySelectorAll('#hoursGrid .hours-row').forEach(row => {
+      const d = Number(row.dataset.day);
+      openingHours[d] = {
+        open:   row.querySelector('.h-open').value  || '11:00',
+        close:  row.querySelector('.h-close').value || '23:00',
+        closed: row.querySelector('.h-closed').checked
+      };
+    });
+    try {
+      const s = await loadSettings();
+      await saveSettings({ ...s, openingHours });
+      await logAudit(currentUser, 'hours_update', { openingHours });
+      toast('Horários salvos!');
+      document.getElementById('hoursStatus').textContent = 'Salvo em ' + new Date().toLocaleTimeString('pt-BR');
+    } catch(e) {
+      toast('Erro ao salvar: ' + e.message, false);
+    }
+  });
+
+  /* ══ BANNERS ══ */
+  let allBanners = [];
+
+  async function loadBanners() {
+    const list = document.getElementById('bannerList');
+    list.innerHTML = '<p style="color:var(--cream-muted);font-size:.85rem">Carregando...</p>';
+    try {
+      const snap = await getDocs(query(collection(db, 'banners'), orderBy('ordem')));
+      allBanners = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderBannerList();
+    } catch {
+      list.innerHTML = '<p style="color:var(--cream-muted);font-size:.85rem">Nenhum banner encontrado.</p>';
+    }
+  }
+
+  function renderBannerList() {
+    const list = document.getElementById('bannerList');
+    if (!allBanners.length) {
+      list.innerHTML = '<p style="color:var(--cream-muted);font-size:.85rem">Nenhum banner cadastrado. Clique em "+ Novo Banner" para criar.</p>';
+      return;
+    }
+    list.innerHTML = '';
+    allBanners.forEach(b => {
+      const item = document.createElement('div');
+      item.className = 'banner-item';
+      item.innerHTML = `
+        ${b.image ? `<img class="banner-item__img" src="${escHtml(b.image)}" alt="" />` : '<div class="banner-item__img" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem">🖼️</div>'}
+        <div class="banner-item__info">
+          <div class="banner-item__title">${escHtml(b.title || '(sem título)')}</div>
+          <div class="banner-item__sub">${escHtml(b.subtitle || '')} · Ordem: ${b.ordem ?? 0} · ${b.active ? '✅ Ativo' : '⬛ Inativo'}</div>
+        </div>
+        <div class="banner-item__actions">
+          <button class="btn-outline-sm" data-edit="${b.id}">Editar</button>
+          <button class="btn-danger" data-del="${b.id}">Excluir</button>
+        </div>`;
+      item.querySelector('[data-edit]').addEventListener('click', () => openBannerModal(b));
+      item.querySelector('[data-del]').addEventListener('click',  () => deleteBanner(b.id));
+      list.appendChild(item);
+    });
+  }
+
+  document.getElementById('btnNewBanner').addEventListener('click', () => openBannerModal(null));
+
+  function openBannerModal(banner) {
+    document.getElementById('bannerModalTitle').textContent = banner ? 'Editar Banner' : 'Novo Banner';
+    document.getElementById('bannerEditId').value    = banner?.id      || '';
+    document.getElementById('bannerTitle').value     = banner?.title   || '';
+    document.getElementById('bannerSubtitle').value  = banner?.subtitle|| '';
+    document.getElementById('bannerImage').value     = banner?.image   || '';
+    document.getElementById('bannerOrdem').value     = banner?.ordem   ?? 0;
+    document.getElementById('bannerActive').checked  = banner?.active  ?? true;
+    document.getElementById('bannerModal').classList.add('open');
+  }
+
+  document.getElementById('btnSaveBanner').addEventListener('click', async () => {
+    const id       = document.getElementById('bannerEditId').value;
+    const payload  = {
+      title:    document.getElementById('bannerTitle').value.trim(),
+      subtitle: document.getElementById('bannerSubtitle').value.trim(),
+      image:    document.getElementById('bannerImage').value.trim(),
+      ordem:    Number(document.getElementById('bannerOrdem').value) || 0,
+      active:   document.getElementById('bannerActive').checked,
+      updatedAt: serverTimestamp()
+    };
+    try {
+      if (id) {
+        await setDoc(doc(db, 'banners', id), payload, { merge: true });
+        await logAudit(currentUser, 'banner_update', { id, title: payload.title });
+        toast('Banner atualizado!');
+      } else {
+        payload.createdAt = serverTimestamp();
+        await addDoc(collection(db, 'banners'), payload);
+        await logAudit(currentUser, 'banner_create', { title: payload.title });
+        toast('Banner criado!');
+      }
+      document.getElementById('bannerModal').classList.remove('open');
+      loadBanners();
+    } catch(e) {
+      toast('Erro: ' + e.message, false);
+    }
+  });
+
+  async function deleteBanner(id) {
+    if (!confirm('Excluir este banner?')) return;
+    try {
+      await deleteDoc(doc(db, 'banners', id));
+      await logAudit(currentUser, 'banner_delete', { id });
+      toast('Banner excluído.');
+      loadBanners();
+    } catch(e) {
+      toast('Erro: ' + e.message, false);
+    }
+  }
+
+  /* ══ BACKUP: EXPORT ══ */
+  document.getElementById('btnExport').addEventListener('click', async () => {
+    try {
+      const settings = await loadSettings();
+      const bannersSnap = await getDocs(collection(db, 'banners'));
+      const banners = bannersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const blob = new Blob([JSON.stringify({ settings, banners }, null, 2)], { type: 'application/json' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url;
+      a.download = `lords-config-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      await logAudit(currentUser, 'export_json', {});
+      toast('Exportado com sucesso!');
+    } catch(e) {
+      toast('Erro na exportação: ' + e.message, false);
+    }
+  });
+
+  /* ══ BACKUP: IMPORT ══ */
+  document.getElementById('btnImport').addEventListener('click', async () => {
+    const file = document.getElementById('importFile').files[0];
+    if (!file) { toast('Selecione um arquivo JSON.', false); return; }
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!data.settings) { toast('Arquivo inválido — falta chave "settings".', false); return; }
+      if (!confirm('Isso sobrescreverá TODAS as configurações atuais. Continuar?')) return;
+      await saveSettings(data.settings);
+      if (Array.isArray(data.banners)) {
+        for (const b of data.banners) {
+          const { id, ...rest } = b;
+          if (id) await setDoc(doc(db, 'banners', id), rest, { merge: true });
+          else    await addDoc(collection(db, 'banners'), rest);
+        }
+      }
+      await logAudit(currentUser, 'import_json', { file: file.name });
+      toast('Importação concluída! Recarregue para ver as mudanças.');
+    } catch(e) {
+      toast('Erro na importação: ' + e.message, false);
+    }
+  });
+
+  /* ══ AUDIT LOGS ══ */
+  async function loadAuditLogs() {
+    const wrap = document.getElementById('auditTableWrap');
+    wrap.innerHTML = '<p style="color:var(--cream-muted);font-size:.85rem">Carregando...</p>';
+    try {
+      const snap = await getDocs(query(
+        collection(db, 'audit_logs'),
+        orderBy('data', 'desc'),
+        limit(50)
+      ));
+      if (snap.empty) { wrap.innerHTML = '<p style="color:var(--cream-muted);font-size:.85rem">Nenhum log encontrado.</p>'; return; }
+      const rows = snap.docs.map(d => {
+        const x = d.data();
+        const date = x.data?.toDate?.()?.toLocaleString('pt-BR') || '—';
+        const details = typeof x.detalhes === 'object' ? JSON.stringify(x.detalhes).slice(0, 80) : '';
+        return `<tr>
+          <td>${escHtml(x.usuario || '—')}</td>
+          <td>${escHtml(x.acao || '—')}</td>
+          <td>${date}</td>
+          <td style="font-size:.72rem;color:var(--cream-muted)">${escHtml(details)}</td>
+        </tr>`;
+      }).join('');
+      wrap.innerHTML = `
+        <table class="audit-table">
+          <thead><tr><th>Usuário</th><th>Ação</th><th>Data</th><th>Detalhes</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    } catch(e) {
+      wrap.innerHTML = `<p style="color:#e74c3c;font-size:.85rem">Erro: ${escHtml(e.message)}</p>`;
+    }
+  }
+
+  function escHtml(s) {
+    if (s == null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+
+</body>
+</html>

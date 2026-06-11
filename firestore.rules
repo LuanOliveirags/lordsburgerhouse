@@ -99,5 +99,24 @@ service cloud.firestore {
 
       allow delete: if isAdmin();
     }
+
+    // ── settings ─────────────────────────────────────────────────────────────
+    match /settings/{docId} {
+      allow read:  if true;        // público — site precisa ler taxa de entrega, horários etc.
+      allow write: if isAdmin();
+    }
+
+    // ── banners ──────────────────────────────────────────────────────────────
+    match /banners/{id} {
+      allow read:  if true;        // público — site exibe banners
+      allow write: if isAdmin();
+    }
+
+    // ── audit_logs ───────────────────────────────────────────────────────────
+    match /audit_logs/{id} {
+      allow read:   if isAdmin();
+      allow create: if isAdmin();  // logAudit() escreve apenas quando logado como admin
+      allow update, delete: if false;
+    }
   }
 }

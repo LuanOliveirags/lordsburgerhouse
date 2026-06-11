@@ -16,7 +16,7 @@
    Firebase APIs           → NUNCA interceptar (Firestore, Auth, Functions)
    ────────────────────────────────────────────────────────────── */
 
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const STATIC_CACHE  = `lords-static-${CACHE_VERSION}`;
 const PAGES_CACHE   = `lords-pages-${CACHE_VERSION}`;
 const IMAGES_CACHE  = `lords-images-${CACHE_VERSION}`;
@@ -38,6 +38,7 @@ const PRECACHE_ASSETS = [
   './assets/js/shared/formatters.js',
   './assets/js/shared/toast.js',
   './assets/js/shared/sidebar.js',
+  './assets/js/shared/settings.js',
   './assets/images/logos/logo.png',
   './assets/images/logos/icon-192.png',
   './assets/images/logos/icon-512.png',
@@ -50,6 +51,7 @@ const PRECACHE_ASSETS = [
   './pages/admin/products.html',
   './pages/admin/users.html',
   './pages/admin/analytics.html',
+  './pages/admin/settings.html',
   './pages/attendant/dashboard.html',
   './pages/customer/orders.html',
   './pages/checkout.html',

@@ -176,6 +176,11 @@
     <a href="pages/auth/login.html" class="mobile-nav__link" id="authMobileBtn">Entrar</a>
   </div>
 
+  <!-- Store Closed Banner (hidden by default, shown by app.js when closed) -->
+  <div id="storeClosedBanner" style="display:none;background:#8b1a1a;color:#fff;text-align:center;padding:10px 20px;font-size:.9rem;font-weight:600;letter-spacing:.03em;z-index:90;position:relative">
+    ⏰ Loja fechada no momento. Volte em breve!
+  </div>
+
   <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
   <section class="hero" id="hero">
     <div class="hero__bg"></div>
@@ -216,7 +221,7 @@
         <span></span>
       </div>
 
-      <p class="hero__subtitle">
+      <p class="hero__subtitle" id="heroSubtitle">
         Ingredientes selecionados, receitas exclusivas e o compromisso
         de entregar o melhor hambúrguer artesanal da cidade.
       </p>
@@ -241,7 +246,7 @@
         </div>
         <div class="hero__stat-sep"></div>
         <div class="hero__stat">
-          <strong>30min</strong>
+          <strong id="heroDeliveryTime">30min</strong>
           <span>entrega</span>
         </div>
       </div>
@@ -266,7 +271,7 @@
       </div>
       <div class="info-strip__item">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        <div>Delivery a partir de <strong>R$ 5,00</strong> — Retirada <strong>grátis</strong></div>
+        <div>Delivery a partir de <strong>R$ <span id="infoStripFee">5,00</span></strong> — Retirada <strong>grátis</strong></div>
       </div>
       <div class="info-strip__item">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
@@ -314,6 +319,11 @@
         <!-- Populated by JS -->
       </div>
     </div>
+  </section>
+
+  <!-- ═══════════════════════════ BANNERS SECTION (dynamic, hidden until loaded) ═══════════════════════ -->
+  <section class="section" id="bannersSection" style="display:none;padding-top:0">
+    <div class="container" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px"></div>
   </section>
 
   <!-- ═══════════════════════════ ABOUT SECTION ═══════════════════════════ -->
@@ -370,7 +380,7 @@
             </div>
             <div>
               <strong>Endereço</strong>
-              <p>Rua das Realezas, 123 — Centro<br />Sua Cidade, Estado</p>
+              <p id="contactAddress">Rua das Realezas, 123 — Centro<br />Sua Cidade, Estado</p>
             </div>
           </div>
           <div class="contact__item">
@@ -379,7 +389,7 @@
             </div>
             <div>
               <strong>Horários</strong>
-              <p>Seg–Sex: 11h às 23h<br />Sáb–Dom: 11h à 00h</p>
+              <p id="contactHours">Seg–Sex: 11h às 23h<br />Sáb–Dom: 11h à 00h</p>
             </div>
           </div>
           <div class="contact__item">
@@ -388,7 +398,7 @@
             </div>
             <div>
               <strong>WhatsApp</strong>
-              <p><a href="https://wa.me/5511940737953" class="link-gold" target="_blank">(11) 94073-7953</a></p>
+              <p><a href="https://wa.me/5511940737953" class="link-gold" target="_blank" id="contactWaText">(11) 94073-7953</a></p>
             </div>
           </div>
           <div class="contact__item">
@@ -397,10 +407,10 @@
             </div>
             <div>
               <strong>Instagram</strong>
-              <p><a href="#" class="link-gold">@lordsburgerhouse</a></p>
+              <p><a href="#" class="link-gold" id="contactInstagram">@lordsburgerhouse</a></p>
             </div>
           </div>
-          <a href="https://wa.me/5511940737953?text=Olá! Gostaria de fazer um pedido" target="_blank" class="btn btn--whatsapp btn--lg contact__whatsapp">
+          <a href="https://wa.me/5511940737953?text=Olá! Gostaria de fazer um pedido" target="_blank" class="btn btn--whatsapp btn--lg contact__whatsapp" id="contactWaBtn" data-wa-link>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             Pedir pelo WhatsApp
           </a>
@@ -410,7 +420,7 @@
           <div class="map-placeholder">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
             <p>Lord's Burger House</p>
-            <span>Rua das Realezas, 123 — Centro</span>
+            <span id="mapAddress">Rua das Realezas, 123 — Centro</span>
           </div>
         </div>
       </div>
@@ -439,18 +449,18 @@
         <a href="#about">Sobre nós</a>
         <a href="#contact">Contato</a>
         <a href="pages/checkout.html">Finalizar Pedido</a>
-        <a href="https://wa.me/5511940737953" target="_blank">WhatsApp</a>
+        <a href="https://wa.me/5511940737953" target="_blank" id="footerWhatsapp">WhatsApp</a>
       </div>
       <div class="footer__social">
         <h4>Redes Sociais</h4>
         <div class="footer__social-links">
-          <a href="#" aria-label="Instagram" class="social-btn">
+          <a href="#" aria-label="Instagram" class="social-btn" id="footerInstagram">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
           </a>
-          <a href="#" aria-label="Facebook" class="social-btn">
+          <a href="#" aria-label="Facebook" class="social-btn" id="footerFacebook">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
           </a>
-          <a href="https://wa.me/5511940737953" aria-label="WhatsApp" class="social-btn" target="_blank">
+          <a href="https://wa.me/5511940737953" aria-label="WhatsApp" class="social-btn" target="_blank" id="footerWaSocial" data-wa-link>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           </a>
         </div>
