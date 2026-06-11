@@ -23,7 +23,9 @@ function updateAuthUI(user) {
   const mobileBtn = document.getElementById('authMobileBtn');
   const label = user ? 'Meus Pedidos' : 'Entrar';
   const href  = user ? 'pages/customer/orders.html' : 'pages/auth/login.html';
-  if (btn)       { btn.textContent = label; btn.href = href; }
+  const iconUser   = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+  const iconOrders = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>';
+  if (btn)       { btn.innerHTML = user ? iconOrders + label : iconUser; btn.href = href; }
   if (mobileBtn) { mobileBtn.textContent = label; mobileBtn.href = href; }
 }
 
