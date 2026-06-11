@@ -1002,6 +1002,7 @@ input,textarea,select{font:inherit;color:inherit}
   z-index:950;opacity:0;pointer-events:none;
   transition:opacity var(--t);
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  touch-action:none;
 }
 .cart-overlay.open{opacity:1;pointer-events:auto}
 
@@ -2273,50 +2274,68 @@ body.has-store-banner {
 .mobile-nav    { overscroll-behavior-y: contain }
 
 /* ── 6b. Cart drawer: bottom-sheet em mobile ─────────────────
-   Troca translateX (horizontal) por translateY (vertical).
-   inset:0 = full-screen sem nenhuma ambiguidade de largura.
-   Padrão nativo iOS/Android: slide do baixo para cima.        */
+   Todas as propriedades conflitantes sobrescritas com !important.
+   height:100% em position:fixed = 100% do viewport (ICB).
+   dvh no @supports para ajuste dinâmico da URL bar móvel.     */
 @media (max-width: 768px) {
   .cart-drawer {
-    inset:         0    !important;   /* top/right/bottom/left = 0 */
-    border-left:   none !important;
+    position:   fixed       !important;
+    top:        0           !important;
+    left:       0           !important;
+    right:      0           !important;
+    bottom:     0           !important;
+    width:      100%        !important;
+    max-width:  100%        !important;
+    height:     100vh       !important;
+    max-height: none        !important;
+    overflow:   hidden      !important;
+    border-left:   none     !important;
     border-top:    1px solid var(--gold-border) !important;
-    border-radius: 20px 20px 0 0     !important;
+    border-radius: 20px 20px 0 0               !important;
     box-shadow:    0 -8px 48px rgba(0,0,0,.65) !important;
-    transform:     translateY(100%)  !important;   /* escondido abaixo */
+    transform:     translateY(100%)            !important;
+    transition:    transform .42s cubic-bezier(.17,.84,.44,1) !important;
+    will-change:   transform;
+    z-index:    960         !important;
+  }
+  @supports (height: 100dvh) {
+    .cart-drawer { height: 100dvh !important }
   }
   .cart-drawer.open {
-    transform:  translateY(0) !important;
-    transition: transform .42s cubic-bezier(.17,.84,.44,1) !important;
+    transform: translateY(0) !important;
   }
 }
 
 /* ── 7. Bottom-sheet: modal de produto em mobile ─────────────
-   Slide-up do bottom → padrão nativo iOS / Android           */
+   Slide-up do bottom. opacity:1 permanente — transform controla
+   o show/hide, pointer-events desabilita interação fora de tela. */
 @media (max-width: 639px) {
   .product-modal {
-    position:  fixed  !important;
-    top:       auto   !important;
-    bottom:    0      !important;
-    left:      0      !important;
-    right:     0      !important;
-    width:     100%;
-    max-width: 100%;
-    border-radius: 20px 20px 0 0;
-    transform: translateY(105%) !important;
-    max-height: 92vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
+    position:       fixed  !important;
+    top:            auto   !important;
+    bottom:         0      !important;
+    left:           0      !important;
+    right:          0      !important;
+    width:          100%   !important;
+    max-width:      100%   !important;
+    border-radius:  20px 20px 0 0  !important;
+    max-height:     92vh;
+    overflow-y:     auto;
+    overflow-x:     hidden;
     overscroll-behavior: contain;
     padding-bottom: max(20px, var(--safe-b));
+    opacity:        1      !important;
+    pointer-events: none   !important;
+    transform:      translateY(105%)                          !important;
+    transition:     transform .42s cubic-bezier(.17,.84,.44,1) !important;
+    z-index:        980    !important;
   }
   @supports (max-height: 92dvh) {
     .product-modal { max-height: 92dvh }
   }
   .product-modal.open {
-    transform: translateY(0) !important;
-    transition: transform .42s cubic-bezier(.17,.84,.44,1) !important;
+    transform:      translateY(0) !important;
+    pointer-events: auto          !important;
   }
   .product-modal::before {
     content: ''; display: block;
@@ -2555,4 +2574,56 @@ body.has-store-banner {
   .hero__glow, .hero__lines { display: none }
   body     { background: #fff; color: #000 }
   .section { padding: 24px 0; page-break-inside: avoid }
+}
+
+/* ── 22. Body scroll lock (CSS :has) — sem depender só do JS ─
+   Bloqueia scroll do body quando cart ou modal estiver aberto. */
+@supports selector(:has(*)) {
+  body:has(.cart-drawer.open),
+  body:has(.modal-overlay.open) {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+}
+
+/* ── 23. Category tabs: sticky top com safe-area ─────────────
+   Só se aplica em telas ≥769px onde position:sticky está ativo.
+   Em mobile as tabs são position:relative (regra @768px). */
+@media (min-width: 769px) {
+  .category-tabs {
+    top: calc(var(--h) + var(--safe-t) + 8px);
+  }
+}
+
+/* ── 24. Mobile nav: scroll interno em telas pequenas ────────
+   Evita que menu longo fique cortado em iPhones SE / compactos. */
+@media (max-width: 768px) {
+  .mobile-nav {
+    max-height: calc(100vh - var(--h) - var(--safe-t));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  @supports (max-height: 100dvh) {
+    .mobile-nav { max-height: calc(100dvh - var(--h) - var(--safe-t)) }
+  }
+}
+
+/* ── 25. Swipe-safe: remove delay de tap de 300ms em iOS ──────
+   manipulation: tap imediato, mantém scroll.
+   none (overlays): bloqueia qualquer gesto de toque.           */
+.cart-drawer,
+.product-modal,
+.btn,
+.product-card,
+.cat-tab,
+.mobile-nav__link,
+.combo-card {
+  touch-action: manipulation;
+}
+.modal-overlay { touch-action: none }
+
+/* ── 26. Garante que imagens não causem overflow horizontal ─── */
+@media (max-width: 768px) {
+  .hero__watermark { overflow: hidden }
+  .products-grid, .combos-grid { overflow: hidden }
 }
