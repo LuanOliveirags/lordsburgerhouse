@@ -2020,10 +2020,176 @@ input,textarea,select{font:inherit;color:inherit}
 @media(max-width:1100px){ .header__brand{display:none} }
 @media(max-width:768px){  .nav-link--cta{display:none} }
 
-/* Corrige stagger: brand div agora é nth-child(1), links começam no(2) */
+/* ============================================================
+   P8.4 — HEADER ACTIONS: ícone "Entrar", status corner, cores
+   ============================================================ */
+
+/* ── Entrar: ícone + texto alinhados */
+.nav-link--auth{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.nav-link--auth svg{
+  flex-shrink:0;
+  transition:transform var(--t);
+}
+.nav-link--auth:hover svg{ transform:scale(1.15) }
+
+/* ── Status: canto direito (após cart, antes do hamburger) */
+.header__status{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:4px 10px 4px 6px;
+  border-radius:var(--r-full);
+  border:1px solid rgba(201,162,39,.14);
+  background:rgba(8,5,1,.55);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  transition:border-color var(--t),background var(--t);
+  white-space:nowrap;
+}
+
+/* Aberto: verde */
+.status-dot--open{
+  background:var(--green);
+  box-shadow:0 0 8px var(--green);
+}
+/* Fechado: vermelho + texto vermelho via sibling */
+.status-dot--closed{
+  background:#e03535;
+  box-shadow:0 0 8px rgba(224,53,53,.8);
+}
+.status-dot--closed + .status-text{
+  color:#f07070;
+}
+.header__status:has(.status-dot--closed){
+  border-color:rgba(224,53,53,.3);
+  background:rgba(30,4,4,.65);
+}
+
+/* ── Tamanho do dot */
+.status-dot{
+  width:7px;height:7px;
+  border-radius:50%;
+  flex-shrink:0;
+  animation:blink 2s ease-in-out infinite;
+}
+
+/* Oculta texto do status em mobile mas mantém o dot */
+@media(max-width:768px){
+  .header__status .status-text{ display:none }
+  .header__status{ padding:6px;border-radius:50% }
+}
+
+/* ── Corrige stagger: brand div agora é nth-child(1), links começam no(2) */
 .mobile-nav.open .mobile-nav__link:nth-child(2){animation-delay:.04s}
 .mobile-nav.open .mobile-nav__link:nth-child(3){animation-delay:.09s}
 .mobile-nav.open .mobile-nav__link:nth-child(4){animation-delay:.14s}
 .mobile-nav.open .mobile-nav__link:nth-child(5){animation-delay:.19s}
 .mobile-nav.open .mobile-nav__link:nth-child(6){animation-delay:.24s}
 .mobile-nav.open .mobile-nav__link:nth-child(7){animation-delay:.29s}
+
+/* ============================================================
+   P8.5 — BANNER POSITION FIX
+   Banner fixo acima do header (z:950 > z:900).
+   body.has-store-banner empurra header e mobile-nav para baixo.
+   ============================================================ */
+:root{ --banner-h:42px }
+
+.store-closed-banner{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:950;
+}
+
+body.has-store-banner .header       { top:var(--banner-h) }
+body.has-store-banner .mobile-nav   { top:calc(var(--h) + var(--banner-h)) }
+body.has-store-banner .hero         { padding-top:calc(var(--h) + var(--banner-h)) }
+
+/* ============================================================
+   P8.6 — ABOUT: frame circular, logo sem fundo, glow premium
+   ============================================================ */
+
+/* Frame: círculo com dois halos box-shadow + fundo atmosférico */
+.about__image-frame{
+  border-radius:50%;
+  overflow:hidden;
+  aspect-ratio:1;
+  max-width:400px;
+  width:100%;
+  margin:0 auto;
+  background:radial-gradient(
+    circle at 45% 38%,
+    rgba(201,162,39,.13) 0%,
+    rgba(14,10,2,.9)    48%,
+    rgba(8,5,1,.6)      100%
+  );
+  border:1px solid rgba(201,162,39,.35);
+  box-shadow:
+    /* halo 1 — suave */
+    0 0 0  10px rgba(201,162,39,.07),
+    0 0 0  11px rgba(201,162,39,.22),
+    /* halo 2 — mais sutil */
+    0 0 0  22px rgba(201,162,39,.04),
+    0 0 0  23px rgba(201,162,39,.12),
+    /* profundidade */
+    0 0  80px rgba(201,162,39,.1),
+    0 40px 80px rgba(0,0,0,.7);
+  transition:box-shadow .4s ease;
+}
+.about__image-frame:hover{
+  box-shadow:
+    0 0 0  10px rgba(201,162,39,.1),
+    0 0 0  11px rgba(201,162,39,.3),
+    0 0 0  22px rgba(201,162,39,.06),
+    0 0 0  23px rgba(201,162,39,.18),
+    0 0 100px rgba(201,162,39,.18),
+    0 40px 80px rgba(0,0,0,.7);
+}
+
+/* Logo sem fundo: ocupa o frame com breathing room + glow dourado */
+.about__image-frame img{
+  width:100%;
+  height:100%;
+  max-width:none;
+  object-fit:contain;
+  padding:22px;
+  filter:
+    drop-shadow(0 0 24px rgba(201,162,39,.6))
+    drop-shadow(0 0 56px rgba(201,162,39,.22))
+    drop-shadow(0 8px 28px rgba(0,0,0,.45));
+  transition:filter .4s ease;
+}
+.about__image-frame:hover img{
+  filter:
+    drop-shadow(0 0 32px rgba(201,162,39,.75))
+    drop-shadow(0 0 72px rgba(201,162,39,.3))
+    drop-shadow(0 8px 28px rgba(0,0,0,.45));
+}
+
+/* Badge: reposicionado para o frame circular */
+.about__badge-float{
+  bottom:-8px;
+  right:max(8px, calc(50% - 188px));
+}
+
+/* Stats: separador e números mais impactantes */
+.about__stat-num{
+  font-size:2.4rem;
+  background:linear-gradient(135deg, var(--gold-light), var(--gold));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+/* Eyebrow + título: respiro melhorado */
+.about__content .section-eyebrow{
+  letter-spacing:.28em;
+}
+.about__content .section-title{
+  font-size:clamp(2rem,3.5vw,3rem);
+  line-height:1.15;
+  margin:6px 0 10px;
+}

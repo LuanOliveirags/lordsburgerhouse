@@ -212,6 +212,7 @@ function updateStoreStatus(s) {
   }
   if (txt) txt.textContent = open ? 'Aberto agora' : 'Fechado';
   if (banner) banner.style.display = open ? 'none' : 'block';
+  document.body.classList.toggle('has-store-banner', !open);
 }
 
 /* ══════════════════════════════════════════════════════
