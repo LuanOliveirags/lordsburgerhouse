@@ -1,0 +1,584 @@
+/* ============================================================
+   LORD'S BURGER HOUSE — responsive.css
+   Todos os blocos @media extraídos de style.css
+   Ordem preservada para manter a cascata CSS intacta.
+   ============================================================ */
+
+/* ── P7.8: Responsive typography (≤360px) */
+@media(max-width:360px){
+  :root { font-size:15px }
+  .hero__title-big { font-size:3.2rem }
+  .container { padding:0 14px }
+  .btn--lg { padding:12px 20px }
+  .hero__actions { gap:10px }
+  .hero__actions .btn--lg { font-size:.82rem }
+}
+
+/* Better product grid on very small screens (≤320px) */
+@media(max-width:320px){
+  .products-grid { grid-template-columns:1fr }
+}
+
+/* Touch-friendly category tabs on mobile (≤768px) */
+@media(max-width:768px){
+  .category-tabs {
+    overflow-x:auto;
+    flex-wrap:nowrap;
+    justify-content:flex-start;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding:10px 14px;
+  }
+  .category-tabs::-webkit-scrollbar { display:none }
+  .cat-tab {
+    scroll-snap-align:start;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+}
+
+/* Cart drawer mobile improvements (≤480px) */
+@media(max-width:480px){
+  .cart-drawer { width:100vw }
+  .cart-item { padding:10px }
+  .cart-item__img { width:56px;height:56px }
+  .cart-footer { padding:14px 16px }
+  .modal-close { top:8px;right:8px }
+  .product-modal__body { padding:18px 18px 24px }
+  .product-modal__name { font-size:1.3rem }
+}
+
+/* Improved bottom FAB for mobile — avoid system UI (≤768px) */
+@media(max-width:768px){
+  .fab-cart {
+    bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+    right:16px;
+  }
+}
+
+/* ── RESPONSIVE — layout main breakpoints */
+@media (max-width:1100px){
+  .about__inner{grid-template-columns:1fr;gap:48px}
+  .about__image{max-width:440px;margin:0 auto}
+  .footer__inner{grid-template-columns:1fr 1fr;gap:32px}
+}
+@media (max-width:900px){
+  .hero__logo-center{width:min(360px,40vw)}
+  .contact__grid{grid-template-columns:1fr}
+  .map-placeholder{height:260px}
+}
+@media (max-width:768px){
+  :root{--h:64px;--cw:100vw}
+  .header__nav{display:none}
+  .btn-menu-mobile{display:flex}
+
+  /* hero mobile */
+  .hero{align-items:flex-end;padding-bottom:80px}
+  .hero__bg{background-position:center center}
+  .hero__overlay{
+    background:
+      linear-gradient(to top,rgba(6,4,1,.98) 0%,rgba(6,4,1,.85) 40%,rgba(6,4,1,.4) 70%,transparent 100%),
+      linear-gradient(to bottom,rgba(6,4,1,.5) 0%,transparent 30%);
+  }
+  .hero__watermark{
+    right:50%;transform:translate(50%,-50%);
+    width:min(360px,80vw);
+    top:30%;
+  }
+  .hero__glow{right:50%;transform:translate(50%,-50%);top:30%}
+  .hero__content{
+    text-align:center;align-items:center;max-width:100%;
+    padding-bottom:0;
+  }
+  .hero__pre{justify-content:center}
+  .hero__title-big{font-size:clamp(3.5rem,13vw,5.5rem)}
+  .hero__title-sm{font-size:clamp(1.6rem,5vw,2.4rem)}
+  .hero__title-accent{font-size:clamp(2rem,6vw,3.2rem)}
+  .hero__subtitle{text-align:center;max-width:none}
+  .hero__actions{justify-content:center}
+  .hero__stats{justify-content:center;width:100%}
+  .hero__divider{justify-content:center}
+
+  .section{padding:64px 0}
+  .about__stats{gap:20px}
+  .footer__inner{grid-template-columns:1fr;gap:28px}
+  .category-tabs{position:relative;top:0;border-radius:var(--r-lg);padding:8px 10px;gap:6px}
+  .cat-tab{padding:7px 14px;font-size:.78rem}
+  .fab-cart{display:flex}
+}
+@media (max-width:480px){
+  .container{padding:0 16px}
+  .products-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+  .combos-grid{grid-template-columns:1fr}
+  .btn--lg{padding:12px 24px;font-size:.9rem}
+  .info-strip__inner{flex-direction:column;gap:10px;align-items:flex-start;padding:4px 0}
+  .info-strip__sep{display:none}
+}
+
+/* ── Responsive P8 */
+@media (max-width:1100px){
+  .hero__layout{gap:24px}
+  .hero__img-col{width:min(400px,38vw)}
+  .hero__badge-circle{width:108px;height:108px;right:-10px}
+  .hero__badge-text-lg{font-size:1rem}
+}
+
+@media (max-width:900px){
+  .info-strip__inner{grid-template-columns:repeat(2,1fr)}
+  .info-strip__item{border-right:none;border-bottom:1px solid rgba(201,162,39,.08)}
+  .info-strip__item:nth-child(odd){border-right:1px solid rgba(201,162,39,.08)}
+  .info-strip__item:last-child{border-bottom:none}
+}
+
+@media (max-width:768px){
+  .hero{align-items:center;padding-bottom:0}
+  .hero__layout{
+    flex-direction:column-reverse;
+    gap:8px;padding:20px 0 76px;
+    min-height:auto;
+  }
+  .hero__layout > .hero__content{
+    max-width:none;width:100%;
+    text-align:center;
+  }
+  .hero__layout > .hero__content .hero__title{border-left:none;padding-left:0}
+  .hero__layout > .hero__content .hero__subtitle{padding-left:0;text-align:center;max-width:none}
+  .hero__layout > .hero__content .hero__actions{justify-content:center;padding-left:0}
+  .hero__layout > .hero__content .hero__stats{justify-content:center;margin-left:0;padding-left:0}
+  .hero__layout > .hero__content .hero__divider{justify-content:center;padding-left:0}
+  .hero__layout > .hero__content .hero__stars{justify-content:center;padding-left:0}
+  .hero__layout > .hero__content .hero__pre{justify-content:center}
+  .hero__img-col{width:min(300px,78vw)}
+  .hero__badge-circle{right:0;bottom:0;width:96px;height:96px}
+  .hero__badge-text-lg{font-size:.85rem}
+}
+
+@media (max-width:480px){
+  .hero__img-col{width:min(240px,80vw)}
+  .hero__badge-circle{display:none}
+  .info-strip__inner{grid-template-columns:1fr 1fr}
+  .info-strip__item{padding:14px 14px;gap:10px;border-right:none;border-bottom:none}
+  .info-strip__item:nth-child(odd){border-right:1px solid rgba(201,162,39,.08)}
+  .info-strip__icon{width:36px;height:36px}
+  .info-strip__value{font-size:.85rem}
+}
+
+@media (max-width:360px){
+  .hero__img-col{display:none}
+  .info-strip__inner{grid-template-columns:1fr}
+  .info-strip__item{border-right:none !important;border-bottom:1px solid rgba(201,162,39,.06) !important}
+}
+
+/* ── Responsive P8.1 */
+@media (max-width:1100px){
+  .hero__img-col::before { left:-16px }
+}
+@media (max-width:900px){
+  .hero__img-col::before { display:none }
+  .hero__img-col { width:min(320px,38vw) }
+}
+@media (max-width:768px){
+  .hero__img-col { width:min(260px,74vw) }
+  .hero__img-frame { border-radius:16px }
+  .hero__layout .hero__title-big   { font-size:clamp(3.5rem,13vw,5.5rem) }
+  .hero__layout .hero__title-accent{ font-size:clamp(2rem,6vw,3.2rem) }
+  .hero__layout .hero__title-sm    { font-size:clamp(.78rem,3vw,.95rem) }
+}
+@media (max-width:480px){
+  .hero__img-col { width:min(210px,70vw) }
+  .hero__img-frame::before { font-size:.7rem;top:10px;right:10px }
+}
+
+/* ── P8.2 Mobile: texto ancorado na base, overlay sobe do baixo */
+@media(max-width:768px){
+  .hero{align-items:flex-end;padding-bottom:0}
+  .hero__layout{
+    flex-direction:column;
+    padding:0 0 72px;
+    min-height:calc(100vh - var(--h));
+    justify-content:flex-end;
+    align-items:flex-start;
+  }
+  .hero__layout > .hero__content{
+    max-width:none;width:100%;
+  }
+  .hero__overlay{
+    background:
+      linear-gradient(to top,
+        rgba(6,4,1,.98) 0%,
+        rgba(6,4,1,.85) 45%,
+        rgba(6,4,1,.4)  72%,
+        transparent     100%
+      ),
+      linear-gradient(to bottom,rgba(6,4,1,.55) 0%,transparent 28%);
+  }
+  .hero__layout .hero__title-big{
+    font-size:clamp(3.5rem,13vw,5.5rem);
+    line-height:.9;
+  }
+  .hero__layout .hero__title-accent{font-size:clamp(2rem,8vw,3.4rem)}
+}
+
+/* ── Responsive: nome da marca some em telas menores */
+@media(max-width:1100px){ .header__brand{display:none} }
+@media(max-width:768px){  .nav-link--cta{display:none} }
+
+/* Oculta texto do status em mobile mas mantém o dot */
+@media(max-width:768px){
+  .header__status .status-text{ display:none }
+  .header__status{ padding:6px;border-radius:50% }
+}
+
+/* ── 6b. Cart drawer: bottom-sheet em mobile ─────────────────
+   Todas as propriedades conflitantes sobrescritas com !important.
+   height:100% em position:fixed = 100% do viewport (ICB).
+   dvh no @supports para ajuste dinâmico da URL bar móvel.     */
+@media (max-width: 768px) {
+  .cart-drawer {
+    position:       fixed               !important;
+    top:            0                   !important;
+    left:           0                   !important;
+    right:          0                   !important;
+    bottom:         0                   !important;
+    width:          100%                !important;
+    max-width:      100%                !important;
+    height:         100vh               !important;
+    max-height:     none                !important;
+    overflow:       hidden              !important;
+    border-left:    none                !important;
+    border-top:     1px solid var(--gold-border) !important;
+    border-radius:  20px 20px 0 0       !important;
+    box-shadow:     0 -8px 48px rgba(0,0,0,.65) !important;
+    transform:      translateY(100%)    !important;
+    /* visibility hidden garante invisibilidade total mesmo se o transform
+       não surtir efeito; delay 0.38s na saída para esperar a animação     */
+    visibility:     hidden              !important;
+    pointer-events: none                !important;
+    transition:     transform .38s cubic-bezier(.17,.84,.44,1),
+                    border-radius .38s cubic-bezier(.17,.84,.44,1),
+                    visibility 0s linear .38s           !important;
+    will-change:    transform;
+    z-index:        960                 !important;
+  }
+  /* translateY(100dvh): valor absoluto dinâmico — não falha quando
+     a URL bar do Chrome mobile esconde e aumenta o viewport visual    */
+  @supports (height: 100dvh) {
+    .cart-drawer {
+      height:    100dvh             !important;
+      transform: translateY(100dvh) !important;
+    }
+  }
+  .cart-drawer.open {
+    transform:      translateY(0)   !important;
+    border-radius:  0               !important;
+    visibility:     visible         !important;
+    pointer-events: auto            !important;
+    /* visibility se torna visible imediatamente (delay 0s na abertura) */
+    transition:     transform .38s cubic-bezier(.17,.84,.44,1),
+                    border-radius .38s cubic-bezier(.17,.84,.44,1),
+                    visibility 0s linear 0s              !important;
+  }
+  /* Header: espaço para notch/Dynamic Island em iPhones */
+  .cart-drawer__header {
+    padding-top: max(20px, var(--safe-t)) !important;
+  }
+}
+
+/* ── 7. Bottom-sheet: modal de produto em mobile ─────────────
+   Slide-up do bottom. opacity:1 permanente — transform controla
+   o show/hide, pointer-events desabilita interação fora de tela. */
+@media (max-width: 639px) {
+  .product-modal {
+    position:       fixed  !important;
+    top:            auto   !important;
+    bottom:         0      !important;
+    left:           0      !important;
+    right:          0      !important;
+    width:          100%   !important;
+    max-width:      100%   !important;
+    border-radius:  20px 20px 0 0  !important;
+    max-height:     92vh;
+    overflow-y:     auto;
+    overflow-x:     hidden;
+    overscroll-behavior: contain;
+    padding-bottom: max(20px, var(--safe-b));
+    opacity:        1      !important;
+    pointer-events: none   !important;
+    transform:      translateY(105%)                          !important;
+    transition:     transform .42s cubic-bezier(.17,.84,.44,1) !important;
+    z-index:        980    !important;
+  }
+  @supports (max-height: 92dvh) {
+    .product-modal { max-height: 92dvh }
+  }
+  .product-modal.open {
+    transform:      translateY(0) !important;
+    pointer-events: auto          !important;
+  }
+  .product-modal::before {
+    content: ''; display: block;
+    width: 40px; height: 4px;
+    background: rgba(201,162,39,.28); border-radius: 2px;
+    margin: 12px auto 0;
+  }
+  .product-modal__img  { height: 200px }
+  .product-modal__body { padding: 12px 18px 16px }
+  .product-modal__name { font-size: 1.25rem }
+}
+
+/* ── 8. Touch devices — tap targets mínimos + active states */
+@media (pointer: coarse) {
+  .qty-btn           { min-width: 44px; min-height: 44px; font-size: 1.1rem }
+  .cart-close,
+  .modal-close       { width: 44px; height: 44px }
+  .btn-cart          { width: 48px; height: 48px }
+  .social-btn        { width: 48px; height: 48px }
+  .cat-tab           { min-height: 44px; padding: 10px 16px }
+  .mobile-nav__link  { padding: 16px 18px; font-size: .95rem }
+  .btn-menu-mobile   { width: 44px; height: 44px }
+  .delivery-opt      { padding: 12px }
+  .footer__links a   { padding: 4px 0; display: block }
+
+  /* Active feedback tátil (hover não funciona em touch) */
+  .product-card:active      { transform: scale(.98);  transition: transform .12s }
+  .btn:active               { transform: scale(.96);  transition: transform .12s }
+  .product-card__add:active { transform: scale(.88);  transition: transform .12s }
+  .cat-tab:active           { opacity: .72; transition: opacity .1s }
+  .nav-link:active          { color: var(--gold) }
+
+  /* Underline animado é hover-only: desativa em touch */
+  .nav-link::after { transition: none; width: 0 !important }
+}
+
+/* ── 9. Hover: reseta efeitos em touch (hover:none) */
+@media (hover: none) {
+  .product-card:hover {
+    transform: none !important;
+    box-shadow: 0 0 0 1px var(--gold-border) !important;
+  }
+  .product-card:hover .product-card__img img { transform: none !important }
+  .product-card:hover::before { animation: none; opacity: 0 }
+  .combo-card:hover    { transform: none !important }
+  .btn--primary:hover,
+  .btn--gold:hover,
+  .btn--whatsapp:hover { transform: none }
+  .info-strip__item:hover { transform: none }
+  .social-btn:hover    { background: none; box-shadow: none }
+}
+
+/* ── 10. Landscape phones (max-height 500px) */
+@media (max-height: 500px) and (orientation: landscape) {
+  :root { --h: 52px }
+
+  .hero { min-height: auto; padding-bottom: 28px }
+  .hero__layout {
+    padding: 12px 0 24px; min-height: auto;
+    gap: 20px; align-items: center;
+  }
+  .hero__title-big    { font-size: clamp(1.9rem, 8vh, 3.5rem) !important }
+  .hero__title-accent { font-size: clamp(1.3rem, 5vh, 2.2rem) !important }
+  .hero__title-sm     { font-size: .65rem !important; letter-spacing: .24em !important }
+  .hero__stats,
+  .hero__scroll-hint,
+  .hero__divider      { display: none }
+  .hero__subtitle     { margin-bottom: 12px }
+  .hero__actions      { margin-bottom: 14px }
+  .hero__actions .btn--lg { padding: 10px 20px; font-size: .78rem }
+  .hero__pre          { margin-bottom: 14px }
+
+  /* Mobile nav: 2 colunas para aproveitar largura em landscape */
+  .mobile-nav {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    padding: 10px 16px; gap: 0;
+    max-height: calc(100svh - var(--h));
+    overflow-y: auto;
+  }
+  @supports not (height: 100svh) {
+    .mobile-nav { max-height: calc(100vh - var(--h)) }
+  }
+  .mobile-nav__brand     { grid-column: 1 / -1; padding-bottom: 6px; margin-bottom: 0 }
+  .mobile-nav__link      { padding: 10px 14px; font-size: .85rem }
+  .mobile-nav__link--cta { grid-column: 1 / -1 }
+}
+
+/* ── 11. ≤360px: iPhone SE 1st gen, Android compacto */
+@media (max-width: 360px) {
+  :root { font-size: 14px; --h: 58px }
+  .container { padding-inline: 14px }
+
+  .hero__title-big    { font-size: 2.7rem  !important; line-height: .9 }
+  .hero__title-accent { font-size: 1.85rem !important }
+  .hero__title-sm     { font-size: .68rem  !important; letter-spacing: .28em }
+  .hero__stats        { flex-wrap: wrap; gap: 0 }
+  .hero__stat-sep     { display: none }
+  .hero__stat         { flex: 1 0 40%; padding: 6px 10px }
+  .hero__actions      { flex-direction: column; gap: 8px }
+  .hero__actions .btn { width: 100%; justify-content: center }
+
+  .section            { padding: 44px 0 }
+  .section-header     { margin-bottom: 32px }
+  .section-title      { font-size: 1.65rem }
+
+  .about__stats       { flex-direction: column; gap: 14px }
+  .about__stat-num    { font-size: 1.8rem }
+
+  .contact__icon      { width: 36px; height: 36px }
+  .contact__item      { padding: 12px; gap: 10px }
+
+  .footer             { padding-top: 36px }
+  .footer__logo       { height: 52px }
+}
+
+/* ── 12. 361–430px: iPhone 14, SE 3, Android médio */
+@media (min-width: 361px) and (max-width: 430px) {
+  /* CTAs do hero empilhados */
+  .hero__actions         { flex-direction: column; gap: 10px }
+  .hero__actions .btn--lg { width: 100%; justify-content: center }
+
+  /* Info strip: scroll horizontal com snap */
+  .info-strip {
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; scroll-snap-type: x mandatory;
+  }
+  .info-strip::-webkit-scrollbar { display: none }
+  .info-strip__inner {
+    grid-template-columns: repeat(4, 148px);
+    gap: 0; width: max-content; min-width: 100%;
+  }
+  .info-strip__item {
+    scroll-snap-align: start;
+    border-right:  1px solid rgba(201,162,39,.08) !important;
+    border-bottom: none !important;
+  }
+}
+
+/* ── 13. 431–599px: iPhone 14 Plus / 15 Plus, Galaxy S Ultra */
+@media (min-width: 431px) and (max-width: 599px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); gap: 14px }
+  .product-card__img { padding-top: 60% }
+}
+
+/* ── 14. 600–767px: tablet portrait (iPad mini, Galaxy Tab) */
+@media (min-width: 600px) and (max-width: 767px) {
+  .products-grid      { grid-template-columns: repeat(2, 1fr); gap: 18px }
+  .combos-grid        { grid-template-columns: repeat(2, 1fr) }
+  .about__inner       { grid-template-columns: auto 1fr; gap: 36px; align-items: center }
+  .about__image,
+  .about__image-frame { max-width: 280px }
+  .section { padding: 72px 0 }
+}
+
+/* ── 15. 768–1023px: tablet landscape (iPad Air, Surface Go) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root { --cw: 400px }
+  .products-grid  { grid-template-columns: repeat(3, 1fr) }
+  .combos-grid    { grid-template-columns: repeat(2, 1fr) }
+  .about__inner   { gap: 52px }
+  .footer__inner  { grid-template-columns: 1.5fr 1fr 1fr; gap: 32px }
+  .footer__social { grid-column: span 3 }
+  .section { padding: 82px 0 }
+}
+
+/* ── 16. 1280px+: desktop grande */
+@media (min-width: 1280px) {
+  :root { --max: 1280px }
+  .section        { padding: 110px 0 }
+  .section-header { margin-bottom: 64px }
+}
+
+/* ── 17. 1440px+: widescreen (MacBook Pro, Dell 27") */
+@media (min-width: 1440px) {
+  :root { --max: 1360px }
+  .hero__layout .hero__title-big    { font-size: min(10.5rem, 8.5vw) }
+  .hero__layout .hero__title-accent { font-size: min(6.5rem,  5.5vw) }
+  .about__inner   { gap: 100px }
+  .contact__grid  { gap: 72px }
+  .footer__inner  { grid-template-columns: 2fr 1fr 1fr 1fr }
+  .footer__social { grid-column: span 1 }
+  .section { padding: 120px 0 }
+}
+
+/* ── 18. 1920px+: ultra-wide (4K, 2560px, múltiplos monitores) */
+@media (min-width: 1920px) {
+  :root { --max: 1600px }
+  .container { padding-inline: 48px }
+  .hero__layout .hero__title-big    { font-size: 11rem }
+  .hero__layout .hero__title-accent { font-size: 7rem }
+  .section-title  { font-size: 3.8rem }
+  .about__inner   { gap: 120px }
+  .section { padding: 140px 0 }
+}
+
+/* ── 19. Acessibilidade: movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:        .01ms !important;
+    animation-iteration-count: 1    !important;
+    transition-duration:       .01ms !important;
+  }
+  html { scroll-behavior: auto }
+  .hero__bg           { transform: none !important; transition: none !important }
+  .hero__title-accent { animation: none !important; background-position: 0 center }
+  .loader__ring-spin,
+  .loader__ring-spin2 { animation: none !important }
+  .hero__burger-img   { animation: none !important }
+}
+
+/* ── 20. Alto contraste (prefers-contrast: high) */
+@media (prefers-contrast: high) {
+  :root {
+    --gold:           #f5c518;
+    --gold-light:     #ffd700;
+    --gold-border:    rgba(245,197,24,.6);
+    --gold-border-hi: rgba(245,197,24,.9);
+    --cream:          #ffffff;
+    --cream-2:        #f5f5f5;
+    --cream-muted:    #c8c8c8;
+  }
+  .product-card   { box-shadow: 0 0 0 2px var(--gold-border) }
+  .nav-link--auth { border-width: 2px }
+  .btn--outline   { border-width: 2px }
+  .header.scrolled { border-bottom: 2px solid var(--gold) }
+}
+
+/* ── 21. Print */
+@media print {
+  .header, .mobile-nav, .loader, .fab-cart, .toast,
+  .cart-drawer, .cart-overlay, .modal-overlay, .product-modal,
+  #pwaInstallBanner, .hero__scroll-hint { display: none !important }
+  .hero    { min-height: auto; padding: 32px 0; page-break-after: always }
+  .hero__bg, .hero__overlay, .hero__watermark,
+  .hero__glow, .hero__lines { display: none }
+  body     { background: #fff; color: #000 }
+  .section { padding: 24px 0; page-break-inside: avoid }
+}
+
+/* ── 23. Category tabs: sticky top com safe-area
+   Só se aplica em telas ≥769px onde position:sticky está ativo.
+   Em mobile as tabs são position:relative (regra @768px). */
+@media (min-width: 769px) {
+  .category-tabs {
+    top: calc(var(--h) + var(--safe-t) + 8px);
+  }
+}
+
+/* ── 24. Mobile nav: scroll interno em telas pequenas
+   Evita que menu longo fique cortado em iPhones SE / compactos. */
+@media (max-width: 768px) {
+  .mobile-nav {
+    max-height: calc(100vh - var(--h) - var(--safe-t));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  @supports (max-height: 100dvh) {
+    .mobile-nav { max-height: calc(100dvh - var(--h) - var(--safe-t)) }
+  }
+}
+
+/* ── 26. Garante que imagens não causem overflow horizontal */
+@media (max-width: 768px) {
+  .hero__watermark { overflow: hidden }
+  .products-grid, .combos-grid { overflow: hidden }
+}

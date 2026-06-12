@@ -7,7 +7,9 @@
       "Bash(Select-Object Name, PSIsContainer)",
       "Bash(grep -n \"P8\\\\|/\\\\*.*P8\" assets/css/style.css)",
       "Bash(grep -n \"^/\\\\*.*P8\\\\|^   P8\" assets/css/style.css)",
-      "Bash(awk '/^   P8\\\\.|^\\\\/\\\\* ── Responsive P8|^\\\\/\\\\*.*P8/{section=$0; line=NR} /^\\\\.hero__bg|^\\\\.store-closed-banner|^\\\\.hero__img-col|^\\\\.hero__layout|^\\\\.nav-link--auth|^\\\\.header__logo img/{if \\(section\\) print NR\": \" $0 \" \\(in \" section \"\\)\"}' assets/css/style.css)"
+      "Bash(awk '/^   P8\\\\.|^\\\\/\\\\* ── Responsive P8|^\\\\/\\\\*.*P8/{section=$0; line=NR} /^\\\\.hero__bg|^\\\\.store-closed-banner|^\\\\.hero__img-col|^\\\\.hero__layout|^\\\\.nav-link--auth|^\\\\.header__logo img/{if \\(section\\) print NR\": \" $0 \" \\(in \" section \"\\)\"}' assets/css/style.css)",
+      "PowerShell($f1 = \"c:\\\\Users\\\\F15-LuanGs\\\\OneDrive\\\\Anexos\\\\Desktop\\\\Project developer\\\\Marketing\\\\lordsburgerhouse\\\\assets\\\\css\\\\style.css\"; $f2 = \"c:\\\\Users\\\\F15-LuanGs\\\\OneDrive\\\\Anexos\\\\Desktop\\\\Project developer\\\\Marketing\\\\lordsburgerhouse\\\\assets\\\\css\\\\responsive.css\"; \"style.css: $\\(\\(Get-Content $f1 | Measure-Object -Line\\).Lines\\) linhas\"; \"responsive.css: $\\(\\(Get-Content $f2 | Measure-Object -Line\\).Lines\\) linhas\")",
+      "PowerShell($dir = \"c:\\\\Users\\\\F15-LuanGs\\\\OneDrive\\\\Anexos\\\\Desktop\\\\Project developer\\\\Marketing\\\\lordsburgerhouse\"; Get-ChildItem \"$dir\\\\assets\\\\css\\\\\" | Select-Object Name, @{N='KB';E={[math]::Round\\($_.Length/1KB,1\\)}}; $s = \\(Select-String \"@media\" \"$dir\\\\assets\\\\css\\\\style.css\"\\).Count; $r = \\(Select-String \"@media\" \"$dir\\\\assets\\\\css\\\\responsive.css\"\\).Count; Write-Host \"style.css  @media: $s\"; Write-Host \"responsive.css @media: $r\")"
     ]
   }
 }
